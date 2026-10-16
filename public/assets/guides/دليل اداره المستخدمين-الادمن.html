@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>دليل ربط الفرونت إند — إدارة المستخدمين (الزبائن والتجار)</title>
+<style>
+:root{
+  --bg:#F6F5F1; --card:#FFFFFF; --border:#E1DFD6;
+  --text:#2B2A26; --text-muted:#6B6A63;
+  --teal:#0F6E56; --teal-l:#E1F5EE; --teal-d:#04342C;
+  --coral:#D85A30; --coral-l:#FAECE7; --coral-d:#4A1B0C;
+  --purple:#534AB7; --purple-l:#EEEDFE; --purple-d:#26215C;
+  --gray:#5F5E5A; --gray-l:#F1EFE8;
+  --code-bg:#1E1E1B; --code-text:#F1EFE8;
+  --blue:#185FA5; --blue-l:#E6F1FB;
+  --green:#3B6D11; --green-l:#EAF3DE;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.8}
+code,.mono{font-family:"Consolas","Courier New",monospace}
+code[dir="ltr"], .mono{direction:ltr;unicode-bidi:embed;display:inline-block}
+a{color:var(--teal)}
+.layout{display:flex;min-height:100vh}
+nav.side{
+  width:260px;flex:0 0 260px;background:var(--card);border-left:1px solid var(--border);
+  position:sticky;top:0;height:100vh;overflow-y:auto;padding:20px 16px;
+}
+nav.side h4{font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin:20px 0 8px}
+nav.side ul{list-style:none;margin:0;padding:0}
+nav.side li{margin:2px 0}
+nav.side a{display:block;padding:7px 10px;border-radius:8px;color:var(--text);text-decoration:none;font-size:14px}
+nav.side a:hover{background:var(--teal-l);color:var(--teal-d)}
+main{flex:1;padding:36px 48px;max-width:980px}
+.eyebrow{color:var(--teal);font-size:13px;font-weight:bold;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+h1{font-size:30px;margin:0 0 10px}
+.lead{color:var(--text-muted);font-size:16px;max-width:760px}
+h2{font-size:22px;margin-top:48px;border-bottom:2px solid var(--teal-l);padding-bottom:8px}
+h3{font-size:17px;margin-top:26px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin:16px 0}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th,td{padding:10px 12px;text-align:right;border:1px solid var(--border)}
+th{background:var(--teal-l);color:var(--teal-d)}
+tr:nth-child(even){background:#FAFAF7}
+.pill{display:inline-block;font-family:monospace;font-weight:bold;font-size:12px;padding:3px 10px;border-radius:20px;direction:ltr}
+.pill-get{background:var(--blue-l);color:var(--blue)}
+.pill-post{background:var(--teal-l);color:var(--teal-d)}
+.pill-put{background:var(--purple-l);color:var(--purple-d)}
+.pill-delete{background:var(--coral-l);color:var(--coral-d)}
+.route-line{display:flex;align-items:center;gap:10px;margin:14px 0}
+pre{background:var(--code-bg);color:var(--code-text);padding:16px;border-radius:10px;overflow-x:auto;direction:ltr;text-align:left;font-size:13px;line-height:1.6}
+.callout{border-radius:10px;padding:14px 16px;margin:14px 0;font-size:14px}
+.callout.warn{background:var(--coral-l);border:1px solid #EFC3AE;color:var(--coral-d)}
+.callout.tip{background:var(--teal-l);border:1px solid #B7E4D3;color:var(--teal-d)}
+.callout strong{display:block;margin-bottom:4px}
+.badge-endpoint{display:inline-block;margin-top:10px;font-family:monospace;font-size:12px;background:var(--purple-l);color:var(--purple-d);padding:4px 12px;border-radius:20px;direction:ltr}
+/* Flow diagram */
+.flow{display:flex;flex-direction:column;align-items:center;gap:6px;margin:24px 0;position:relative}
+.fbox{background:var(--purple-l);border:1px solid #C9C4EE;color:var(--purple-d);border-radius:10px;padding:10px 18px;font-size:14px;text-align:center;min-width:220px}
+.fbox b{display:block;font-size:14px}
+.fbox span{display:block;font-size:12px;color:var(--purple);margin-top:2px}
+.fbox.gray{background:var(--gray-l);border-color:#D3D1C7;color:var(--gray)}
+.fbox.coral{background:var(--coral-l);border-color:#EFC3AE;color:var(--coral-d)}
+.fbox.teal{background:var(--teal-l);border-color:#B7E4D3;color:var(--teal-d)}
+.arrow{width:2px;height:20px;background:var(--text-muted)}
+.branch{display:flex;gap:24px;justify-content:center;width:100%;margin:6px 0}
+.branch .col{display:flex;flex-direction:column;align-items:center;gap:6px}
+.branch .col .lbl{font-size:12px;color:var(--text-muted);margin-bottom:2px}
+/* Mockups */
+.phone{width:300px;border:8px solid #2B2A26;border-radius:32px;background:var(--card);padding:0;overflow:hidden;margin:16px auto}
+.screen{padding:14px}
+.screen h5{margin:0 0 10px;font-size:15px;text-align:center}
+.row{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding:9px 4px;font-size:13px}
+.row small{display:block;color:var(--text-muted);font-size:11px}
+.status-tag{font-size:11px;padding:2px 8px;border-radius:12px}
+.status-active{background:var(--teal-l);color:var(--teal-d)}
+.status-banned{background:var(--coral-l);color:var(--coral-d)}
+.search-bar{background:var(--gray-l);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--text-muted);margin-bottom:10px}
+/* Modal mockup */
+.modal-wrap{background:#0000001a;border-radius:14px;padding:40px;display:flex;justify-content:center;margin:16px 0}
+.modal{background:var(--card);border-radius:14px;padding:22px;width:340px;box-shadow:0 6px 24px #00000022}
+.modal h5{margin:0 0 8px;font-size:16px}
+.modal p{font-size:13px;color:var(--text-muted);margin:0 0 16px}
+.modal .actions{display:flex;gap:10px;justify-content:flex-end}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;border:1px solid var(--border);cursor:default}
+.btn.danger{background:var(--coral);color:#fff;border-color:var(--coral)}
+.btn.ghost{background:transparent;color:var(--text)}
+/* tree (not used heavily here but part of shared system) */
+footer{margin-top:60px;padding:24px 0;border-top:1px solid var(--border);color:var(--text-muted);font-size:13px;text-align:center}
+ol.tips li{margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="side">
+  <h4>البداية</h4>
+  <ul>
+    <li><a href="#overview">نظرة عامة واختيار الأداة</a></li>
+  </ul>
+  <h4>تصفح المستخدمين</h4>
+  <ul>
+    <li><a href="#ep-index">GET قائمة المستخدمين والإحصائيات</a></li>
+    <li><a href="#ep-show">GET تفاصيل مستخدم</a></li>
+    <li><a href="#ep-orders">GET طلبيات زبون</a></li>
+  </ul>
+  <h4>إدارة الطرف الآخر</h4>
+  <ul>
+    <li><a href="#ep-toggle">POST تفعيل / حظر</a></li>
+    <li><a href="#ep-update">PUT تعديل بيانات</a></li>
+    <li><a href="#ep-destroy">DELETE حذف الحساب</a></li>
+  </ul>
+  <h4>مرجع سريع</h4>
+  <ul>
+    <li><a href="#errors">جدول الأخطاء</a></li>
+    <li><a href="#tips">نصائح عملية</a></li>
+    <li><a href="#backend-note">ملاحظة للباك إند</a></li>
+  </ul>
+</nav>
+<main>
+  <div class="eyebrow">دليل تكامل الفرونت إند</div>
+  <h1>لوحة الأدمن — إدارة المستخدمين (الزبائن والتجار)</h1>
+  <p class="lead">
+    دليل تقني شامل لربط واجهة Angular بمسارات إدارة المستخدمين في الباك إند (Laravel).
+    يغطي كل Route فعلي، شكل الطلب والاستجابة مع الإحصائيات المتفرعة الجديدة للمشترين والتجار، الفخاخ الخفية في الكود، ومخططات توضيحية[cite: 10].
+  </p>
+
+  <h2 id="overview">1. نظرة عامة واختيار الأداة</h2>
+  <div class="card">
+    <table>
+      <tr><th>الميزة</th><th>الأداة المقترحة</th><th>السبب</th></tr>
+      <tr>
+        <td>قائمة المستخدمين + إحصائيات + فلترة</td>
+        <td>Angular — جدول بتبويبات ديناميكية</td>
+        <td>الباك إند أصبح يوفر أعداداً متفرعة (للكل، النشطين، المحظورين) لكل من الزبائن والتجار في استجابة واحدة[cite: 10].</td>
+      </tr>
+      <tr>
+        <td>عرض تفاصيل زبون + سجل طلبياته</td>
+        <td>Angular — شاشة تفصيلية بتبويبين</td>
+        <td>تحتاج جلب مسارين منفصلين (show + orders) وعرضهما معاً دون تشارك كاش[cite: 9].</td>
+      </tr>
+      <tr>
+        <td>تعديل بيانات المستخدم</td>
+        <td>Angular — Reactive Form داخل مودال</td>
+        <td>الباك إند الآن يدعم تعديل بيانات الزبون والتاجر في نفس المسار[cite: 10].</td>
+      </tr>
+      <tr>
+        <td>حظر/تفعيل وحذف الحساب</td>
+        <td>Angular — أزرار إجراء + مودال تأكيد للحذف</td>
+        <td>عملية الحذف حساسة وغير قابلة للتراجع من واجهة الأدمن، فتحتاج تأكيداً صريحاً[cite: 9].</td>
+      </tr>
+    </table>
+  </div>
+
+  <h2 id="ep-index">2. GET /admin/users — قائمة المستخدمين مع الإحصائيات المتفرعة</h2>
+  <div class="card">
+    <div class="route-line"><span class="pill pill-get">GET</span><code dir="ltr">/admin/users?role=all&status=all&search=</code></div>
+    <p>تم تحديث هذا المسار ليدعم جلب كافة الأنواع ويوفر إحصائيات متفرعة جاهزة للتبويبات[cite: 10]:</p>
+    <table>
+      <tr><th>الحقل</th><th>القيم المسموحة</th><th>ملاحظة</th></tr>
+      <tr><td><code dir="ltr">role</code></td><td>all / buyer / seller</td><td>اختياري، الافتراضي all[cite: 10]</td></tr>
+      <tr><td><code dir="ltr">status</code></td><td>all / active / banned</td><td>اختياري، الافتراضي all[cite: 10]</td></tr>
+      <tr><td><code dir="ltr">search</code></td><td>نص حتى 100 حرف</td><td>يبحث في الاسم، البريد، الهاتف، واسم المتجر للتاجر[cite: 10]</td></tr>
+    </table>
+    <h3>استجابة النجاح — 200 (النسخة المحدثة)</h3>
+    <pre>{
+  "success": true,
+  "filters_applied": {
+    "role": "all",
+    "status": "active",
+    "search": null
+  },
+  "counts": {
+    "buyers": {
+      "all": 150,
+      "active": 140,
+      "banned": 10
+    },
+    "sellers": {
+      "all": 45,
+      "active": 40,
+      "banned": 5
+    },
+    "total_users": {
+      "all": 195,
+      "active": 180,
+      "banned": 15
+    }
+  },
+  "data": {
+    "current_page": 1,
+    "data": [ { "id": 12, "role": "buyer", "full_name": "...", "is_active": true } ],
+    "total": 180,
+    "last_page": 12,
+    "per_page": 15
+  }
+}</pre>
+    <div class="callout tip">
+      <strong>توصية تصميم: استخدام كائن counts الجديد</strong>
+      استفد من كائن <code dir="ltr">counts</code> لطباعة الأرقام بداخل التبويبات في الفرونت إند مباشرة. الباك إند يقوم بحساب هذه الأرقام في استعلام واحد مجمع لتحسين الأداء حتى أثناء البحث الفعلي[cite: 10].
+    </div>
+    <div class="callout warn">
+      <strong>فخ: حقل data مضاعف المعنى</strong>
+      الاستجابة تحوي مفتاح <code dir="ltr">data</code> على مستويين مختلفين: المستوى الأول هو كائن الـ Paginator، والمستوى الثاني بداخله هو المصفوفة الفعلية. أي كود يحاول قراءة المصفوفة مباشرة سيفشل — الصحيح هو <code dir="ltr">response.data.data</code>[cite: 9].
+    </div>
+  </div>
+
+  <h2 id="ep-show">3. GET /admin/users/{id} — تفاصيل مستخدم محدد</h2>
+  <div class="card">
+    <div class="route-line"><span class="pill pill-get">GET</span><code dir="ltr">/admin/users/{id}</code></div>
+    <pre>// 200
+{ "success": true, "data": { "id": 12, "role": "buyer", "full_name": "...", "email": "..." } }
+
+// 404
+{ "success": false, "message": "المستخدم المطلوب غير موجود، أو غير مصرح بعرض بياناته." }</pre>
+    <div class="callout warn">
+      <strong>ملاحظة أمنية: هذا المسار يعرض المشترين والتجار</strong>
+      المسار يستثني فقط حسابات الأدمن (<code dir="ltr">role != 'admin'</code>) ويسمح بجلب الزبائن والتجار بشكل متساوٍ[cite: 10].
+    </div>
+  </div>
+
+  <h2 id="ep-orders">4. GET /admin/buyers/{id}/orders — طلبيات الزبون</h2>
+  <div class="card">
+    <div class="route-line"><span class="pill pill-get">GET</span><code dir="ltr">/admin/buyers/{id}/orders</code></div>
+    <pre>{
+  "success": true,
+  "orders": {
+    "current_page": 1,
+    "data": [ { "id": 5, "shop": { "id": 3, "name": "متجر النور" } } ],
+    "total": 4
+  }
+}</pre>
+    <div class="callout warn">
+      <strong>فخ: لا يوجد 404 لمعرف غير موجود</strong>
+      لا يتحقق الكود من وجود الزبون قبل جلب الطلبات[cite: 9, 10]. صمّم شاشة الطلبيات على أساس "حالة فارغة" وليس "حالة خطأ" عند عدم وجود بيانات[cite: 9].
+    </div>
+  </div>
+
+  <h2 id="ep-toggle">5. POST /admin/buyers/{id}/toggle-status</h2>
+  <div class="card">
+    <div class="route-line"><span class="pill pill-post">POST</span><code dir="ltr">/admin/buyers/{id}/toggle-status</code></div>
+    <p>الحالة تُعكس تلقائياً (true↔false) بناءً على القيمة الحالية في قاعدة البيانات[cite: 9, 10].</p>
+    <pre>// 200
+{
+  "success": true,
+  "message": "تم تجميد حساب الزبون وحظره من الدخول إلى التطبيق.",
+  "data": { "id": 12, "is_active": false }
+}</pre>
+    <div class="callout warn">
+      <strong>فخ: تحديث الحالة من الباك إند فقط</strong>
+      يجب على الفرونت الاعتماد على <code dir="ltr">data.is_active</code> القادم من الاستجابة لتحديث الواجهة، وعدم قلب حالة محلية بشكل متفائل لتجنب مشاكل التزامن[cite: 9].
+    </div>
+  </div>
+
+  <h2 id="ep-update">6. PUT /admin/users/{id} — تعديل بيانات الزبون أو التاجر</h2>
+  <div class="card">
+    <div class="route-line"><span class="pill pill-put">PUT</span><code dir="ltr">/admin/users/{id}</code></div>
+    <p>تم تحديث هذا المسار ليتمكن الأدمن من تعديل بيانات المشتري أو التاجر[cite: 10].</p>
+    <pre>// Request body (كل الحقول اختيارية)
+{
+  "full_name": "أحمد علي",
+  "phone_number": "0911234567",
+  "address": null
+}</pre>
+    <table>
+      <tr><th>الحقل</th><th>القاعدة</th></tr>
+      <tr><td>full_name</td><td>نص، حتى 255 حرف[cite: 10]</td></tr>
+      <tr><td>phone_number</td><td>يبدأ بـ 091/092/093/094/095 + 7 أرقام[cite: 10]</td></tr>
+      <tr><td>address</td><td>نص أو null[cite: 10]</td></tr>
+    </table>
+    <div class="callout warn">
+      <strong>فخ: null يمسح الحقل</strong>
+      عدم إرسال المفتاح إطلاقاً يترك القيمة الحالية دون تغيير[cite: 9]. أي بناء الـ payload يجب أن يكون ديناميكياً[cite: 9].
+    </div>
+    <div class="callout tip">
+      <strong>رسالة نجاح ديناميكية</strong>
+      يُرجع المسار رسالة "تم تحديث بيانات الزبون بنجاح" أو "تم تحديث بيانات التاجر بنجاح" بناءً على دور المستخدم <code dir="ltr">role</code> المكتشف[cite: 10].
+    </div>
+  </div>
+
+  <h2 id="ep-destroy">7. DELETE /admin/buyers/{id} — حذف حساب الزبون</h2>
+  <div class="card">
+    <div class="route-line"><span class="pill pill-delete">DELETE</span><code dir="ltr">/admin/buyers/{id}</code></div>
+    <p>عملية متعددة الخطوات ضمن Transaction واحدة — إما تنجح كل الخطوات معاً أو تتراجع كلها[cite: 9, 10].</p>
+
+    <div class="flow">
+      <div class="fbox gray"><b>ضغط الأدمن على حذف</b></div>
+      <div class="arrow"></div>
+      <div class="fbox"><b>بدء Transaction</b></div>
+      <div class="arrow"></div>
+      <div class="fbox"><b>طمس البيانات الشخصية (Anonymization)</b><span>حذف التوكنات وتعديل البريد وتصفير الهاتف[cite: 10]</span></div>
+      <div class="arrow"></div>
+      <div class="fbox teal"><b>الاحتفاظ بالطلبيات القديمة (Orders)</b><span>لحماية الأرباح وتقارير النظام[cite: 10]</span></div>
+    </div>
+
+    <pre>// 200
+{ "success": true, "message": "تم حذف حساب الزبون بنجاح..." }</pre>
+
+    <div class="callout warn">
+      <strong>فخ: الطلبات القديمة لا تُحذف</strong>
+      جداول <code dir="ltr">orders</code> و<code dir="ltr">order_items</code> تبقى كما هي تماماً للحفاظ على تقارير المتاجر المالية[cite: 9, 10].
+    </div>
+  </div>
+
+  <h2>8. الشاشات الرئيسية في Angular</h2>
+  <p>راجع الدليل السابق للحصول على الـ Mockups للجدول والمودال. الفكرة الأساسية الآن هي الاعتماد على تبويبات علوية للأدوار باستخدام إحصائيات <code dir="ltr">counts</code> المرجعة[cite: 10].</p>
+
+  <h2 id="errors">9. جدول ملخص لكل الأخطاء المتوقعة</h2>
+  <div class="card">
+    <table>
+      <tr><th>الكود</th><th>يظهر في</th><th>المعنى</th><th>ماذا يفعل الفرونت</th></tr>
+      <tr><td>400</td><td>index, update</td><td>معاملات رابط غير صالحة، أو لا يوجد حقل صالح للتحديث[cite: 9, 10]</td><td>عرض رسالة تحقق دون إعادة تحميل الصفحة[cite: 9]</td></tr>
+      <tr><td>404</td><td>show, toggleStatus, update, destroy</td><td>المعرّف غير موجود ضمن النطاق المطلوب[cite: 9, 10]</td><td>إعادة توجيه مع تنبيه[cite: 9]</td></tr>
+      <tr><td>422</td><td>update</td><td>فشل قواعد التحقق (Validator)[cite: 9, 10]</td><td>عرض الأخطاء تحت كل حقل مباشرة[cite: 9]</td></tr>
+      <tr><td>500</td><td>كل المسارات</td><td>خطأ خادم أو قاعدة بيانات[cite: 9, 10]</td><td>رسالة عامة وإمكانية إعادة المحاولة[cite: 9]</td></tr>
+    </table>
+  </div>
+
+  <h2 id="tips">10. نصائح عملية لتفادي الاحتكاك مع الباك إند</h2>
+  <div class="card">
+    <ol class="tips">
+      <li>استخدم كائن <code dir="ltr">counts</code> في مسار الـ <code dir="ltr">index</code> لطباعة أعداد المشترين والتجار بجميع حالاتهم بشكل متزامن مع البحث والفلترة[cite: 10].</li>
+      <li>عند قراءة استجابة الـ Pagination اقرأ دائماً من المستوى الداخلي (<code dir="ltr">data.data</code>)[cite: 9].</li>
+      <li>ابنِ الـ payload الخاص بالتعديل ديناميكياً لتفادي مسح الحقول دون قصد[cite: 9].</li>
+      <li>عامل شاشة طلبيات الزبون كحالة قابلة للفراغ (Empty State)[cite: 9].</li>
+    </ol>
+  </div>
+
+  <footer>دليل تكامل داخلي — لوحة الأدمن / إدارة المستخدمين — للاستخدام الداخلي فقط.</footer>
+</main>
+</div>
+</body>
+</html>

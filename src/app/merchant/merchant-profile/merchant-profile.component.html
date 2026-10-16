@@ -1,0 +1,232 @@
+<div class="mprofile-page">
+
+  @if (isLoading()) {
+    <div class="page-loading">
+      <i class="fas fa-circle-notch fa-spin"></i>
+    </div>
+  }
+
+  @if (!isLoading() && store()) {
+
+    <!-- ══ BANNER ══ -->
+    <div class="mprofile-banner">
+      @if (store()!.banner_url) {
+        <img [src]="store()!.banner_url"
+             [alt]="store()!.name"
+             class="banner-img" />
+      } @else {
+        <div class="banner-default"></div>
+      }
+      <div class="banner-overlay"></div>
+
+      <!-- Edit Banner -->
+      <label class="btn-edit-banner" title="تغيير البانر">
+        <i class="fas fa-camera"></i>
+        <span>تغيير البانر</span>
+        <input type="file" accept="image/*" hidden
+               (change)="onBannerChange($event)" />
+      </label>
+    </div>
+
+    <!-- ══ IDENTITY ══ -->
+    <div class="mprofile-identity">
+
+      <!-- Logo -->
+      <div class="mprofile-logo-wrap">
+        <div class="mprofile-logo">
+          @if (store()!.logo_url) {
+            <img [src]="store()!.logo_url"
+                 [alt]="store()!.name" />
+          } @else {
+            <i class="fas fa-store"></i>
+          }
+        </div>
+        <label class="btn-edit-logo" title="تغيير الشعار">
+          <i class="fas fa-camera"></i>
+          <input type="file" accept="image/*" hidden
+                 (change)="onLogoChange($event)" />
+        </label>
+      </div>
+
+      <div class="mprofile-name-section">
+        <div class="mprofile-name-row">
+          <h1>{{ store()!.name }}</h1>
+          <div class="store-status-badge"
+               [class.active]="store()!.is_active">
+            <div class="status-dot"></div>
+            {{ store()!.is_active
+              ? 'مفتوح ويستقبل طلبات'
+              : 'مغلق مؤقتاً' }}
+          </div>
+        </div>
+        <p class="store-desc">{{ store()!.description }}</p>
+        @if (store()!.business_address) {
+          <p class="store-addr">
+            <i class="fas fa-map-marker-alt"></i>
+            {{ store()!.business_address }}
+          </p>
+        }
+      </div>
+
+      <button class="btn-edit-store"
+              (click)="router.navigate([
+                '/merchant/store-settings'])">
+        <i class="fas fa-cog"></i>
+        إعدادات المتجر
+      </button>
+
+    </div>
+
+    <!-- ══ STATS ══ -->
+    <div class="mprofile-stats-row">
+      <div class="mprofile-stat"
+           (click)="router.navigate(['/merchant/products'])">
+        <div class="mstat-icon products">
+          <i class="fas fa-box"></i>
+        </div>
+        <span class="mstat-num">
+          {{ dashData()?.cards?.products_count ?? 0 }}
+        </span>
+        <span class="mstat-lbl">منتج</span>
+      </div>
+      <div class="mprofile-stat">
+        <div class="mstat-icon followers">
+          <i class="fas fa-users"></i>
+        </div>
+        <span class="mstat-num">
+          {{ dashData()?.cards?.followers_count ?? 0 }}
+        </span>
+        <span class="mstat-lbl">متابع</span>
+      </div>
+      <div class="mprofile-stat"
+           (click)="router.navigate(['/merchant/orders'])">
+        <div class="mstat-icon orders">
+          <i class="fas fa-shopping-bag"></i>
+        </div>
+        <span class="mstat-num">
+          {{ dashData()?.cards?.total_orders ?? 0 }}
+        </span>
+        <span class="mstat-lbl">طلب</span>
+      </div>
+      <div class="mprofile-stat">
+        <div class="mstat-icon rating">
+          <i class="fas fa-star"></i>
+        </div>
+        <span class="mstat-num">
+          {{ dashData()?.general_rating?.average ?? '—' }}
+        </span>
+        <span class="mstat-lbl">تقييم</span>
+      </div>
+    </div>
+
+    <!-- ══ ACTIONS LIST ══ -->
+    <div class="mprofile-section">
+      <div class="mprofile-actions-list">
+
+        <button class="maction-row"
+                (click)="router.navigate(['/merchant/products'])">
+          <div class="maction-icon purple">
+            <i class="fas fa-box"></i>
+          </div>
+          <span>منتجاتي</span>
+          <span class="maction-badge">
+            {{ dashData()?.cards?.products_count ?? 0 }}
+          </span>
+          <i class="fas fa-chevron-left maction-arrow"></i>
+        </button>
+
+        <button class="maction-row"
+                (click)="router.navigate(['/merchant/orders'])">
+          <div class="maction-icon orange">
+            <i class="fas fa-shopping-bag"></i>
+          </div>
+          <span>الطلبات</span>
+          <i class="fas fa-chevron-left maction-arrow"></i>
+        </button>
+
+        <button class="maction-row"
+                (click)="router.navigate([
+                  '/merchant/store-settings'])">
+          <div class="maction-icon blue">
+            <i class="fas fa-cog"></i>
+          </div>
+          <span>إعدادات المتجر</span>
+          <i class="fas fa-chevron-left maction-arrow"></i>
+        </button>
+
+        <button class="maction-row"
+                (click)="router.navigate(['/merchant'])">
+          <div class="maction-icon green">
+            <i class="fas fa-chart-bar"></i>
+          </div>
+          <span>الإحصائيات</span>
+          <i class="fas fa-chevron-left maction-arrow"></i>
+        </button>
+
+        @if (store()!.social_links?.instagram ||
+             store()!.social_links?.facebook) {
+          <div class="maction-row social-row">
+            <div class="maction-icon indigo">
+              <i class="fas fa-share-alt"></i>
+            </div>
+            <span>روابط التواصل</span>
+            <div class="social-links-inline">
+              @if (store()!.social_links?.instagram) {
+                <a [href]="store()!.social_links!.instagram"
+                   target="_blank"
+                   class="social-btn instagram">
+                  <i class="fab fa-instagram"></i>
+                </a>
+              }
+              @if (store()!.social_links?.facebook) {
+                <a [href]="store()!.social_links!.facebook"
+                   target="_blank"
+                   class="social-btn facebook">
+                  <i class="fab fa-facebook-f"></i>
+                </a>
+              }
+              @if (store()!.social_links?.whatsapp) {
+                <a [href]="'https://wa.me/' +
+                   store()!.social_links!.whatsapp"
+                   target="_blank"
+                   class="social-btn whatsapp">
+                  <i class="fab fa-whatsapp"></i>
+                </a>
+              }
+            </div>
+          </div>
+        }
+
+        <button class="maction-row"
+                (click)="router.navigate(['/support'])">
+          <div class="maction-icon teal">
+            <i class="fas fa-headset"></i>
+          </div>
+          <span>المساعدة والدعم</span>
+          <i class="fas fa-chevron-left maction-arrow"></i>
+        </button>
+
+        <button class="maction-row"
+                (click)="router.navigate(['/terms'])">
+          <div class="maction-icon gray">
+            <i class="fas fa-file-contract"></i>
+          </div>
+          <span>الشروط والأحكام</span>
+          <i class="fas fa-chevron-left maction-arrow"></i>
+        </button>
+
+        <button class="maction-row danger"
+                (click)="authService.logout()">
+          <div class="maction-icon danger-icon">
+            <i class="fas fa-sign-out-alt"></i>
+          </div>
+          <span>تسجيل الخروج</span>
+          <i class="fas fa-chevron-left maction-arrow"></i>
+        </button>
+
+      </div>
+    </div>
+
+  }
+
+</div>

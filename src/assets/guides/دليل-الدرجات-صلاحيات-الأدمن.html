@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>دليل ربط الفرونت إند بدعم الدرجات — بعد تقييد الصلاحيات للأدمن</title>
+<style>
+:root{
+  --bg:#f6f7f5; --card:#ffffff; --text:#1f2a27; --text-2:#5b655f; --text-mute:#8a938d;
+  --border:#e0e3de; --border-strong:#c7cdc6;
+  --teal:#0f6e56; --teal-l:#e1f5ee; --teal-b:#5dcaa5;
+  --coral:#993c1d; --coral-l:#faece7; --coral-b:#f0997b;
+  --purple:#3c3489; --purple-l:#eeedfe; --purple-b:#7f77dd;
+  --gray:#444441; --gray-l:#f1efe8; --gray-b:#b4b2a9;
+  --amber:#854f0b; --amber-l:#faeeda; --amber-b:#ef9f27;
+  --red:#791f1f; --red-l:#fcebeb; --red-b:#e24b4a;
+  --code-bg:#1e2624; --code-text:#e7f1ec;
+  --radius:10px;
+  font-family:"Segoe UI","Tahoma",sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);line-height:1.75;font-size:15.5px}
+code, .mono{font-family:"Consolas","Courier New",monospace}
+a{color:var(--teal)}
+.layout{display:flex;max-width:1280px;margin:0 auto}
+nav.side{width:250px;flex:0 0 250px;position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;padding:24px 18px;border-left:1px solid var(--border);background:var(--card)}
+nav.side h4{font-size:12px;color:var(--text-mute);text-transform:uppercase;letter-spacing:.04em;margin:22px 0 8px}
+nav.side h4:first-child{margin-top:0}
+nav.side a{display:block;padding:7px 10px;border-radius:8px;color:var(--text-2);text-decoration:none;font-size:14px;margin-bottom:2px}
+nav.side a:hover{background:var(--gray-l);color:var(--text)}
+main{flex:1;min-width:0;padding:36px 44px 80px}
+.eyebrow{color:var(--teal);font-weight:600;font-size:13px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px}
+h1{font-size:30px;margin:0 0 10px;font-weight:600}
+.lead{color:var(--text-2);font-size:16.5px;max-width:760px;margin:0 0 34px}
+h2{font-size:22px;margin:46px 0 14px;padding-top:8px;border-top:1px solid var(--border);font-weight:600}
+h2:first-of-type{border-top:none}
+h3{font-size:17px;margin:24px 0 10px;font-weight:600}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin:16px 0}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px;background:var(--card);border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+th,td{padding:10px 14px;text-align:right;border-bottom:1px solid var(--border);vertical-align:top}
+th{background:var(--teal-l);color:var(--teal);font-weight:600;font-size:13.5px}
+tr:last-child td{border-bottom:none}
+code[dir="ltr"], pre[dir="ltr"]{direction:ltr;text-align:left;display:inline-block}
+pre{background:var(--code-bg);color:var(--code-text);padding:14px 16px;border-radius:8px;overflow-x:auto;font-size:13.5px;margin:10px 0;direction:ltr;text-align:left}
+code.inline{background:var(--gray-l);padding:1px 6px;border-radius:5px;font-size:13.5px}
+.route-line{display:flex;align-items:center;gap:10px;margin:14px 0 4px}
+.pill{display:inline-block;padding:3px 11px;border-radius:20px;font-size:12.5px;font-weight:600;font-family:monospace;direction:ltr}
+.pill-get{background:#e6f1fb;color:#0c447c}
+.pill-post{background:var(--teal-l);color:var(--teal)}
+.pill-put{background:var(--amber-l);color:var(--amber)}
+.pill-delete{background:var(--red-l);color:var(--red)}
+.pill-patch{background:var(--purple-l);color:var(--purple)}
+.route-path{font-family:monospace;font-size:14.5px;direction:ltr}
+.callout{border-radius:10px;padding:14px 18px;margin:14px 0;font-size:14.5px;border:1px solid transparent}
+.callout.warn{background:var(--coral-l);border-color:var(--coral-b);color:var(--coral)}
+.callout.tip{background:var(--teal-l);border-color:var(--teal-b);color:var(--teal)}
+.callout .t-title{font-weight:600;margin-bottom:4px;display:block}
+.badge-endpoint{display:inline-block;margin-top:8px;font-size:12px;font-family:monospace;direction:ltr;background:var(--gray-l);color:var(--text-2);padding:4px 10px;border-radius:6px}
+
+/* flow diagram */
+.flow{display:flex;flex-direction:column;align-items:center;gap:0;margin:20px 0}
+.fbox{width:320px;border-radius:10px;padding:12px 16px;text-align:center;border:1px solid transparent;font-size:14px}
+.fbox .ft{font-weight:600;margin-bottom:3px}
+.fbox .fs{font-size:12.5px;font-family:monospace;direction:ltr;opacity:.85}
+.fbox.purple{background:var(--purple-l);color:var(--purple);border-color:var(--purple-b)}
+.fbox.teal{background:var(--teal-l);color:var(--teal);border-color:var(--teal-b)}
+.fbox.gray{background:var(--gray-l);color:var(--gray);border-color:var(--gray-b)}
+.fbox.coral{background:var(--coral-l);color:var(--coral);border-color:var(--coral-b)}
+.farrow{width:1.5px;height:26px;background:var(--border-strong)}
+.branch{display:flex;align-items:flex-start;gap:24px;justify-content:center;width:100%;margin:6px 0}
+.branch .fbox{width:260px}
+
+/* mockups */
+.phone{width:300px;border:8px solid #20241f;border-radius:34px;background:#0d0f0d;padding:8px;margin:0 auto}
+.screen{background:#fff;border-radius:24px;overflow:hidden;min-height:480px;font-size:13.5px;color:#1f2a27}
+.screen .topbar{background:var(--teal);color:#fff;padding:14px 16px;font-weight:600}
+.screen .body{padding:14px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #eee}
+.swatch-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.swatch{width:34px;height:34px;border-radius:50%;border:2px solid #ddd;display:flex;align-items:center;justify-content:center;font-size:10px}
+.swatch.sel{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal-l)}
+.btn-cart{width:100%;text-align:center;padding:11px;border-radius:8px;font-weight:600;margin-top:12px}
+.btn-cart.off{background:#e7e7e2;color:#a3a89f}
+.btn-cart.on{background:var(--teal);color:#fff}
+
+.tree{max-width:520px}
+.tnode{border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin:6px 0;background:#fff;display:flex;justify-content:space-between;align-items:center}
+.tnode .actions{display:flex;gap:6px}
+.tbtn{font-size:12px;padding:3px 9px;border-radius:6px;cursor:default}
+.tbtn.edit{background:var(--purple-l);color:var(--purple)}
+.tbtn.del{background:var(--red-l);color:var(--red)}
+.tbtn.add{background:var(--teal);color:#fff}
+
+.modal-wrap{background:#00000055;border-radius:12px;padding:40px 20px;display:flex;align-items:center;justify-content:center}
+.modal{background:#fff;border-radius:12px;width:100%;max-width:340px;padding:18px 20px;box-shadow:0 8px 24px #0002}
+.modal h4{margin:0 0 12px;font-size:15px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12.5px;color:var(--text-2);margin-bottom:4px}
+.field select, .field input{width:100%;padding:8px 10px;border:1px solid var(--border-strong);border-radius:7px;font-size:13.5px;background:#fafaf8;color:#888}
+footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--border);color:var(--text-mute);font-size:13px}
+@media (max-width:900px){nav.side{display:none}main{padding:24px}}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="side">
+  <h4>تصفح المشتري</h4>
+  <a href="#buyer-pdp">صفحة المنتج والدرجات</a>
+  <a href="#buyer-cart">السلة والطلب</a>
+
+  <h4>إدارة الطرف الآخر</h4>
+  <a href="#admin-shades">الأدمن — إدارة كاملة</a>
+  <a href="#seller-shades">التاجر — قراءة فقط</a>
+  <a href="#link-image">ربط الدرجة بصورة منتج</a>
+  <a href="#flow">مخطط دورة الحياة</a>
+  <a href="#mockups">نماذج الشاشات</a>
+
+  <h4>مرجع سريع</h4>
+  <a href="#errors">جدول الأخطاء</a>
+  <a href="#tips">نصائح عملية</a>
+  <a href="#backend-note">ملاحظة للباك إند</a>
+</nav>
+
+<main>
+  <div class="eyebrow">توثيق فرونت إند</div>
+  <h1>دعم الدرجات (Shades) — بعد تقييد الصلاحيات للأدمن فقط</h1>
+  <p class="lead">
+    هذا الدليل محدَّث بناءً على مسارات <code class="inline">admin.php</code> و<code class="inline">Seller.php</code> الفعلية:
+    إدارة كتالوج الدرجات (إضافة/تعديل/حذف) أصبحت حصراً عند الأدمن، والتاجر أصبح بوضع
+    قراءة فقط. الشرح موجّه لفريقي Flutter (تطبيق المشتري وتطبيق التاجر على الهاتف) وAngular
+    (لوحة تحكم الأدمن ولوحة التاجر على الويب).
+  </p>
+
+  <div class="callout warn">
+    <span class="t-title">لا يوجد كود فعلي كامل غير مسارات الـ Controllers</span>
+    وصلني ملفا المسارات فقط (بدون أجسام الدوال داخل الـ Controllers نفسها)، إضافة لتوثيق
+    API سابق. بنيت هذا الدليل على تقاطع الاثنين. أي فحص صلاحية إضافي داخل جسم الدالة
+    (مثال: تحقق ملكية دقيق) غير مضمون هنا ويحتاج تأكيد من الباك إند.
+  </div>
+
+  <h2 id="overview">نظرة عامة واختيار الأداة</h2>
+  <table>
+    <tr><th>الميزة</th><th>الأداة المناسبة</th><th>السبب</th></tr>
+    <tr><td>لوحة الأدمن — جدول الدرجات + إضافة/تعديل/حذف</td><td>Angular</td><td>جدول بيانات + مودالات CRUD متكررة، مناسب للوحات التحكم أكثر من التصفح المتسلسل</td></tr>
+    <tr><td>لوحة التاجر ويب — اختيار درجة عند رفع صورة منتج</td><td>Angular</td><td>جزء من نموذج إدارة منتج أكبر (فورم متعدد الحقول)، الأنسب لبيئة اللوحة الحالية</td></tr>
+    <tr><td>تطبيق التاجر على الهاتف — نفس الاختيار</td><td>Flutter</td><td>يوجد مسار مستقل <code class="inline" dir="ltr">/store/phone/dashboard</code> يؤكد وجود تطبيق موبايل منفصل للتاجر</td></tr>
+    <tr><td>صفحة المنتج للمشتري — اختيار الدرجة قبل الإضافة للسلة</td><td>Flutter</td><td>تجربة تصفح وشراء متسلسلة، تفاعل لمسي مباشر مع الصور والسلة</td></tr>
+  </table>
+
+  <h2 id="buyer-pdp">تصفح المشتري — صفحة المنتج</h2>
+  <div class="route-line"><span class="pill pill-get">GET</span><span class="route-path">/api/Buyer/products/{slug}</span></div>
+  <p>الاستجابة تتضمن <code class="inline" dir="ltr">data.shades[]</code> عند وجود درجات. كل درجة تحمل صورها الخاصة داخل <code class="inline" dir="ltr">shades[].images</code>.</p>
+  <pre dir="ltr">{
+  "data": {
+    "id": "product-uuid",
+    "shades": [
+      { "id": "shade-uuid-1", "name": "الدرجة الفاتحة",
+        "images": [{ "id": "image-uuid", "image_url": "...", "is_primary": true }] }
+    ],
+    "colors": [], "sizes": []
+  }
+}</pre>
+  <div class="callout warn">
+    <span class="t-title">لا يجوز إرسال color_id وshade_id معاً</span>
+    نفس عنصر السلة أو نفس الصورة لا يقبل الاثنين معاً. إن كان المنتج يتطلب اختياراً،
+    يجب تعطيل زر "إضافة للسلة" حتى يتم الاختيار، والصورة المعروضة تتحدث تلقائياً حسب
+    الدرجة/اللون المختار.
+  </div>
+
+  <h2 id="buyer-cart">السلة والطلب</h2>
+  <div class="route-line"><span class="pill pill-post">POST</span><span class="route-path">/api/cart/items</span></div>
+  <pre dir="ltr">{ "product_id": "...", "quantity": 1, "shade_id": "shade-uuid", "size_id": "size-uuid" }</pre>
+  <div class="route-line"><span class="pill pill-put">PUT</span><span class="route-path">/api/cart/items/{cartItemId}</span></div>
+  <div class="route-line"><span class="pill pill-get">GET</span><span class="route-path">/api/cart</span></div>
+  <p>كل عنصر يحمل <code class="inline" dir="ltr">shade_id</code>, <code class="inline" dir="ltr">shade_name</code>, و<code class="inline" dir="ltr">is_shade_valid</code>. نفس المنتج بمقاس واحد لكن بدرجتين مختلفتين يظهر كعنصرين منفصلين في السلة.</p>
+  <div class="callout warn">
+    <span class="t-title">is_shade_valid صار أهم مما كان</span>
+    بما أن حذف الدرجة أصبح بيد الأدمن فقط، وهي عملية على الكتالوج المركزي المشترك بين
+    كل المتاجر، حذف درجة واحدة قد يُبطل عناصر سلة في متاجر متعددة دفعة واحدة. تأكد أن
+    شاشة السلة تتعامل بوضوح مع <code class="inline" dir="ltr">is_shade_valid: false</code>
+    (تعطيل الشراء + رسالة "الدرجة لم تعد متوفرة") بدل تجاهل الحقل.
+  </div>
+  <div class="route-line"><span class="pill pill-post">POST</span><span class="route-path">/api/orders/store</span></div>
+  <p>الدرجة تنتقل تلقائياً من عنصر السلة لعنصر الطلب — لا حاجة لإرسالها مجدداً. داخل <code class="inline" dir="ltr">invoice.items[]</code> تظهر كحقل <code class="inline" dir="ltr">shade</code> نصي.</p>
+
+  <h2 id="admin-shades">الأدمن — إدارة كاملة للدرجات</h2>
+  <p>مجموعة مسارات <code class="inline" dir="ltr">AdminShadeController</code> تحت بادئة <code class="inline" dir="ltr">/api/admin/shades</code> (تتطلب <code class="inline" dir="ltr">auth:sanctum</code> + Middleware <code class="inline" dir="ltr">IsAdmin</code>):</p>
+  <table>
+    <tr><th>الميثود</th><th>المسار</th><th>الوصف</th></tr>
+    <tr><td><span class="pill pill-get">GET</span></td><td class="mono" dir="ltr">/admin/shades</td><td>قائمة كل الدرجات في الكتالوج المركزي</td></tr>
+    <tr><td><span class="pill pill-post">POST</span></td><td class="mono" dir="ltr">/admin/shades/store</td><td>إنشاء درجة جديدة</td></tr>
+    <tr><td><span class="pill pill-get">GET</span></td><td class="mono" dir="ltr">/admin/shades/{id}/show</td><td>تفاصيل درجة محددة</td></tr>
+    <tr><td><span class="pill pill-put">PUT</span></td><td class="mono" dir="ltr">/admin/shades/{id}/update</td><td>تعديل درجة</td></tr>
+    <tr><td><span class="pill pill-delete">DELETE</span></td><td class="mono" dir="ltr">/admin/shades/{id}/delete</td><td>حذف درجة</td></tr>
+  </table>
+  <div class="callout tip">
+    <span class="t-title">نفس النمط في الألوان والمقاسات</span>
+    <code class="inline" dir="ltr">/admin/colors</code> و<code class="inline" dir="ltr">/admin/sizes</code> يتبعان نفس بنية المسارات الخمسة تماماً.
+    يمكن للوحة الأدمن في Angular بناء مكوّن CRUD عام واحد (جدول + مودال إضافة/تعديل)
+    وإعادة استخدامه لثلاث شاشات (درجات/ألوان/مقاسات) بدل بناء ثلاث شاشات منفصلة.
+  </div>
+
+  <h2 id="seller-shades">التاجر — قراءة فقط</h2>
+  <p>مسارات <code class="inline" dir="ltr">SellerShadeController</code> تحت <code class="inline" dir="ltr">/api/store/shades</code>:</p>
+  <table>
+    <tr><th>الميثود</th><th>المسار</th><th>الوصف</th></tr>
+    <tr><td><span class="pill pill-get">GET</span></td><td class="mono" dir="ltr">/store/shades</td><td>قائمة الدرجات (نفس كتالوج الأدمن، بدون تصفية حسب المتجر)</td></tr>
+    <tr><td><span class="pill pill-get">GET</span></td><td class="mono" dir="ltr">/store/shades/{id}</td><td>تفاصيل درجة واحدة</td></tr>
+  </table>
+  <div class="callout warn">
+    <span class="t-title">لا يوجد store/update/delete للتاجر — والخطأ 404 وليس 403</span>
+    هذا ليس فحص صلاحية يرجع خطأ "غير مصرح" — المسارات نفسها غير معرّفة أصلاً في
+    <code class="inline" dir="ltr">Seller.php</code>. لو حاول الفرونت إند إرسال POST/PUT/DELETE
+    لهذا المسار (مثلاً كود قديم قبل التحديث) سيرجع 404 Not Found، وليس 403 Forbidden.
+    لا تبني منطق معالجة الخطأ على افتراض 403 لهذه الحالة تحديداً.
+  </div>
+  <div class="callout tip">
+    <span class="t-title">تصميم الشاشة</span>
+    بما أن الاختيار للتاجر Read-only، اعرض الدرجات كقائمة اختيار (Select/Autocomplete)
+    فقط بدون أي زر "إضافة درجة جديدة" داخل شاشة التاجر. إن احتاج التاجر درجة غير
+    موجودة، هذا يحتاج تواصل خارج النظام مع الأدمن حالياً — لا مسار لطلبها من داخل التطبيق.
+  </div>
+
+  <h2 id="link-image">ربط الدرجة بصورة منتج (التاجر ما زال يفعل هذا)</h2>
+  <div class="route-line"><span class="pill pill-post">POST</span><span class="route-path">/api/store/products/{id}/images</span></div>
+  <p>القراءة فقط لا تعني اختفاء الدرجات من شاشة التاجر بالكامل: التاجر ما زال يربط
+  <code class="inline" dir="ltr">shade_id</code> موجود مسبقاً بصورة منتج عند الرفع — هو فقط لا يستطيع
+  إنشاء درجة جديدة لم تكن موجودة بالكتالوج.</p>
+  <pre dir="ltr">images[0][file]     = image-file
+images[0][shade_id] = shade-uuid   // من قائمة GET /store/shades فقط</pre>
+  <div class="callout warn">
+    <span class="t-title">فخ محتمل بمسار مكرر — راجع مع الباك إند</span>
+    داخل مجموعة <code class="inline" dir="ltr">prefix('/products')</code> يوجد سطر:
+    <code class="inline" dir="ltr">Route::post('/products/{id}/general-images', ...)</code>
+    — بما أنه بالفعل داخل بادئة <code class="inline" dir="ltr">/products</code>، فالمسار الفعلي الناتج هو
+    <code class="inline" dir="ltr">/store/products/products/{id}/general-images</code> (كلمة products مكررة).
+    قبل استخدام هذا المسار في الفرونت إند تأكد من الباك إند إن كان هذا مقصوداً أو خطأ كتابي.
+  </div>
+
+  <h2 id="flow">مخطط دورة حياة الدرجة</h2>
+  <div class="flow">
+    <div class="fbox purple"><div class="ft">الأدمن</div><div class="fs">إدارة كاملة CRUD /admin/shades</div></div>
+    <div class="farrow"></div>
+    <div class="fbox teal"><div class="ft">التاجر يقرأ القائمة</div><div class="fs">GET /store/shades</div></div>
+    <div class="branch">
+      <div>
+        <div class="farrow" style="margin:0 auto"></div>
+        <div class="fbox teal"><div class="ft">ربط الدرجة بصورة منتج</div><div class="fs">POST products/{id}/images</div></div>
+      </div>
+      <div>
+        <div class="farrow" style="margin:0 auto"></div>
+        <div class="fbox coral"><div class="ft">محاولة إضافة/تعديل/حذف</div><div class="fs">404 لا يوجد مسار</div></div>
+      </div>
+    </div>
+    <div class="farrow"></div>
+    <div class="fbox gray"><div class="ft">المشتري</div><div class="fs">يشوف الدرجات في صفحة المنتج</div></div>
+    <div class="farrow"></div>
+    <div class="fbox gray"><div class="ft">اختيار الدرجة</div><div class="fs">زر الإضافة للسلة يتفعّل</div></div>
+    <div class="farrow"></div>
+    <div class="fbox gray"><div class="ft">السلة ثم الطلب</div><div class="fs">shade_id يترحّل تلقائياً</div></div>
+  </div>
+
+  <h2 id="mockups">نماذج الشاشات</h2>
+
+  <h3>شاشة الأدمن — Angular</h3>
+  <div class="tree">
+    <div class="tnode"><span>الدرجة الفاتحة</span><span class="actions"><span class="tbtn edit">تعديل</span><span class="tbtn del">حذف</span></span></div>
+    <div class="tnode"><span>الدرجة الغامقة</span><span class="actions"><span class="tbtn edit">تعديل</span><span class="tbtn del">حذف</span></span></div>
+    <div class="tnode"><span>درجة الوردي الفاتح</span><span class="actions"><span class="tbtn edit">تعديل</span><span class="tbtn del">حذف</span></span></div>
+    <div style="text-align:left;margin-top:10px"><span class="tbtn add">+ إضافة درجة</span></div>
+  </div>
+  <span class="badge-endpoint">GET /admin/shades · POST /admin/shades/store · PUT .../update · DELETE .../delete</span>
+  <p>أزرار "تعديل" و"حذف" تظهر فقط في هذه الشاشة (لوحة الأدمن). قبل تنفيذ الحذف فعلياً،
+  يفضَّل عرض تحذير أن الحذف يؤثر على كل المتاجر التي تستخدم هذه الدرجة حالياً (انظر
+  ملاحظة <code class="inline" dir="ltr">is_shade_valid</code> أعلاه).</p>
+
+  <h3>شاشة التاجر — رفع صورة منتج (اختيار درجة، بدون إدارة)</h3>
+  <div class="modal-wrap">
+    <div class="modal">
+      <h4>رفع صورة للمنتج</h4>
+      <div class="field"><label>الصورة</label><input type="text" value="product-photo.jpg" disabled></div>
+      <div class="field"><label>الدرجة (اختياري)</label><select disabled><option>— اختر من القائمة —</option><option>الدرجة الفاتحة</option><option>الدرجة الغامقة</option></select></div>
+      <div class="btn-cart on" style="width:auto;display:inline-block;padding:8px 20px">حفظ</div>
+    </div>
+  </div>
+  <span class="badge-endpoint">GET /store/shades → تعبئة القائمة · POST /store/products/{id}/images → الحفظ</span>
+  <p>القائمة المنسدلة للدرجة هنا للاختيار فقط، لا يوجد زر "إضافة درجة جديدة" بجانبها —
+  هذا الفرق البصري هو ما يميز شاشة التاجر عن شاشة الأدمن.</p>
+
+  <h3>شاشة المشتري — صفحة المنتج (Flutter)</h3>
+  <div class="phone">
+    <div class="screen">
+      <div class="topbar">تفاصيل المنتج</div>
+      <div class="body">
+        <div style="height:150px;background:#f1efe8;border-radius:10px;margin-bottom:10px"></div>
+        <div style="font-weight:600;margin-bottom:6px">اسم المنتج</div>
+        <div style="color:#5b655f;font-size:12.5px;margin-bottom:4px">اختر الدرجة</div>
+        <div class="swatch-row">
+          <div class="swatch sel">فاتح</div>
+          <div class="swatch">غامق</div>
+          <div class="swatch">وردي</div>
+        </div>
+        <div class="btn-cart on">أضف للسلة</div>
+      </div>
+    </div>
+  </div>
+  <span class="badge-endpoint">GET /Buyer/products/{slug} → shades[] · POST /cart/items → shade_id</span>
+  <p>بما أن التاجر اختار درجة سابقاً عند رفع الصورة، زر "أضف للسلة" هنا يتفعّل بمجرد
+  اختيار المشتري لدرجة — نفس منطق التعطيل الموضّح في قسم صفحة المنتج أعلاه.</p>
+
+  <h2 id="errors">جدول ملخص الأخطاء المتوقعة</h2>
+  <table>
+    <tr><th>الكود</th><th>يظهر في</th><th>المعنى</th><th>ماذا يفعل الفرونت</th></tr>
+    <tr><td>404</td><td>POST/PUT/DELETE على /store/shades من التاجر</td><td>المسار غير موجود أصلاً، ليس رفض صلاحية</td><td>لا تعرض هذه الأزرار للتاجر أصلاً — لا تعتمد على استجابة السيرفر لإخفائها</td></tr>
+    <tr><td>422</td><td>POST /cart/items بلون ودرجة معاً</td><td>خرق قاعدة "لا يجوز إرسال الاثنين"</td><td>امنع الحالة من الفرونت قبل الإرسال: راديو واحد فقط بين لون/درجة</td></tr>
+    <tr><td>is_shade_valid: false</td><td>GET /cart</td><td>الدرجة حُذفت من الكتالوج المركزي بعد إضافتها للسلة</td><td>عطّل العنصر واعرض رسالة "الدرجة لم تعد متوفرة"، امنع المتابعة للدفع</td></tr>
+    <tr><td>زر الإضافة معطل</td><td>صفحة المنتج</td><td>المنتج يملك درجات/ألوان ولم يُختر أي منها بعد</td><td>لا ترسل الطلب، فعّل الزر فقط بعد اختيار قيمة صالحة</td></tr>
+  </table>
+
+  <h2 id="tips">نصائح عملية لتفادي الاحتكاك مع الباك إند</h2>
+  <div class="card">
+    <ol>
+      <li>لا تبني أي زر إضافة/تعديل/حذف درجة داخل شاشات التاجر — هذه المسارات غير موجودة له إطلاقاً، الإخفاء يجب أن يكون من الفرونت لا انتظار خطأ من السيرفر.</li>
+      <li>وحّد مكوّن "قراءة فقط" الواحد بين الدرجات والألوان والمقاسات عند التاجر، فالثلاثة تتبع نفس بنية <code class="inline" dir="ltr">index</code> / <code class="inline" dir="ltr">show</code> فقط.</li>
+      <li>عند بناء لوحة الأدمن، وحّد مكوّن CRUD واحد قابل لإعادة الاستخدام للدرجات/الألوان/المقاسات لتطابق بنية المسارات الخمس المتماثلة.</li>
+      <li>تحقق دائماً من <code class="inline" dir="ltr">is_shade_valid</code> في استجابة السلة قبل السماح بإتمام الطلب.</li>
+      <li>امنع إرسال <code class="inline" dir="ltr">color_id</code> و<code class="inline" dir="ltr">shade_id</code> معاً من واجهة الإدخال نفسها (راديو مشترك) بدل الاعتماد على رفض السيرفر.</li>
+    </ol>
+  </div>
+
+  <h2 id="backend-note">ملاحظة مقترحة لفريق الباك إند</h2>
+  <div class="callout warn">
+    <span class="t-title">مسار general-images مكرر البادئة</span>
+    في <code class="inline" dir="ltr">Seller.php</code>، السطر
+    <code class="inline" dir="ltr">Route::post('/products/{id}/general-images', ...)</code>
+    معرّف داخل <code class="inline" dir="ltr">prefix('/products')</code> أصلاً، فينتج مسار
+    <code class="inline" dir="ltr">/store/products/products/{id}/general-images</code>. الرجاء التأكيد
+    إن كان مقصوداً أو تصحيحه لـ <code class="inline" dir="ltr">/store/products/{id}/general-images</code>
+    قبل اعتماد الفرونت إند عليه رسمياً.
+  </div>
+  <div class="callout warn">
+    <span class="t-title">حذف درجة مركزية بلا فحص استخدام</span>
+    بما أن <code class="inline" dir="ltr">DELETE /admin/shades/{id}/delete</code> يحذف من كتالوج
+    مشترك بين كل المتاجر، يُقترح فحص استخدام الدرجة الحالي (سلات مفتوحة، منتجات منشورة)
+    قبل الحذف الفعلي، أو اعتماد حذف ناعم (Soft Delete) بدل الحذف النهائي.
+  </div>
+
+  <footer>دليل داخلي لفريق الفرونت إند — مبني على مسارات admin.php وSeller.php وتوثيق API الحالي لدعم الدرجات.</footer>
+</main>
+</div>
+</body>
+</html>

@@ -31,14 +31,73 @@ export const routes: Routes = [
           .then(c => c.CartComponent)
       },
       {
+        path: 'wishlist',
+        loadComponent: () => import('./features/wishlist/wishlist.component').then(c => c.WishlistComponent)
+      },
+      {
+        path: 'notifications',
+        loadComponent: () => import('./features/notifications/notifications.component').then(c => c.NotificationsComponent)
+      },
+      {
+        // بروفايل عام لأي مشتري آخر — مختلف تماماً عن /profile (الخاص بالمستخدم الحالي)
+        path: 'buyers/:buyerId',
+        loadComponent: () => import('./features/buyer-profile/buyer-profile.component')
+          .then(c => c.BuyerProfileComponent)
+      },
+      {
         path: 'products',
         loadComponent: () => import('./features/products/products-list/products-list.component')
           .then(c => c.ProductsListComponent)
       },
       {
+        path: 'stores',
+        loadComponent: () => import('./features/stores/stores.component').then(c => c.StoresComponent)
+      },
+      {
         path: 'stores/:id',
         loadComponent: () => import('./features/stores/store-profile/store-profile.component')
           .then(c => c.StoreProfileComponent)
+      },
+      {
+        path: 'become-merchant',
+        loadComponent: () => import(
+          './features/merchant-upgrade/merchant-upgrade.component'
+        ).then(c => c.MerchantUpgradeComponent)
+      },
+      {
+        path: 'orders',
+        canActivate: [authGuard],
+        loadComponent: () => import('./features/orders/orders.component')
+          .then(c => c.OrdersComponent)
+      },
+      {
+        path: 'orders/:id',
+        canActivate: [authGuard],
+        loadComponent: () => import('./features/orders/order-details/order-details.component')
+          .then(c => c.OrderDetailsComponent)
+      },
+      {
+        path: 'checkout/:shopId',
+        canActivate: [authGuard],
+        loadComponent: () => import('./features/checkout/checkout.component')
+          .then(c => c.CheckoutComponent)
+      },
+      {
+        path: 'terms',
+        loadComponent: () => import(
+          './features/terms/terms.component'
+        ).then(c => c.TermsComponent)
+      },
+      {
+        path: 'support',
+        loadComponent: () => import(
+          './features/support/support.component'
+        ).then(c => c.SupportComponent)
+      },
+      {
+        path: 'faq',
+        redirectTo: 'support',
+        pathMatch: 'full'
       }
     ]
   },
@@ -52,14 +111,43 @@ export const routes: Routes = [
         loadComponent: () => import('./auth/login/login.component').then(c => c.LoginComponent)
       },
       {
+        path: 'admin-login',
+        loadComponent: () => import('./auth/admin-login/admin-login.component')
+          .then(c => c.AdminLoginComponent)
+      },
+      {
         path: 'register',
         canActivate: [guestGuard],
         loadComponent: () => import('./auth/register/register.component').then(c => c.RegisterComponent)
       },
       {
         path: 'merchant-apply',
-        canActivate: [guestGuard],
         loadComponent: () => import('./auth/merchant-apply/merchant-apply.component').then(c => c.MerchantApplyComponent)
+      },
+      {
+        path: 'verify-otp',
+        loadComponent: () => import('./auth/verify-otp/verify-otp.component')
+          .then(c => c.VerifyOtpComponent)
+      },
+      {
+        path: 'interests',
+        loadComponent: () => import('./auth/interests/interests.component')
+          .then(c => c.InterestsComponent)
+      },
+      {
+        path: 'forgot-password',
+        loadComponent: () => import('./auth/forgot-password/forgot-password.component')
+          .then(c => c.ForgotPasswordComponent)
+      },
+      {
+        path: 'reset-password',
+        loadComponent: () => import('./auth/reset-password/reset-password.component')
+          .then(c => c.ResetPasswordComponent)
+      },
+      {
+        path: 'change-password',
+        loadComponent: () => import('./auth/change-password/change-password.component')
+          .then(c => c.ChangePasswordComponent)
       }
     ]
   },
@@ -77,12 +165,33 @@ export const routes: Routes = [
         loadComponent: () => import('./merchant/products/products.component').then(c => c.ProductsComponent)
       },
       {
-        path: 'orders', 
+        path: 'products/create',
+        loadComponent: () => import('./merchant/products/create-product/create-product.component').then(c => c.CreateProductComponent)
+      },
+      {
+        path: 'products/edit/:id',
+        loadComponent: () => import('./merchant/products/edit-product/edit-product.component').then(c => c.EditProductComponent)
+      },
+      {
+        path: 'orders',
         loadComponent: () => import('./merchant/orders/orders.component').then(c => c.OrdersComponent)
       },
       {
+        path: 'orders/:id',
+        loadComponent: () => import('./merchant/orders/order-detail/order-detail.component').then(c => c.OrderDetailComponent)
+      },
+
+      {
         path: 'store-settings',
         loadComponent: () => import('./merchant/store-settings/store-settings.component').then(c => c.StoreSettingsComponent)
+      },
+      {
+        path: 'profile',
+        loadComponent: () => import('./merchant/merchant-profile/merchant-profile.component').then(c => c.MerchantProfileComponent)
+      },
+      {
+        path: 'notifications',
+        loadComponent: () => import('./merchant/notifications/merchant-notifications.component').then(c => c.MerchantNotificationsComponent)
       }
     ]
   },
@@ -94,6 +203,10 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () => import('./admin/dashboard/admin-dashboard.component').then(c => c.AdminDashboardComponent)
+      },
+      {
+        path: 'products',
+        loadComponent: () => import('./admin/products/admin-products.component').then(c => c.AdminProductsComponent)
       },
       {
         path: 'applications',
@@ -118,7 +231,32 @@ export const routes: Routes = [
       {
         path: 'admins',
         loadComponent: () => import('./admin/admins/admins.component').then(c => c.AdminsComponent)
+      },
+      {
+        path: 'shops',
+        loadComponent: () => import('./admin/shops/shops.component').then(c => c.ShopsComponent)
+      },
+      {
+        path: 'shades',
+        loadComponent: () => import('./admin/shades/shades.component').then(c => c.ShadesComponent)
+      },
+      {
+        path: 'colors',
+        loadComponent: () => import('./admin/colors/colors.component').then(c => c.ColorsComponent)
+      },
+      {
+        path: 'sizes',
+        loadComponent: () => import('./admin/sizes/sizes.component').then(c => c.SizesComponent)
+      },
+      {
+        path: 'ads',
+        loadComponent: () => import('./admin/ads/ads.component').then(c => c.AdsComponent)
+      },
+      {
+        path: 'notifications',
+        loadComponent: () => import('./admin/send-notification/send-notification.component').then(c => c.SendNotificationComponent)
       }
+
     ]
   },
   {

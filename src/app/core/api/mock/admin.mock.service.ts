@@ -15,25 +15,25 @@ export class AdminMockService {
   });
 
   users = signal<AdminUser[]>([
-    { id: 1, name: 'أحمد محمد علي', email: 'ahmed@test.com',
+    { id: 1, name: 'Void Cat ', email: 'void@test.com',
       role: 'buyer', status: 'active', 
       joinDate: '2024-01-15', ordersCount: 12 },
-    { id: 2, name: 'فاطمة خالد', email: 'fatma@test.com',
+    { id: 2, name: 'Casa', email: 'casa@test.com',
       role: 'buyer', status: 'active',
       joinDate: '2024-01-20', ordersCount: 5 },
-    { id: 3, name: 'خالد سالم', email: 'khaled@test.com',
+    { id: 3, name: 'Golm', email: 'golm@test.com',
       role: 'buyer', status: 'banned',
       joinDate: '2024-02-01', ordersCount: 0 },
-    { id: 4, name: 'تاجر تجريبي', email: 'merchant@test.com',
+    { id: 4, name: 'Hex', email: 'merchant@test.com',
       role: 'merchant', status: 'active',
       joinDate: '2024-01-01', ordersCount: 0 },
-    { id: 5, name: 'نور الهدى', email: 'nour@test.com',
+    { id: 5, name: 'Fox', email: 'nour@test.com',
       role: 'merchant', status: 'active',
       joinDate: '2024-02-10', ordersCount: 0 }
   ]);
 
   applications = signal<AdminApplication[]>([
-    { id: 1, userId: 10, ownerName: 'سالم محمد',
+    { id: 1, userId: 10, ownerName: 'سارة ناجي',
       businessName: 'متجر العسل الليبي',
       description: 'متخصصون في العسل الجبلي الطبيعي',
       categories: ['الأطعمة والمأكولات'],

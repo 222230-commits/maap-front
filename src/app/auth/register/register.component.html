@@ -1,49 +1,188 @@
-<div class="flex flex-col gap-4 p-4 max-w-md mx-auto mt-10 border rounded shadow-sm bg-white">
-  <h2 class="text-2xl font-bold mb-4">تسجيل حساب جديد</h2>
-  
-  @if (error) {
-    <div class="text-red-500 mb-2 font-medium">{{ error }}</div>
-  }
+<div class="auth-page">
 
-  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
-    <div class="flex flex-col gap-1">
-      <label class="font-medium text-gray-700">الاسم الكامل</label>
-      <input type="text" formControlName="name" class="border p-2 rounded focus:outline-none focus:border-primary">
-      @if (registerForm.get('name')?.touched && registerForm.get('name')?.invalid) {
-        <span class="error-message">هذا الحقل مطلوب (3 أحرف على الأقل)</span>
-      }
+  <div class="auth-hero">
+    <div class="auth-hero-content">
+      <div class="auth-logo">
+        <img src="assets/logo.png" alt="مأب"
+             onerror="this.style.display='none';
+             this.nextElementSibling.style.display='block'" />
+        <span style="display:none">مأب</span>
+      </div>
+      <h2>انضم لمجتمع مأب</h2>
+      <p>تسوّق من أفضل المتاجر الليبية وانضم لآلاف العملاء على منصتنا.</p>
+      <div class="auth-hero-features">
+        <div class="hero-feature">
+          <i class="fas fa-user-plus"></i>
+          <span>تسجيل مجاني وسريع</span>
+        </div>
+        <div class="hero-feature">
+          <i class="fas fa-shield-alt"></i>
+          <span>بياناتك في أمان تام</span>
+        </div>
+        <div class="hero-feature">
+          <i class="fas fa-store"></i>
+          <span>اكتشف متاجر محلية مميزة</span>
+        </div>
+      </div>
     </div>
-
-    <div class="flex flex-col gap-1">
-      <label class="font-medium text-gray-700">البريد الإلكتروني</label>
-      <input type="email" formControlName="email" class="border p-2 rounded focus:outline-none focus:border-primary">
-      @if (registerForm.get('email')?.touched && registerForm.get('email')?.invalid) {
-        <span class="error-message">البريد الإلكتروني غير صحيح</span>
-      }
-    </div>
-    
-    <div class="flex flex-col gap-1">
-      <label class="font-medium text-gray-700">كلمة المرور</label>
-      <input type="password" formControlName="password" class="border p-2 rounded focus:outline-none focus:border-primary">
-      @if (registerForm.get('password')?.touched && registerForm.get('password')?.invalid) {
-        <span class="error-message">كلمة المرور مطلوبة (6 أحرف على الأقل)</span>
-      }
-    </div>
-
-    <div class="flex flex-col gap-1">
-      <label class="font-medium text-gray-700">تأكيد كلمة المرور</label>
-      <input type="password" formControlName="confirmPassword" class="border p-2 rounded focus:outline-none focus:border-primary">
-      @if (registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.invalid) {
-        <span class="error-message">تأكيد كلمة المرور مطلوب</span>
-      }
-    </div>
-    
-    <button type="submit" [disabled]="registerForm.invalid" class="bg-primary text-white p-2 rounded disabled:opacity-50 mt-2">
-      تسجيل
-    </button>
-  </form>
-
-  <div class="mt-4 text-sm">
-    <a routerLink="/auth/login" class="text-primary hover:underline">لدي حساب بالفعل؟ دخول</a>
   </div>
+
+  <div class="auth-form-side">
+    <div class="auth-form-container">
+
+      <div class="form-header">
+        <h1>إنشاء حساب جديد</h1>
+        <p>أدخل بياناتك لإنشاء حسابك</p>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="form-alert error">
+          <i class="fas fa-exclamation-circle"></i>
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="reg-name">الاسم الكامل *</label>
+            <div class="input-wrapper">
+              <i class="fas fa-user input-icon"></i>
+              <input type="text" id="reg-name"
+                     formControlName="full_name"
+                     placeholder="الاسم الكامل (اسمين)" />
+            </div>
+            @if (registerForm.get('full_name')?.touched &&
+                 registerForm.get('full_name')?.invalid) {
+              <span class="field-error">يجب إدخال اسمين على الأقل</span>
+            }
+          </div>
+          <div class="form-field">
+            <label for="reg-username">اسم المستخدم *</label>
+            <div class="input-wrapper">
+              <i class="fas fa-at input-icon"></i>
+              <input type="text" id="reg-username"
+                     formControlName="username"
+                     placeholder="username"
+                     dir="ltr" />
+            </div>
+            @if (registerForm.get('username')?.touched &&
+                 registerForm.get('username')?.invalid) {
+              <span class="field-error">3 أحرف على الأقل</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="reg-email">البريد الإلكتروني *</label>
+          <div class="input-wrapper">
+            <i class="fas fa-envelope input-icon"></i>
+            <input type="email" id="reg-email"
+                   formControlName="email"
+                   placeholder="example@gmail.com"
+                   dir="ltr" />
+          </div>
+          @if (registerForm.get('email')?.touched &&
+               registerForm.get('email')?.invalid) {
+            <span class="field-error">أدخل بريداً إلكترونياً صحيحاً</span>
+          }
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="reg-phone">رقم الهاتف *</label>
+            <div class="input-wrapper">
+              <i class="fas fa-phone input-icon"></i>
+              <input type="tel" id="reg-phone"
+                     formControlName="phone_number"
+                     placeholder="091XXXXXXX"
+                     dir="ltr" />
+            </div>
+            @if (registerForm.get('phone_number')?.touched &&
+                 registerForm.get('phone_number')?.invalid) {
+              <span class="field-error">رقم ليبي يبدأ بـ 091 أو 092</span>
+            }
+          </div>
+          <div class="form-field">
+            <label for="reg-city">المدينة *</label>
+            <div class="input-wrapper">
+              <i class="fas fa-map-marker-alt input-icon"></i>
+              <select id="reg-city" formControlName="address" class="select-input">
+                <option value="">اختر مدينتك</option>
+                <option value="طرابلس">طرابلس</option>
+                <option value="بنغازي">بنغازي</option>
+                <option value="مصراتة">مصراتة</option>
+                <option value="سبها">سبها</option>
+                <option value="صبراتة">صبراتة</option>
+                <option value="الخمس">الخمس</option>
+                <option value="الجبل الغربي">الجبل الغربي</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="reg-pass">كلمة المرور *</label>
+            <div class="input-wrapper">
+              <i class="fas fa-lock input-icon"></i>
+              <input [type]="showPassword() ? 'text' : 'password'"
+                     id="reg-pass"
+                     formControlName="password"
+                     placeholder="••••••••"
+                     dir="ltr" />
+              <button type="button" class="toggle-pw"
+                      (click)="showPassword.update(v => !v)">
+                <i [class]="showPassword() ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+              </button>
+            </div>
+            @if (registerForm.get('password')?.touched &&
+                 registerForm.get('password')?.invalid) {
+              <span class="field-error">8 أحرف على الأقل</span>
+            }
+          </div>
+          <div class="form-field">
+            <label for="reg-confirm">تأكيد كلمة المرور *</label>
+            <div class="input-wrapper">
+              <i class="fas fa-lock input-icon"></i>
+              <input [type]="showPassword() ? 'text' : 'password'"
+                     id="reg-confirm"
+                     formControlName="password_confirmation"
+                     placeholder="••••••••"
+                     dir="ltr" />
+            </div>
+            @if (registerForm.get('password_confirmation')?.touched &&
+                 registerForm.hasError('mismatch')) {
+              <span class="field-error">كلمتا المرور غير متطابقتين</span>
+            }
+          </div>
+        </div>
+
+        <div class="otp-note">
+          <i class="fas fa-info-circle"></i>
+          سيتم إرسال رمز تحقق إلى بريدك الإلكتروني لتفعيل حسابك
+        </div>
+
+        <button type="submit" class="btn-submit"
+                [disabled]="isLoading() || registerForm.invalid">
+          @if (isLoading()) {
+            <i class="fas fa-spinner fa-spin"></i>
+            جاري التسجيل...
+          } @else {
+            <i class="fas fa-user-plus"></i>
+            إنشاء الحساب
+          }
+        </button>
+
+      </form>
+
+      <div class="form-footer">
+        <span>لديك حساب بالفعل؟</span>
+        <a routerLink="/auth/login">تسجيل الدخول</a>
+      </div>
+
+    </div>
+  </div>
+
 </div>

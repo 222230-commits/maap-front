@@ -1,66 +1,122 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { AdminMockService, AdminApplication } from '@core/api/mock/admin.mock.service';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { AdminService, Application } from '../../core/services/admin.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
-  selector: 'app-admin-applications',
-  imports: [CommonModule, FormsModule],
-  templateUrl: './applications.component.html',
+  selector: 'app-applications',  templateUrl: './applications.component.html',
   styleUrl: './applications.component.scss'
 })
-export class ApplicationsComponent {
-  public adminService = inject(AdminMockService);
-  private router = inject(Router);
+export class ApplicationsComponent implements OnInit {
+  private adminService = inject(AdminService);
+  private authService = inject(AuthService);
 
-  activeTab = signal<'pending'|'approved'|'rejected'>('pending');
-  selectedApp = signal<AdminApplication | null>(null);
+  isLoading = signal(true);
+  isActing = signal(false);
+  error = signal('');
+  activeTab = signal<'all'|'pending'|'approved'|'rejected'>('pending');
+  applications = signal<Application[]>([]);
+  selectedApp = signal<Application | null>(null);
   showDetailModal = signal(false);
-  adminNote = signal('');
   showRejectForm = signal(false);
+  rejectionReason = signal('');
+  adminNotes = signal('');
+  actionSuccess = signal('');
+  actionError = signal('');
 
-  currentApps = computed(() => {
-    const apps = this.adminService.applications();
-    if (this.activeTab() === 'pending') return apps.filter(a => a.status === 'pending');
-    if (this.activeTab() === 'approved') return apps.filter(a => a.status === 'approved');
-    return apps.filter(a => a.status === 'rejected');
-  });
-
-  pendingCount = computed(() => this.adminService.applications().filter(a => a.status === 'pending').length);
-  approvedCount = computed(() => this.adminService.applications().filter(a => a.status === 'approved').length);
-  rejectedCount = computed(() => this.adminService.applications().filter(a => a.status === 'rejected').length);
-
-  openDetail(app: AdminApplication) {
-    this.selectedApp.set(app);
-    this.adminNote.set(app.adminNote || '');
-    this.showDetailModal.set(true);
+  ngOnInit(): void {
+    this.loadApplications();
   }
 
-  closeDetail() {
-    this.showDetailModal.set(false);
+  loadApplications(): void {
+    this.isLoading.set(true);
+    this.error.set('');
+    this.adminService.getApplications(this.activeTab()).subscribe({
+      next: (res) => {
+        this.applications.set(res.data.data);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.error.set('فشل تحميل الطلبات');
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  changeTab(tab: 'all'|'pending'|'approved'|'rejected'): void {
+    this.activeTab.set(tab);
+    this.loadApplications();
+  }
+
+  openDetail(app: Application): void {
+    this.selectedApp.set(app);
+    this.showDetailModal.set(true);
     this.showRejectForm.set(false);
-    this.adminNote.set('');
+    this.actionSuccess.set('');
+    this.actionError.set('');
+  }
+
+  closeDetail(): void {
+    this.showDetailModal.set(false);
     this.selectedApp.set(null);
   }
 
-  updateAdminNote(val: string) {
-    this.adminNote.set(val);
+  approve(): void {
+    if (!this.selectedApp()) return;
+    this.isActing.set(true);
+    this.adminService.approveApplication(this.selectedApp()!.id).subscribe({
+      next: (res) => {
+        this.actionSuccess.set('تمت الموافقة بنجاح!');
+        this.isActing.set(false);
+        this.authService.refreshUser();
+        this.loadApplications();
+        setTimeout(() => this.closeDetail(), 1500);
+      },
+      error: (err) => {
+        this.actionError.set(err?.error?.message || 'فشلت عملية الموافقة');
+        this.isActing.set(false);
+      }
+    });
   }
 
-  approve() {
-    const app = this.selectedApp();
-    if (app) {
-      this.adminService.approveApplication(app.id, this.adminNote());
-      this.closeDetail();
-    }
+  reject(): void {
+    if (!this.selectedApp() || !this.rejectionReason()) return;
+    this.isActing.set(true);
+    this.adminService.rejectApplication(
+      this.selectedApp()!.id,
+      this.rejectionReason(),
+      this.adminNotes()
+    ).subscribe({
+      next: () => {
+        this.actionSuccess.set('تم الرفض بنجاح');
+        this.isActing.set(false);
+        this.loadApplications();
+        setTimeout(() => this.closeDetail(), 1500);
+      },
+      error: (err) => {
+        this.actionError.set(err?.error?.message || 'فشلت عملية الرفض');
+        this.isActing.set(false);
+      }
+    });
   }
 
-  reject() {
-    const app = this.selectedApp();
-    if (app) {
-      this.adminService.rejectApplication(app.id, this.adminNote());
-      this.closeDetail();
-    }
+  updateRejectionReason(v: string): void {
+    this.rejectionReason.set(v);
+  }
+
+  updateAdminNotes(v: string): void {
+    this.adminNotes.set(v);
+  }
+
+  formatDate(date: string | null | undefined): string {
+    if (!date) return '—';
+    const d = new Date(date);
+    return isNaN(d.getTime()) ? '—' : d.toLocaleDateString('ar-LY');
+  }
+
+  getStatusLabel(status: string): string {
+    const map: Record<string, string> = {
+      pending: 'معلق', approved: 'موافق', rejected: 'مرفوض'
+    };
+    return map[status] ?? status;
   }
 }

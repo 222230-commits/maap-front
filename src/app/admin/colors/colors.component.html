@@ -1,0 +1,195 @@
+<div class="space-y-6">
+
+  <!-- Header -->
+  <div class="bg-white dark:bg-darkest rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm p-6 flex justify-between items-center gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">الألوان (Colors)</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">إدارة كتالوج الألوان المركزي — مشترك بين كل المتاجر</p>
+    </div>
+    <button (click)="openCreate()"
+            class="px-5 py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-bold rounded-lg transition-colors shadow-sm flex items-center gap-2">
+      <i class="fas fa-plus"></i> إضافة لون
+    </button>
+  </div>
+
+  <!-- Success alert -->
+  @if (successMsg()) {
+    <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 rounded-xl px-5 py-3 flex items-center gap-3 text-sm font-bold">
+      <i class="fas fa-check-circle"></i> {{ successMsg() }}
+    </div>
+  }
+
+  <!-- Warning -->
+  <div class="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-xl px-5 py-3 flex items-start gap-3 text-sm text-amber-800 dark:text-amber-300">
+    <i class="fas fa-triangle-exclamation mt-0.5"></i>
+    <span>حذف لون من هنا يؤثر على <strong>كل المتاجر والمنتجات</strong> التي تستخدمه. استخدم الحذف بحذر.</span>
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading()) {
+    <div class="bg-white dark:bg-darkest rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm p-16 flex flex-col items-center justify-center text-gray-500">
+      <i class="fas fa-circle-notch fa-spin text-4xl text-primary mb-4"></i>
+      <p>جاري تحميل الألوان...</p>
+    </div>
+  }
+
+  <!-- Colors Grid -->
+  @if (!isLoading() && colors().length > 0) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      @for (color of colors(); track color.id) {
+        <div class="bg-white dark:bg-darkest rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm p-5 flex items-center justify-between gap-3 hover:shadow-md hover:border-primary/30 transition-all">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-full border-2 border-gray-200 dark:border-gray-700 shrink-0"
+                 [style.background-color]="color.hex_code || '#ccc'"></div>
+            <span class="font-bold text-gray-900 dark:text-white truncate">{{ color.name }}</span>
+          </div>
+          <div class="flex gap-2 shrink-0">
+            <button (click)="openEdit(color)"
+                    class="w-8 h-8 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 flex items-center justify-center transition-colors"
+                    title="تعديل">
+              <i class="fas fa-pen text-xs"></i>
+            </button>
+            <button (click)="openDelete(color)"
+                    class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 text-red-500 dark:text-red-400 flex items-center justify-center transition-colors"
+                    title="حذف">
+              <i class="fas fa-trash text-xs"></i>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading() && colors().length === 0) {
+    <div class="bg-white dark:bg-darkest rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm p-16 flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+      <div class="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center text-5xl mb-6 text-primary">
+        <i class="fas fa-swatchbook"></i>
+      </div>
+      <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">لا توجد ألوان</h3>
+      <p class="mb-6">أضف أول لون للكتالوج المركزي.</p>
+      <button (click)="openCreate()"
+              class="px-5 py-2.5 bg-primary text-white font-bold rounded-lg flex items-center gap-2">
+        <i class="fas fa-plus"></i> إضافة لون
+      </button>
+    </div>
+  }
+
+</div>
+
+@if (showCreateModal()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div class="bg-white dark:bg-darkest w-full max-w-sm rounded-2xl shadow-2xl flex flex-col">
+      <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+        <h2 class="text-lg font-bold text-gray-900 dark:text-white">إضافة لون جديد</h2>
+        <button (click)="showCreateModal.set(false)" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        @if (actionError()) {
+          <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-2 text-sm">
+            <i class="fas fa-exclamation-circle me-1"></i> {{ actionError() }}
+          </div>
+        }
+        <div>
+          <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">اسم اللون</label>
+          <input type="text" [ngModel]="newName()" (ngModelChange)="newName.set($event)"
+                 placeholder="مثال: أحمر"
+                 class="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+        </div>
+        <div>
+          <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">كود اللون (اختياري)</label>
+          <div class="flex gap-3 items-center">
+            <input type="color" [ngModel]="newHex()" (ngModelChange)="newHex.set($event)"
+                   class="w-10 h-10 rounded-lg border border-gray-200 cursor-pointer p-0.5">
+            <input type="text" [ngModel]="newHex()" (ngModelChange)="newHex.set($event)"
+                   placeholder="#FF0000"
+                   class="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-mono text-sm">
+          </div>
+        </div>
+      </div>
+      <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/30 rounded-b-2xl flex gap-3">
+        <button (click)="showCreateModal.set(false)" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-darkest hover:bg-gray-50 transition-colors">إلغاء</button>
+        <button (click)="saveCreate()" [disabled]="!newName().trim() || isSaving()"
+                class="flex-1 px-4 py-2 rounded-lg text-sm font-bold text-white bg-primary hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+          @if (isSaving()) { <i class="fas fa-spinner fa-spin"></i> } حفظ
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showEditModal() && selectedColor()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div class="bg-white dark:bg-darkest w-full max-w-sm rounded-2xl shadow-2xl flex flex-col">
+      <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+        <h2 class="text-lg font-bold text-gray-900 dark:text-white">تعديل اللون</h2>
+        <button (click)="showEditModal.set(false)" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        @if (actionError()) {
+          <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-2 text-sm">
+            <i class="fas fa-exclamation-circle me-1"></i> {{ actionError() }}
+          </div>
+        }
+        <div>
+          <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">اسم اللون</label>
+          <input type="text" [ngModel]="editName()" (ngModelChange)="editName.set($event)"
+                 class="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+        </div>
+        <div>
+          <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">كود اللون</label>
+          <div class="flex gap-3 items-center">
+            <input type="color" [ngModel]="editHex()" (ngModelChange)="editHex.set($event)"
+                   class="w-10 h-10 rounded-lg border border-gray-200 cursor-pointer p-0.5">
+            <input type="text" [ngModel]="editHex()" (ngModelChange)="editHex.set($event)"
+                   class="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-mono text-sm">
+          </div>
+        </div>
+      </div>
+      <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/30 rounded-b-2xl flex gap-3">
+        <button (click)="showEditModal.set(false)" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-darkest hover:bg-gray-50 transition-colors">إلغاء</button>
+        <button (click)="saveEdit()" [disabled]="!editName().trim() || isSaving()"
+                class="flex-1 px-4 py-2 rounded-lg text-sm font-bold text-white bg-primary hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+          @if (isSaving()) { <i class="fas fa-spinner fa-spin"></i> } حفظ التعديلات
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showDeleteModal() && selectedColor()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div class="bg-white dark:bg-darkest w-full max-w-sm rounded-2xl shadow-2xl flex flex-col">
+      <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center text-red-600 dark:text-red-400 shrink-0">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h2 class="text-lg font-bold text-gray-900 dark:text-white">حذف اللون</h2>
+      </div>
+      <div class="p-6">
+        @if (actionError()) {
+          <div class="mb-4 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-2 text-sm">
+            <i class="fas fa-exclamation-circle me-1"></i> {{ actionError() }}
+          </div>
+        }
+        <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+          سيتم حذف اللون <strong class="text-gray-900 dark:text-white">"{{ selectedColor()?.name }}"</strong>
+          من الكتالوج المركزي وفك ارتباطه من كل المنتجات في كل المتاجر.
+          <br><br>
+          <span class="text-red-600 font-bold">هذا الإجراء لا يمكن التراجع عنه.</span>
+        </p>
+      </div>
+      <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/30 rounded-b-2xl flex gap-3">
+        <button (click)="showDeleteModal.set(false)" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-darkest hover:bg-gray-50 transition-colors">إلغاء</button>
+        <button (click)="confirmDelete()" [disabled]="isDeleting()"
+                class="flex-1 px-4 py-2 rounded-lg text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+          @if (isDeleting()) { <i class="fas fa-spinner fa-spin"></i> } حذف نهائي
+        </button>
+      </div>
+    </div>
+  </div>
+}

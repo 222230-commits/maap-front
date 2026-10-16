@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>دليل بروفايل مشتري معين — للفرونت إند</title>
+<style>
+  :root{
+    --bg:#F7F6F2;
+    --card-bg:#FFFFFF;
+    --border:#E4E2D8;
+    --border-strong:#CFCDC0;
+    --text-primary:#242320;
+    --text-secondary:#5F5E58;
+    --text-muted:#8B897F;
+    --teal:#0F6E56;
+    --teal-light:#E1F5EE;
+    --teal-border:#9FE1CB;
+    --teal-dark:#085041;
+    --coral:#993C1D;
+    --coral-light:#FAECE7;
+    --coral-border:#F0997B;
+    --coral-dark:#4A1B0C;
+    --purple:#534AB7;
+    --purple-light:#EEEDFE;
+    --purple-border:#AFA9EC;
+    --gray-fill:#F1EFE8;
+    --gray-border:#D3D1C7;
+    --blue:#185FA5;
+    --blue-light:#E6F1FB;
+    --code-bg:#242320;
+    --code-text:#F1EFE8;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text-primary);
+    font-family:"Segoe UI",Tahoma,Arial,sans-serif;
+    line-height:1.8;
+    display:flex;
+    min-height:100vh;
+  }
+  code, .mono{
+    font-family:"Consolas","Courier New",monospace;
+    direction:ltr;
+    unicode-bidi:embed;
+  }
+  a{color:var(--teal);}
+
+  nav.side{
+    position:sticky;
+    top:0;
+    align-self:flex-start;
+    width:250px;
+    min-width:250px;
+    height:100vh;
+    overflow-y:auto;
+    background:var(--card-bg);
+    border-left:1px solid var(--border);
+    padding:24px 18px;
+  }
+  nav.side .brand{
+    font-size:14px;
+    font-weight:700;
+    color:var(--teal-dark);
+    margin-bottom:24px;
+  }
+  nav.side .grp-title{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    color:var(--text-muted);
+    margin:20px 0 8px;
+  }
+  nav.side a{
+    display:block;
+    font-size:13.5px;
+    color:var(--text-secondary);
+    text-decoration:none;
+    padding:6px 8px;
+    border-radius:6px;
+    margin-bottom:2px;
+  }
+  nav.side a:hover{background:var(--teal-light);color:var(--teal-dark);}
+
+  main{flex:1;padding:36px 48px 80px;max-width:980px;}
+  .eyebrow{
+    font-size:12px;
+    font-weight:700;
+    color:var(--teal);
+    text-transform:uppercase;
+    letter-spacing:.6px;
+    margin-bottom:8px;
+  }
+  h1{font-size:30px;margin:0 0 10px;}
+  header p.desc{color:var(--text-secondary);font-size:15.5px;max-width:760px;}
+  header{margin-bottom:36px;padding-bottom:24px;border-bottom:1px solid var(--border);}
+
+  h2{
+    font-size:21px;
+    margin:44px 0 14px;
+    padding-top:8px;
+    scroll-margin-top:20px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  h3{font-size:16px;margin:22px 0 8px;}
+
+  .card{
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:20px 24px;
+    margin-bottom:18px;
+  }
+
+  table{width:100%;border-collapse:collapse;margin:12px 0 20px;font-size:13.5px;}
+  th,td{border:1px solid var(--border);padding:9px 12px;text-align:right;vertical-align:top;}
+  th{background:var(--teal-light);color:var(--teal-dark);font-weight:700;}
+  tr:nth-child(even) td{background:#FBFAF7;}
+
+  .badge-row{display:flex;align-items:center;gap:10px;margin:10px 0 14px;}
+  .pill{
+    font-family:"Consolas","Courier New",monospace;
+    direction:ltr;
+    font-size:12.5px;
+    font-weight:700;
+    padding:4px 10px;
+    border-radius:999px;
+  }
+  .pill-get{background:var(--blue-light);color:var(--blue);}
+  .pill-post{background:var(--teal-light);color:var(--teal-dark);}
+  .pill-delete{background:var(--coral-light);color:var(--coral);}
+  .path{font-family:"Consolas","Courier New",monospace;direction:ltr;font-size:13.5px;color:var(--text-primary);}
+
+  pre{
+    background:var(--code-bg);
+    color:var(--code-text);
+    padding:14px 16px;
+    border-radius:8px;
+    overflow-x:auto;
+    direction:ltr;
+    text-align:left;
+    font-size:12.8px;
+    font-family:"Consolas","Courier New",monospace;
+    margin:8px 0 16px;
+  }
+  .code-label{font-size:12px;color:var(--text-muted);margin:14px 0 -4px;font-weight:700;}
+
+  .callout{
+    border-radius:8px;
+    padding:12px 16px;
+    margin:12px 0;
+    font-size:13.8px;
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+  }
+  .callout .ic{font-weight:700;font-size:15px;flex-shrink:0;}
+  .callout.warn{background:var(--coral-light);border:1px solid var(--coral-border);color:var(--coral-dark);}
+  .callout.warn .ic{color:var(--coral);}
+  .callout.tip{background:var(--teal-light);border:1px solid var(--teal-border);color:var(--teal-dark);}
+  .callout.tip .ic{color:var(--teal);}
+
+  .flow{display:flex;flex-direction:column;align-items:center;gap:4px;margin:24px 0;padding:24px 10px;background:#FBFAF7;border:1px dashed var(--border-strong);border-radius:12px;}
+  .fbox{
+    border-radius:10px;
+    padding:10px 18px;
+    text-align:center;
+    font-size:13.5px;
+    min-width:220px;
+    border:1px solid;
+  }
+  .fbox .t1{font-weight:700;margin-bottom:2px;}
+  .fbox .t2{font-size:12px;font-family:"Consolas","Courier New",monospace;direction:ltr;opacity:.85;}
+  .fbox.api{background:var(--purple-light);border-color:var(--purple-border);color:#26215C;}
+  .fbox.decision{background:var(--gray-fill);border-color:var(--gray-border);color:var(--text-primary);border-radius:999px;}
+  .fbox.ok{background:var(--teal-light);border-color:var(--teal-border);color:var(--teal-dark);}
+  .fbox.err{background:var(--coral-light);border-color:var(--coral-border);color:var(--coral-dark);}
+  .arrow-down{font-size:18px;color:var(--text-muted);}
+  .branch{display:flex;gap:40px;align-items:flex-start;justify-content:center;width:100%;}
+  .branch .col{display:flex;flex-direction:column;align-items:center;gap:4px;}
+  .branch .label{font-size:11.5px;color:var(--text-muted);font-weight:700;}
+
+  .mockup-row{display:flex;gap:26px;flex-wrap:wrap;justify-content:center;margin:20px 0 6px;}
+  .phone{
+    width:250px;
+    background:#EFEDE4;
+    border-radius:26px;
+    padding:14px;
+    border:1px solid var(--border-strong);
+  }
+  .screen{
+    background:#FFFFFF;
+    border-radius:16px;
+    padding:14px;
+    min-height:260px;
+  }
+  .screen .stitle{font-size:13.5px;font-weight:700;margin-bottom:2px;}
+  .screen .ssub{font-size:11px;color:var(--text-muted);margin-bottom:10px;font-family:"Consolas","Courier New",monospace;direction:ltr;}
+  .row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+  .avatar-circle{
+    width:44px;height:44px;border-radius:50%;background:var(--blue-light);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--blue);
+  }
+  .stat-box{background:var(--gray-fill);border-radius:8px;padding:8px;text-align:center;}
+  .stat-box .n{font-size:16px;font-weight:700;}
+  .stat-box .l{font-size:10px;color:var(--text-muted);}
+  .lockbox{
+    background:var(--gray-fill);
+    border:1px dashed var(--border-strong);
+    border-radius:8px;
+    padding:10px;
+    font-size:11.5px;
+    color:var(--text-muted);
+    text-align:center;
+    margin-top:10px;
+  }
+  .badge-endpoint{
+    display:inline-block;
+    margin-top:10px;
+    font-family:"Consolas","Courier New",monospace;
+    direction:ltr;
+    font-size:11px;
+    background:var(--purple-light);
+    color:#26215C;
+    padding:4px 10px;
+    border-radius:999px;
+    text-align:center;
+  }
+  .mockup-col{display:flex;flex-direction:column;align-items:center;}
+
+  footer{
+    margin-top:60px;
+    padding-top:20px;
+    border-top:1px solid var(--border);
+    font-size:12.5px;
+    color:var(--text-muted);
+    text-align:center;
+  }
+
+  .num-list{padding-right:20px;}
+  .num-list li{margin-bottom:10px;font-size:14px;}
+
+  @media(max-width:900px){
+    nav.side{display:none;}
+    main{padding:24px;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="side">
+  <div class="brand">دليل بروفايل مشتري معين</div>
+
+  <div class="grp-title">البروفايل العام</div>
+  <a href="#overview">نظرة عامة واختيار الأداة</a>
+  <a href="#profile">جلب بروفايل مشتري معين</a>
+  <a href="#privacy">لماذا لا يظهر الهاتف والبريد؟</a>
+
+  <div class="grp-title">المتاجر المتابَعة</div>
+  <a href="#followed-shops">قائمة المتاجر المتابَعة</a>
+  <a href="#flow">مخطط التدفق</a>
+  <a href="#mockups">نماذج الشاشات</a>
+
+  <div class="grp-title">مرجع سريع</div>
+  <a href="#errors">جدول كل الأخطاء</a>
+  <a href="#tips">نصائح عملية</a>
+  <a href="#backend-note">ملاحظة لفريق الباك إند</a>
+</nav>
+
+<main>
+  <header>
+    <div class="eyebrow">توثيق فرونت إند</div>
+    <h1>دليل بروفايل مشتري معين</h1>
+    <p class="desc">
+      شرح كامل لمساري عرض البروفايل العام لأي مشتري آخر، وقائمة المتاجر التي يتابعها،
+      مع توضيح مفصّل لسبب عدم ظهور رقم الهاتف والبريد الإلكتروني في هذا البروفايل تحديداً.
+    </p>
+  </header>
+
+  <h2 id="overview">نظرة عامة واختيار الأداة</h2>
+  <table>
+    <tr><th>الميزة</th><th>الأداة المقترحة</th><th>السبب</th></tr>
+    <tr>
+      <td>عرض بطاقة بروفايل مشتري آخر (اسم، صورة، إحصائيات)</td>
+      <td>Flutter</td>
+      <td>بطاقة عرض واحدة بسيطة داخل تطبيق الموبايل، لا تحتاج جداول أو مودالات إدارية</td>
+    </tr>
+    <tr>
+      <td>قائمة المتاجر المتابَعة لمشترٍ معين (Scroll + Pagination)</td>
+      <td>Flutter</td>
+      <td>قائمة قابلة للتمرير التدريجي (per_page) تناسب تجربة الموبايل المتسلسلة</td>
+    </tr>
+  </table>
+  <div class="callout tip">
+    <span class="ic">i</span>
+    <span>كلا المسارين هنا لعرض بيانات مستخدم آخر (Public View)، وليسا لتعديل بيانات — لذلك لا حاجة
+    لأي نموذج إدخال أو لوحة تحكم؛ Flutter وحده يكفي لهذه الشاشات.</span>
+  </div>
+
+  <h2 id="profile">جلب بروفايل مشتري معين (Public Profile)</h2>
+  <div class="badge-row">
+    <span class="pill pill-get">GET</span>
+    <span class="path">/Buyer/profile/{buyer}</span>
+  </div>
+  <p>
+    <code>{buyer}</code> هو معرّف (ID) أي مستخدم في النظام — وليس بالضرورة المستخدم الحالي المسجّل
+    دخوله. يُستخدم هذا المسار لعرض بروفايل <b>مستخدم آخر</b> (مثلاً عند الضغط على اسم كاتب تعليق في
+    شاشة التقييمات، أو عند عرض من يتابع متجراً معيناً).
+  </p>
+
+  <div class="code-label">مثال الاستجابة — 200</div>
+  <pre>{
+  "message": "تم جلب البروفايل العام للمشتري بنجاح.",
+  "data": {
+    "personal_info": {
+      "id": "uuid",
+      "full_name": "مها أحمد",
+      "avatar_url": "https://...",
+      "joined_at": "2024-03-10"
+    },
+    "statistics": {
+      "total_orders": 32,
+      "total_reviews_written": 9,
+      "followed_shops_count": 5
+    }
+  }
+}</pre>
+
+  <div class="code-label">استجابة الخطأ — 403 (محاولة عرض بروفايل حساب إدارة)</div>
+  <pre>{
+  "error": "لا يمكن عرض بروفايل الإدارة"
+}</pre>
+
+  <table>
+    <tr><th>الحقل</th><th>الوصف</th></tr>
+    <tr><td><code>personal_info.joined_at</code></td><td>تاريخ فقط بصيغة <span class="mono">YYYY-MM-DD</span> بدون وقت — يكون null إن لم يوجد تاريخ إنشاء لسبب ما</td></tr>
+    <tr><td><code>statistics.total_orders</code></td><td>إجمالي عدد الطلبات التي قام بها هذا المشتري (كل الحالات، وليس المكتملة فقط)</td></tr>
+    <tr><td><code>statistics.total_reviews_written</code></td><td>عدد التقييمات التي كتبها هذا المستخدم على منتجات مختلفة</td></tr>
+    <tr><td><code>statistics.followed_shops_count</code></td><td>عدد المتاجر التي يتابعها</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>
+      <code>statistics</code> يحتوي الآن ثلاثة حقول فقط: <code>total_orders</code>،
+      <code>total_reviews_written</code>، و<code>followed_shops_count</code>. حقل
+      <code>wishlist_items_count</code> (عدد منتجات المفضلة) <b>لم يعد موجوداً</b> في هذه الاستجابة —
+      لا تعتمد عليه إن كنت قد بنيت الواجهة على نسخة سابقة من هذا الدليل. إن كانت شاشتك تعرض عدد
+      عناصر المفضلة لمستخدم آخر، يجب إزالة ذلك العنصر من التصميم أو التنسيق مع الباك إند حول سبب
+      الحذف (انظر "ملاحظة لفريق الباك إند" أدناه).
+    </span>
+  </div>
+
+  <h2 id="privacy">لماذا لا يظهر رقم الهاتف أو البريد الإلكتروني؟</h2>
+  <div class="callout tip">
+    <span class="ic">✓</span>
+    <span>
+      هذا <b>متعمّد وليس نقصاً في الكود</b>. لاحظ في الاستجابة أعلاه أن <code>personal_info</code>
+      يحتوي فقط أربعة حقول مُختارة يدوياً: <code>id</code>، <code>full_name</code>،
+      <code>avatar_url</code>، و<code>joined_at</code>. الكود لا يستخدم <code>$buyer->toArray()</code>
+      أو ما شابه (ما كان سيُخرج كل أعمدة الجدول بما فيها الهاتف والبريد)، بل يبني مصفوفة يدوية تحتوي
+      فقط الحقول الآمنة للعرض العام. هذا هو نمط "القائمة البيضاء" (Whitelisting) لحماية خصوصية
+      المستخدمين — أي بيانات تواصل حساسة لا تدخل الاستجابة من الأساس، فلا داعي لإخفائها لاحقاً في
+      الفرونت.
+    </span>
+  </div>
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>
+      هذا المسار مخصص لعرض بروفايل <b>مستخدم آخر</b> (Public Profile)، وهو مختلف تماماً عن مسار
+      "بروفايلي الشخصي" (<span class="mono">GET /user/profile/Show</span>) الذي يعيد بيانات المستخدم
+      المسجّل دخوله هو نفسه، والذي من المتوقع أن يحتوي حقولاً حساسة مثل الهاتف والبريد والعنوان لأنه
+      يعرض بيانات صاحب الحساب لنفسه فقط. <b>لا تخلط بين المسارين</b>: لا تستخدم بيانات هذا المسار
+      العام لملء نموذج "تعديل الملف الشخصي" الخاص بالمستخدم الحالي — استخدم مسار البروفايل الخاص فقط
+      لذلك.
+    </span>
+  </div>
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>
+      التحقق الوحيد المطبَّق في هذا المسار هو استبعاد الحسابات ذات <code>role = admin</code> (يرجع
+      403). لا يوجد تحقق من أن المستخدم المطلوب عرضه هو "مشترٍ" فعلاً بمعنى الكلمة — أي حساب تاجر
+      (Seller) غير إداري يمكن أيضاً عرض بروفايله عبر هذا المسار بنفس الشكل بالضبط. لا تفترض أن كل
+      نتيجة تُعاد من هنا هي بالضرورة "مشترٍ" فقط.
+    </span>
+  </div>
+
+  <h2 id="followed-shops">قائمة المتاجر المتابَعة لمشترٍ معيّن</h2>
+  <div class="badge-row">
+    <span class="pill pill-get">GET</span>
+    <span class="path">/Buyer/profile/{buyer}/followed-shops?per_page=10</span>
+  </div>
+  <p>يعيد قائمة مُرقّمة (Paginated) بالمتاجر التي يتابعها <code>{buyer}</code>، مرتبة بتاريخ المتابعة الأحدث أولاً.</p>
+
+  <div class="code-label">استجابة الخطأ — 403 (محاولة عرض متابَعات حساب إدارة)</div>
+  <pre>{
+  "error": "لا يمكن عرض بروفايل الإدارة"
+}</pre>
+
+  <div class="code-label">شكل الاستجابة الفعلي — انتبه جيداً للتعشيش</div>
+  <pre>{
+  "message": "تم جلب المتاجر المُتابَعة للمشتري بنجاح.",
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": "uuid",
+        "name": "متجر الأناقة",
+        "logo_url": "https://...",
+        "slug": "elegance-store",
+        "followed_at": "2026-06-01"
+      },
+      {
+        "id": "uuid",
+        "name": "متجر التقنية",
+        "logo_url": null,
+        "slug": "tech-store",
+        "followed_at": "2026-05-12"
+      }
+    ],
+    "first_page_url": "...",
+    "from": 1,
+    "last_page": 3,
+    "last_page_url": "...",
+    "links": [ "..." ],
+    "next_page_url": "...",
+    "path": "...",
+    "per_page": 10,
+    "prev_page_url": null,
+    "to": 10,
+    "total": 25
+  }
+}</pre>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>
+      <b>هذا هو الفخ الأهم في هذا المسار:</b> كلمة <code>data</code> تظهر في الاستجابة على مستويين
+      بمعنيين مختلفين تماماً. <code>data</code> الخارجي (بجانب <code>message</code>) هو كائن ترقيم
+      الصفحات (Paginator) بأكمله بكل حقوله (current_page, links, meta...)، بينما <code>data</code>
+      الداخلي (داخل ذلك الكائن) هو المصفوفة الفعلية لعناصر المتاجر. أي محاولة قراءة
+      <span class="mono">response.data</span> مباشرة كأنها مصفوفة متاجر ستفشل أو تُرجع كائناً غير
+      متوقع — الوصول الصحيح للعناصر هو <span class="mono">response.data.data</span>، ورقم الصفحة
+      الحالية هو <span class="mono">response.data.current_page</span>، وهكذا. هذا الشكل مختلف تماماً
+      عن نمط الترقيم المستخدم في مسارات التقييمات (حيث <code>data</code> هي المصفوفة مباشرة و
+      <code>meta</code>/<code>links</code> منفصلان على نفس المستوى) — لا تُطبّق نفس دالة قراءة
+      الترقيم من هناك على هذا المسار.
+    </span>
+  </div>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>
+      <code>followed_at</code> هنا تاريخ فقط (بدون وقت)، بعكس <code>created_at_human</code>/<code>created_at</code>
+      الكاملين المستخدَمين في مسارات أخرى مثل التقييمات. لا تتوقع دقة بالساعة والدقيقة لوقت المتابعة.
+    </span>
+  </div>
+
+  <h2 id="flow">مخطط التدفق</h2>
+  <p>تدفّق مبسّط لجلب البروفايل العام، يوضح الفرع الوحيد الموجود فعلياً (حساب إدارة):</p>
+  <div class="flow">
+    <div class="fbox api"><div class="t1">طلب بروفايل مشتري</div><div class="t2">GET profile/{buyer}</div></div>
+    <div class="arrow-down">↓</div>
+    <div class="fbox decision">role = admin؟</div>
+    <div class="branch">
+      <div class="col">
+        <div class="label">نعم</div>
+        <div class="fbox err"><div class="t1">403 ممنوع</div><div class="t2">لا يمكن عرض بروفايل الإدارة</div></div>
+      </div>
+      <div class="col">
+        <div class="label">لا</div>
+        <div class="fbox ok"><div class="t1">إرجاع بيانات عامة فقط</div><div class="t2">بدون هاتف أو بريد إلكتروني</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="callout tip">
+    <span class="ic">✓</span>
+    <span>مسار "المتاجر المتابَعة" أصبح الآن يمر بنفس فحص <code>role = admin</code> في بدايته تماماً
+    مثل مسار البروفايل الأساسي — كلا المسارين يرفضان الوصول لحسابات الإدارة بنفس رسالة 403.</span>
+  </div>
+
+  <h2 id="mockups">نماذج الشاشات الرئيسية</h2>
+  <div class="mockup-row">
+    <div class="mockup-col">
+      <div class="phone"><div class="screen">
+        <div class="stitle">بروفايل مشترٍ آخر</div>
+        <div class="ssub">GET profile/{buyer}</div>
+        <div class="row" style="border-bottom:none;padding-top:0">
+          <div class="avatar-circle">MA</div>
+          <div style="text-align:right"><div style="font-weight:700">مها أحمد</div><div style="font-size:10.5px;color:var(--text-muted)">عضو منذ 2024-03-10</div></div>
+        </div>
+        <div style="display:flex;gap:8px;margin:10px 0">
+          <div class="stat-box" style="flex:1"><div class="n">32</div><div class="l">طلب</div></div>
+          <div class="stat-box" style="flex:1"><div class="n">14</div><div class="l">مفضلة</div></div>
+        </div>
+        <div class="lockbox">لا يوجد رقم هاتف أو بريد إلكتروني — بروفايل عام لشخص آخر، هذا متعمّد</div>
+      </div></div>
+      <div class="badge-endpoint">GET profile/{buyer}</div>
+    </div>
+
+    <div class="mockup-col">
+      <div class="phone"><div class="screen">
+        <div class="stitle">المتاجر المتابَعة</div>
+        <div class="ssub">GET profile/{buyer}/followed-shops</div>
+        <div class="row"><span>متجر الأناقة</span><span style="color:var(--text-muted)">2026-06-01</span></div>
+        <div class="row" style="border-bottom:none"><span>متجر التقنية</span><span style="color:var(--text-muted)">2026-05-12</span></div>
+        <div class="lockbox">العناصر تحت <span class="mono">data.data</span> وليس <span class="mono">data</span> مباشرة</div>
+      </div></div>
+      <div class="badge-endpoint">GET profile/{buyer}/followed-shops</div>
+    </div>
+  </div>
+
+  <h2 id="errors">جدول ملخّص لكل الأخطاء المتوقعة</h2>
+  <table>
+    <tr><th>الكود</th><th>يظهر في</th><th>المعنى</th><th>ماذا يفعل الفرونت</th></tr>
+    <tr>
+      <td>401</td>
+      <td>كلا المسارين</td>
+      <td>لا يوجد توكن صالح للمستخدم الحالي</td>
+      <td>أعد المستخدم لشاشة تسجيل الدخول</td>
+    </tr>
+    <tr>
+      <td>403</td>
+      <td>كلا المسارين (profile و followed-shops)</td>
+      <td>المعرّف المطلوب يخص حساب إدارة (role = admin)</td>
+      <td>اعرض رسالة "هذا البروفايل غير متاح" بدل رسالة خطأ عامة</td>
+    </tr>
+    <tr>
+      <td>404 (Route Model Binding)</td>
+      <td>كلا المسارين</td>
+      <td>معرّف {buyer} غير موجود في النظام</td>
+      <td>اعرض شاشة "المستخدم غير موجود" العامة</td>
+    </tr>
+  </table>
+
+  <h2 id="tips">نصائح عملية لتفادي الاحتكاك مع الباك إند</h2>
+  <div class="card">
+    <ol class="num-list">
+      <li>لا تعرض حقول هاتف أو بريد إلكتروني في شاشة بروفايل مستخدم آخر — هذه البيانات غير موجودة
+      أصلاً في الاستجابة، وعرضها كـ "فارغة" بدل إخفاء العنصر بالكامل يعطي انطباعاً خاطئاً بأن البيانات
+      وُجدت ولكنها فارغة.</li>
+      <li>عند قراءة قائمة المتاجر المتابَعة، تعامل مع <code>response.data</code> كـ كائن ترقيم صفحات
+      كامل، واستخرج المصفوفة من <code>response.data.data</code> تحديداً — لا تُطبّق منطق القراءة نفسه
+      المستخدَم في مسارات التقييمات لأن شكل الترقيم مختلف هناك.</li>
+      <li>ميّز دائماً بين مسار "بروفايلي أنا" (بيانات كاملة، حساسة) ومسار "بروفايل شخص آخر" (بيانات
+      عامة محدودة) في الكود، حتى لو تشابهت التسميات — لا تستخدم نفس النموذج (Model class) في الفرونت
+      لكليهما دون تمييز واضح للحقول المتاحة.</li>
+      <li>اربط الانتقال لهذه الشاشة من أي مكان يظهر فيه اسم مستخدم آخر قابل للنقر (كاتب تعليق، متابع
+      لمتجر) عبر <code>{buyer}</code> الخاص به، وليس عبر بيانات محلية مخزَّنة مسبقاً قد تكون قديمة.</li>
+    </ol>
+  </div>
+
+  <h2 id="backend-note">ملاحظة مقترحة لفريق الباك إند</h2>
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>
+      <code>showSpecificBuyer</code> يستبعد صراحة الحسابات ذات <code>role = admin</code> برسالة 403
+      واضحة، بينما <code>buyerFollowedShops</code> لا يحتوي أي فحص مشابه إطلاقاً — يمكن لأي مستخدم
+      مسجّل دخول حالياً جلب قائمة المتاجر التي يتابعها حساب إداري عبر
+      <span class="mono">GET profile/{admin_id}/followed-shops</span> مباشرة، رغم منع الوصول لبروفايله
+      الأساسي. يُقترح توحيد نفس فحص الاستبعاد في بداية <code>buyerFollowedShops</code> إن كان هذا غير
+      مقصود.
+    </span>
+  </div>
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>
+      حقول <code>statistics</code> (خصوصاً <code>total_orders</code> و<code>wishlist_items_count</code>)
+      تُعرض حالياً لأي مستخدم آخر عبر هذا المسار العام، دون فحص خصوصية إضافي. يُستحسن التأكيد مع فريق
+      المنتج ما إذا كان عرض عدد طلبات ومفضلة مستخدم آخر لأي زائر مسجّل دخول قراراً مقصوداً، أم يجب
+      حصره بالمستخدم نفسه فقط (وعرض عدد التقييمات والمتابعات فقط للعموم بصفتها معلومات اجتماعية غير
+      حساسة).
+    </span>
+  </div>
+
+  <footer>
+    دليل بروفايل مشتري معين — تم إعداده لفريق الفرونت إند · ملف HTML مستقل بدون اتصال إنترنت
+  </footer>
+</main>
+
+</body>
+</html>

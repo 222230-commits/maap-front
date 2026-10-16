@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دليل إدارة الإعلانات — Admin (Angular) + Buyer (Flutter)</title>
+<style>
+  :root{
+    --bg:#f7f9f9;
+    --card-bg:#ffffff;
+    --border:#dfe6e6;
+    --text:#1e2b2b;
+    --muted:#5c6b6b;
+    --teal:#0e8a86;
+    --teal-light:#e3f4f3;
+    --teal-dark:#075f5c;
+    --coral:#e2653f;
+    --coral-light:#fdece6;
+    --purple:#6b4fc0;
+    --purple-light:#efe9fb;
+    --gray:#8993a1;
+    --gray-light:#eef1f4;
+    --code-bg:#1d2733;
+    --code-text:#dfe8ef;
+    --green:#1f9d70;
+    --green-light:#e4f7ee;
+    --red:#c93b3b;
+    --red-light:#fbe7e7;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI", Tahoma, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.7;
+  }
+  code, pre, .mono{
+    font-family:Consolas, "Courier New", monospace;
+  }
+  code[dir="ltr"], pre[dir="ltr"]{ direction:ltr; text-align:left; display:inline-block; }
+
+  .layout{ display:flex; min-height:100vh; }
+
+  nav.side{
+    width:260px;
+    flex-shrink:0;
+    background:var(--teal-dark);
+    color:#e7f4f3;
+    position:sticky;
+    top:0;
+    align-self:flex-start;
+    height:100vh;
+    overflow-y:auto;
+    padding:20px 16px;
+  }
+  nav.side h3{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    color:#9fd8d4;
+    margin:22px 0 8px;
+    border-bottom:1px solid rgba(255,255,255,.15);
+    padding-bottom:6px;
+  }
+  nav.side h3:first-child{ margin-top:0; }
+  nav.side a{
+    display:block;
+    color:#eafaf9;
+    text-decoration:none;
+    font-size:14px;
+    padding:6px 8px;
+    border-radius:6px;
+    margin-bottom:2px;
+    opacity:.9;
+  }
+  nav.side a:hover{ background:rgba(255,255,255,.12); opacity:1; }
+
+  main{ flex:1; padding:32px 40px 80px; max-width:1100px; }
+
+  header.top{
+    margin-bottom:34px;
+    padding-bottom:20px;
+    border-bottom:2px solid var(--border);
+  }
+  .eyebrow{
+    display:inline-block;
+    background:var(--teal-light);
+    color:var(--teal-dark);
+    font-size:12px;
+    font-weight:700;
+    padding:4px 12px;
+    border-radius:999px;
+    margin-bottom:12px;
+    letter-spacing:.3px;
+  }
+  header.top h1{ margin:0 0 10px; font-size:30px; color:var(--teal-dark); }
+  header.top p{ margin:0; color:var(--muted); font-size:15.5px; max-width:760px; }
+
+  h2{
+    font-size:22px;
+    color:var(--teal-dark);
+    margin:46px 0 14px;
+    padding-top:10px;
+    border-top:1px solid var(--border);
+  }
+  h2:first-of-type{ border-top:none; }
+  h3{ font-size:17px; color:var(--text); margin:24px 0 10px; }
+
+  .card{
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:20px 22px;
+    margin-bottom:18px;
+    box-shadow:0 1px 2px rgba(0,0,0,.03);
+  }
+
+  table{ width:100%; border-collapse:collapse; margin:14px 0; font-size:14px; }
+  th, td{ border:1px solid var(--border); padding:9px 12px; text-align:right; vertical-align:top; }
+  th{ background:var(--teal-light); color:var(--teal-dark); font-weight:700; }
+  tr:nth-child(even) td{ background:#fafcfc; }
+
+  .endpoint-line{ display:flex; align-items:center; gap:10px; margin:6px 0 16px; flex-wrap:wrap; }
+  .pill{
+    display:inline-block;
+    font-size:12px;
+    font-weight:800;
+    padding:4px 12px;
+    border-radius:6px;
+    letter-spacing:.4px;
+  }
+  .pill-get{ background:#e3edfc; color:#1c4f9c; }
+  .pill-post{ background:var(--green-light); color:var(--green); }
+  .pill-put{ background:var(--purple-light); color:var(--purple); }
+  .pill-delete{ background:var(--red-light); color:var(--red); }
+  .path{
+    background:var(--code-bg);
+    color:var(--code-text);
+    padding:5px 12px;
+    border-radius:6px;
+    font-size:14px;
+  }
+  .auth-tag{ font-size:11.5px; color:var(--muted); border:1px dashed var(--gray); border-radius:6px; padding:3px 9px;}
+
+  pre.code-block{
+    background:var(--code-bg);
+    color:var(--code-text);
+    padding:16px 18px;
+    border-radius:8px;
+    overflow-x:auto;
+    font-size:13.3px;
+    direction:ltr;
+    text-align:left;
+    margin:10px 0 16px;
+  }
+  .code-label{ font-size:12.5px; font-weight:700; color:var(--muted); margin:14px 0 -4px; }
+
+  .callout{
+    border-radius:8px;
+    padding:13px 16px;
+    margin:14px 0;
+    font-size:14.3px;
+    border:1px solid transparent;
+  }
+  .callout b{ display:block; margin-bottom:4px; font-size:13px; letter-spacing:.2px; }
+  .callout.warn{ background:var(--coral-light); border-color:#f2c6b3; color:#7a3417; }
+  .callout.danger{ background:var(--red-light); border-color:#eeb9b9; color:#7a2323; }
+  .callout.tip{ background:var(--teal-light); border-color:#bfe4e2; color:var(--teal-dark); }
+
+  /* flow diagram */
+  .flow{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:20px 0 26px; }
+  .fbox{
+    border-radius:10px;
+    padding:12px 16px;
+    font-size:13.5px;
+    min-width:150px;
+    text-align:center;
+    border:1px solid transparent;
+  }
+  .fbox.api{ background:var(--purple-light); color:var(--purple); border-color:#d9cdf2; font-weight:700; }
+  .fbox.manual{ background:var(--gray-light); color:#44505c; border-color:#d7dce2; }
+  .fbox.success{ background:var(--green-light); color:var(--green); border-color:#bfe6d4; font-weight:700; }
+  .fbox.fail{ background:var(--red-light); color:var(--red); border-color:#f0bcbc; font-weight:700; }
+  .arrow{ color:var(--gray); font-size:20px; }
+  .branch{ display:flex; flex-direction:column; gap:8px; align-items:flex-start; }
+
+  /* mockups */
+  .mock-wrap{ display:flex; gap:26px; flex-wrap:wrap; margin:18px 0 8px; align-items:flex-start; }
+  .phone{
+    width:250px;
+    border:8px solid #2a2f38;
+    border-radius:30px;
+    background:#fff;
+    overflow:hidden;
+    box-shadow:0 6px 16px rgba(0,0,0,.15);
+  }
+  .phone .screen{ background:#fff; min-height:420px; }
+  .phone .statusbar{ background:#2a2f38; color:#fff; font-size:10px; padding:5px 12px; display:flex; justify-content:space-between; }
+  .phone .navtitle{ background:var(--teal); color:#fff; padding:12px; font-size:14px; font-weight:700; text-align:center; }
+  .phone .banner{ margin:10px; border-radius:10px; background:linear-gradient(135deg,var(--teal),#0aa39d); color:#fff; padding:26px 14px; text-align:center; font-size:12.5px; position:relative; }
+  .phone .banner .dots{ display:flex; justify-content:center; gap:4px; margin-top:10px; }
+  .phone .banner .dots span{ width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,.6); }
+  .phone .banner .dots span.on{ background:#fff; }
+  .phone .row{ display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid #eef1f1; font-size:12.5px; }
+  .phone .row .thumb{ width:34px; height:34px; border-radius:6px; background:var(--gray-light); flex-shrink:0; }
+
+  .dashboard-mock{
+    flex:1;
+    min-width:420px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    overflow:hidden;
+    background:#fff;
+  }
+  .dashboard-mock .dtop{ background:var(--teal-dark); color:#fff; padding:10px 16px; font-size:13px; display:flex; justify-content:space-between; }
+  .dashboard-mock .dtoolbar{ padding:10px 16px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+  .dashboard-mock .btn{ background:var(--teal); color:#fff; font-size:12px; padding:6px 14px; border-radius:6px; }
+  .dashboard-mock table{ margin:0; font-size:12.5px; }
+  .dashboard-mock th, .dashboard-mock td{ padding:8px 10px; }
+  .badge-status{ font-size:11px; padding:2px 8px; border-radius:999px; font-weight:700; }
+  .badge-status.active{ background:var(--green-light); color:var(--green); }
+  .badge-status.off{ background:var(--gray-light); color:#5c6b6b; }
+  .icon-btn{ font-size:11px; color:var(--teal-dark); border:1px solid var(--border); border-radius:5px; padding:3px 8px; margin-left:4px; }
+
+  .modal-wrap{ position:relative; min-width:340px; }
+  .modal{
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:#fff;
+    box-shadow:0 8px 24px rgba(0,0,0,.12);
+    overflow:hidden;
+  }
+  .modal .mhead{ background:var(--purple-light); color:var(--purple); font-weight:700; padding:12px 16px; font-size:14px; }
+  .modal .mbody{ padding:14px 16px; font-size:12.8px; }
+  .modal .field{ margin-bottom:10px; }
+  .modal .field label{ display:block; font-size:11.5px; color:var(--muted); margin-bottom:3px; }
+  .modal .field .box{ border:1px solid var(--border); border-radius:6px; padding:7px 10px; background:#fafcfc; color:#8993a1;}
+  .modal .mfoot{ padding:10px 16px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px; }
+  .modal .mfoot .btn{ background:var(--teal); color:#fff; font-size:12px; padding:6px 14px; border-radius:6px; }
+  .modal .mfoot .btn.ghost{ background:#fff; color:var(--muted); border:1px solid var(--border); }
+
+  .badge-endpoint{
+    display:inline-block;
+    margin-top:10px;
+    font-size:11.5px;
+    background:var(--gray-light);
+    color:#3c4650;
+    padding:4px 10px;
+    border-radius:6px;
+    direction:ltr;
+  }
+
+  ol.tips li{ margin-bottom:10px; }
+
+  footer{
+    margin-top:60px;
+    padding-top:18px;
+    border-top:1px solid var(--border);
+    color:var(--muted);
+    font-size:12.5px;
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <nav class="side">
+    <h3>البداية</h3>
+    <a href="#overview">نظرة عامة واختيار الأداة</a>
+    <a href="#flow-create">تدفق إنشاء إعلان (خطوتين)</a>
+
+    <h3>لوحة الإدارة (Angular)</h3>
+    <a href="#admin-index">GET — كل الإعلانات</a>
+    <a href="#admin-store">POST — إنشاء إعلان</a>
+    <a href="#admin-image">POST — رفع الصورة</a>
+    <a href="#admin-show">GET — تفاصيل إعلان</a>
+    <a href="#admin-update">PUT — تعديل + الترتيب</a>
+    <a href="#admin-delete">DELETE — حذف إعلان</a>
+    <a href="#admin-toggle">POST — تفعيل/إيقاف سريع</a>
+
+    <h3>واجهة المشتري (Flutter)</h3>
+    <a href="#buyer-index">GET — عرض الإعلانات</a>
+
+    <h3>مرجع سريع</h3>
+    <a href="#mockups">نماذج الشاشات (Mockups)</a>
+    <a href="#errors">جدول الأخطاء</a>
+    <a href="#tips">نصائح عملية</a>
+  </nav>
+
+  <main>
+    <header class="top" id="top">
+      <span class="eyebrow">Ads Module · Admin + Buyer API Guide</span>
+      <h1>دليل ربط الفرونت إند بنظام إدارة الإعلانات</h1>
+      <p>
+        هذا الدليل يشرح بالتفصيل كل مسار (Route) متعلق بالإعلانات في المشروع: مسارات لوحة تحكم
+        الإدارة (Admin) التي يُفترض بناؤها بـ <b>Angular</b>، ومسار عرض الإعلانات للمشتري الذي
+        يُفترض استهلاكه من تطبيق <b>Flutter</b>. لكل مسار: شكل الطلب، كل أشكال الاستجابة الممكنة،
+        منطق العمل الخفي، والفخاخ التي يجب الانتباه لها قبل البدء بالتطوير.
+      </p>
+    </header>
+
+    <h2 id="overview">نظرة عامة واختيار الأداة</h2>
+    <div class="card">
+      <table>
+        <tr><th>الميزة</th><th>الأداة المقترحة</th><th>السبب</th></tr>
+        <tr>
+          <td>لوحة إدارة الإعلانات (جدول، إنشاء، تعديل، حذف، رفع صورة، إعادة ترتيب)</td>
+          <td>Angular</td>
+          <td>واجهة إدارية تحتوي جدولاً به فلترة حسب المكان (position)، نماذج (Forms) متعددة الحقول
+              مع Validation، ومودالات تعديل/حذف — هذا نمط لوحات التحكم الكلاسيكي الذي يناسب
+              Angular Reactive Forms وخدمات HTTP المهيكلة.</td>
+        </tr>
+        <tr>
+          <td>عرض الإعلانات للمستخدم النهائي (بانرات، بوب-أب)</td>
+          <td>Flutter</td>
+          <td>استهلاك بسيط لمسار واحد (GET /ads) وعرضه كسلايدر/بانر داخل تطبيق الموبايل — تجربة
+              بصرية بسيطة وسلسة داخل التطبيق، لا تحتاج نماذج معقّدة.</td>
+        </tr>
+      </table>
+      <div class="callout tip">
+        <b>ملاحظة عامة على المصادقة</b>
+        جميع مسارات لوحة الإدارة محمية بـ <code dir="ltr">auth:sanctum</code> + Middleware اسمه
+        <code dir="ltr">IsAdmin</code>، أي يجب إرسال Bearer Token لحساب أدمن مع كل طلب.
+        أما مسار المشتري <code dir="ltr">GET /ads</code> فهو <b>عام تماماً بدون تسجيل دخول</b>
+        (معرّف خارج مجموعة <code dir="ltr">auth:sanctum</code> في ملف الراوتس)، فيمكن لتطبيق
+        Flutter استدعاءه فوراً دون أي توكن.
+      </div>
+      <div class="callout tip">
+        <b>نطاق كل واجهة (مهم)</b>
+        كل مسارات <code dir="ltr">/admin/*</code> (بما فيها كل مسارات هذا الدليل تحت
+        "لوحة الإدارة") مخصصة <b>لواجهة Angular فقط</b> ولا يجب استهلاكها من تطبيق Flutter
+        إطلاقاً — فهي تتطلب صلاحية أدمن ولا معنى لها داخل تطبيق المشتري. أما مسار المشتري
+        العام <code dir="ltr">GET /ads</code> فهو المسار الوحيد في هذا الدليل المشترك بين
+        الاثنين، ويمكن استهلاكه من Angular (لو وُجدت واجهة عرض عامة فيها) ومن Flutter معاً بنفس
+        الشكل تماماً.
+      </div>
+    </div>
+
+    <h2 id="flow-create">تدفق إنشاء إعلان جديد (عملية من خطوتين)</h2>
+    <div class="card">
+      <p>إنشاء الإعلان في هذا النظام <b>ليس عملية واحدة</b>، بل خطوتان منفصلتان تماماً. لا يوجد
+      مسار واحد يستقبل بيانات الإعلان + الصورة معاً.</p>
+      <div class="flow">
+        <div class="fbox manual">الأدمن يملأ نموذج بيانات الإعلان (بدون صورة)</div>
+        <div class="arrow">←</div>
+        <div class="fbox api">POST /admin/ads/store</div>
+        <div class="arrow">←</div>
+        <div class="branch">
+          <div class="fbox success">201 — تم الإنشاء، يرجع id الإعلان</div>
+          <div class="fbox fail">422 — خطأ تحقق (Validation)</div>
+        </div>
+        <div class="arrow">←</div>
+        <div class="fbox manual">الأدمن يختار صورة الإعلان</div>
+        <div class="arrow">←</div>
+        <div class="fbox api">POST /admin/ads/{id}/image</div>
+        <div class="arrow">←</div>
+        <div class="branch">
+          <div class="fbox success">200 — تم رفع الصورة</div>
+          <div class="fbox fail">422 — نوع/حجم ملف غير صالح</div>
+        </div>
+      </div>
+      <div class="callout warn">
+        <b>فخ مهم</b>
+        بعد استدعاء <code dir="ltr">store</code> بنجاح، يكون الإعلان محفوظاً في قاعدة البيانات
+        <b>بدون صورة (image_url = null)</b> إذا لم يكمل المستخدم الخطوة الثانية. يجب على واجهة
+        Angular أن تنتقل تلقائياً لخطوة رفع الصورة مباشرة بعد نجاح الإنشاء (باستخدام الـ id
+        المُعاد في الاستجابة)، وأن تُظهر تنبيهاً واضحاً إذا أغلق المستخدم النافذة قبل رفع الصورة
+        — لأن الإعلان سيبقى موجوداً في القائمة بدون صورة ولن يُحذف تلقائياً.
+      </div>
+    </div>
+
+    <!-- ================= ADMIN INDEX ================= -->
+    <h2 id="admin-index">1. جلب كل الإعلانات (لوحة الإدارة)</h2>
+    <div class="endpoint-line">
+      <span class="pill pill-get">GET</span>
+      <span class="path" dir="ltr">/admin/ads</span>
+      <span class="auth-tag">Bearer Token (Admin)</span>
+    </div>
+    <div class="card">
+      <p>يرجع <b>كل</b> الإعلانات بلا استثناء (مفعّلة، موقوفة، منتهية الصلاحية) — بعكس مسار
+      المشتري الذي يُظهر فقط الصالحة. مناسب لجدول الإدارة الذي يجب أن يرى كل شيء.</p>
+
+      <div class="code-label">مثال استجابة 200</div>
+      <pre class="code-block">{
+  "success": true,
+  "data": {
+    "home_main_banner": [
+      {
+        "id": "b1f5c2b0-....-....-....-............",
+        "shop_id": null,
+        "title": "عرض الصيف الكبير",
+        "image_url": "https://rdvvlvabfisrvesoltrd.supabase.co/storage/v1/object/public/ads/xyz.jpg",
+        "target_type": "external",
+        "target_id": null,
+        "target_url": "https://example.com/summer-sale",
+        "position": "home_main_banner",
+        "sort_order": 1,
+        "is_active": true,
+        "start_date": "2026-08-01T00:00:00.000000Z",
+        "end_date": "2026-08-31T00:00:00.000000Z",
+        "created_at": "...",
+        "updated_at": "..."
+      }
+    ],
+    "popup_modal": [ /* ... نفس الشكل ... */ ],
+    "": [ /* إعلانات بدون مكان محدد (position = null) */ ]
+  }
+}</pre>
+
+      <div class="callout warn">
+        <b>فخ: شكل الـ data ليس مصفوفة (Array)</b>
+        بيانات <code dir="ltr">data</code> ليست مصفوفة واحدة من الإعلانات، بل <b>كائن (Object)</b>
+        مفاتيحه هي قيم <code dir="ltr">position</code> (مثل <code dir="ltr">home_main_banner</code>،
+        <code dir="ltr">popup_modal</code>). في Angular يجب عمل
+        <code dir="ltr">Object.keys(response.data)</code> ثم المرور على كل مفتاح، وليس التعامل
+        معها كـ Array مباشرة.
+      </div>
+      <div class="callout warn">
+        <b>فخ: مفتاح فارغ للإعلانات بلا مكان</b>
+        أي إعلان لم يُحدَّد له <code dir="ltr">position</code> (قيمته null) سيظهر تحت مفتاح
+        <b>نص فارغ ""</b> في الكائن. يجب على الجدول في Angular معالجة هذه الحالة بعرض قسم باسم
+        "غير مصنّف" بدل تجاهله أو تعطّل الواجهة.
+      </div>
+    </div>
+
+    <!-- ================= ADMIN STORE ================= -->
+    <h2 id="admin-store">2. إنشاء بيانات الإعلان (بدون صورة)</h2>
+    <div class="endpoint-line">
+      <span class="pill pill-post">POST</span>
+      <span class="path" dir="ltr">/admin/ads/store</span>
+      <span class="auth-tag">Bearer Token (Admin)</span>
+    </div>
+    <div class="card">
+      <div class="code-label">مثال طلب (Request Body — JSON)</div>
+      <pre class="code-block">{
+  "shop_id": null,
+  "title": "عرض الصيف الكبير",
+  "target_type": "external",
+  "target_id": null,
+  "target_url": "https://example.com/summer-sale",
+  "position": "home_main_banner",
+  "sort_order": 2,
+  "is_active": true,
+  "start_date": "2026-08-10",
+  "end_date": "2026-08-31"
+}</pre>
+
+      <table>
+        <tr><th>الحقل</th><th>القاعدة</th><th>ملاحظة</th></tr>
+        <tr><td><code dir="ltr">shop_id</code></td><td>nullable | uuid | يجب أن يكون موجوداً فعلاً في جدول shops</td><td>—</td></tr>
+        <tr><td><code dir="ltr">title</code></td><td>required | نص | حتى 255 حرف</td><td>—</td></tr>
+        <tr><td><code dir="ltr">target_type</code></td><td>required | واحدة من: external, product, shop, category</td><td>لا يوجد ربط تلقائي بين هذه القيمة وبين target_id/target_url (انظر التحذير أدناه)</td></tr>
+        <tr><td><code dir="ltr">target_id</code></td><td>nullable | uuid فقط (بدون فحص وجوده فعلياً)</td><td>لا يتحقق الباك إند أن هذا الـ id موجود فعلاً في جدول المنتجات/المتاجر/التصنيفات</td></tr>
+        <tr><td><code dir="ltr">target_url</code></td><td>nullable | رابط صالح</td><td>—</td></tr>
+        <tr><td><code dir="ltr">position</code></td><td>nullable | نص حر</td><td>لا قائمة مسموحة محددة في الباك إند — أي نص يُقبل</td></tr>
+        <tr><td><code dir="ltr">sort_order</code></td><td>nullable | رقم صحيح ≥ 1</td><td>الباك إند يعيد حسابه تلقائياً (انظر أدناه)</td></tr>
+        <tr><td><code dir="ltr">is_active</code></td><td>boolean</td><td>—</td></tr>
+        <tr><td><code dir="ltr">start_date</code></td><td>nullable | تاريخ</td><td>إن لم يُرسل، يُضبط تلقائياً على الآن</td></tr>
+        <tr><td><code dir="ltr">end_date</code></td><td>nullable | تاريخ | يجب أن يكون بعد أو يساوي start_date</td><td>—</td></tr>
+      </table>
+
+      <div class="callout danger">
+        <b>فخ: لا تحقق من تطابق target_type مع target_id / target_url</b>
+        الحقول <code dir="ltr">target_id</code> و <code dir="ltr">target_url</code> غير مرتبطة
+        منطقياً بـ <code dir="ltr">target_type</code> في الباك إند إطلاقاً — يمكن نظرياً حفظ
+        <code dir="ltr">target_type = "product"</code> بدون أي <code dir="ltr">target_id</code>،
+        أو <code dir="ltr">target_type = "external"</code> بدون <code dir="ltr">target_url</code>،
+        وسيُقبل الطلب بنجاح. <b>على واجهة Angular فرض هذا الترابط بنفسها</b> (مثال: عند اختيار
+        target_type = external أظهر حقل الرابط كإلزامي، وعند اختيار product/shop/category أظهر
+        حقل اختيار target_id كإلزامي وأخفِ حقل الرابط).
+      </div>
+
+      <div class="callout warn">
+        <b>فخ: منطق sort_order تلقائي ومختلف حسب وجود position</b>
+        <ul style="margin:6px 0 0;">
+          <li>إذا لم تُرسل <code dir="ltr">position</code> إطلاقاً: يُحفظ <code dir="ltr">sort_order</code> كما أُرسل من الفرونت حرفياً بدون أي تعديل أو تحقق من تعارضه مع إعلانات أخرى.</li>
+          <li>إذا أُرسلت <code dir="ltr">position</code>: الباك إند يتجاهل الرقم الذي أرسلتَه إن كان أكبر من (أعلى ترتيب حالي + 1) ويضعه تلقائياً في النهاية.</li>
+          <li>إذا أرسلتَ رقماً ضمن التسلسل الحالي (مثلاً تريد وضعه رقم 2 وهناك 3 إعلانات)، سيُزاح كل ما هو ≥ 2 خطوة واحدة للأسفل تلقائياً.</li>
+        </ul>
+        لا تحاول حساب sort_order يدوياً في الفرونت عندما توجد position — أرسل الرقم الذي يريده
+        المستخدم فقط ودع الباك إند يعيد ترتيب البقية، ثم اعتمد على القيمة المُعادة في الاستجابة
+        كمصدر الحقيقة.
+      </div>
+
+      <div class="code-label">استجابة 201 — نجاح</div>
+      <pre class="code-block">{
+  "success": true,
+  "message": "تم إنشاء بيانات الإعلان بنجاح، يرجى رفع الصورة الآن",
+  "data": { "id": "b1f5c2b0-....", "title": "...", "image_url": null, "sort_order": 2, "...": "..." }
+}</pre>
+
+      <div class="code-label">استجابة 422 — خطأ تحقق (شكل Laravel الافتراضي، ليس {success:false})</div>
+      <pre class="code-block">{
+  "message": "The title field is required. (and 1 more error)",
+  "errors": {
+    "title": ["The title field is required."],
+    "target_type": ["The selected target type is invalid."]
+  }
+}</pre>
+      <div class="callout warn">
+        <b>فخ: شكل استجابة الخطأ مختلف عن شكل استجابة النجاح</b>
+        استجابات النجاح تتبع الصيغة <code dir="ltr">{success, message, data}</code>، لكن أخطاء
+        422 (فشل Validation) تأتي بصيغة Laravel القياسية <code dir="ltr">{message, errors}</code>
+        بدون حقل <code dir="ltr">success</code> إطلاقاً. لا تعتمد Angular Interceptor على وجود
+        <code dir="ltr">success: false</code> لاكتشاف كل الأخطاء — تحقق من الـ HTTP Status Code
+        (422) واقرأ <code dir="ltr">errors</code> مباشرة لعرضها تحت كل حقل في الفورم.
+      </div>
+    </div>
+
+    <!-- ================= UPLOAD IMAGE ================= -->
+    <h2 id="admin-image">3. رفع / تحديث صورة الإعلان</h2>
+    <div class="endpoint-line">
+      <span class="pill pill-post">POST</span>
+      <span class="path" dir="ltr">/admin/ads/{id}/image</span>
+      <span class="auth-tag">Bearer Token (Admin)</span>
+    </div>
+    <div class="card">
+      <div class="code-label">الطلب — multipart/form-data (وليس JSON)</div>
+      <pre class="code-block">POST /admin/ads/b1f5c2b0-.../image
+Content-Type: multipart/form-data
+
+image: (ملف) jpeg / png / jpg / webp، الحد الأقصى 5120 كيلوبايت (5 ميجا)</pre>
+
+      <div class="code-label">استجابة 200 — نجاح</div>
+      <pre class="code-block">{
+  "success": true,
+  "message": "تم رفع الصورة بنجاح",
+  "data": {
+    "id": "b1f5c2b0-....",
+    "image_url": "https://rdvvlvabfisrvesoltrd.supabase.co/storage/v1/object/public/ads/newfile.jpg",
+    "...": "..."
+  }
+}</pre>
+
+      <div class="callout tip">
+        <b>ميزة مهمة: لا تبني رابط الصورة بنفسك</b>
+        الحقل <code dir="ltr">image_url</code> في كل استجابات القراءة (index / show / store /
+        update / uploadImage) هو دائماً <b>رابط كامل وجاهز للعرض المباشر</b> (رابط Supabase
+        عام)، لأن الموديل يحوّله تلقائياً عبر Accessor في الباك إند. لا داعي لأي منطق في
+        Angular/Flutter لتركيب الرابط أو إضافة دومين — استخدم القيمة كما هي في وسم الصورة مباشرة.
+      </div>
+      <div class="callout warn">
+        <b>فخ: استبدال الصورة يحذف القديمة نهائياً</b>
+        رفع صورة جديدة لإعلان لديه صورة سابقة يحذف الملف القديم من التخزين السحابي (Supabase)
+        فوراً وبشكل <b>غير قابل للتراجع</b> قبل حفظ الجديدة. إن فشل رفع الملف الجديد لأي سبب بعد
+        نجاح حذف القديم، سيبقى الإعلان بلا صورة مؤقتاً. يُفضّل إظهار تأكيد بسيط ("سيتم استبدال
+        الصورة الحالية") قبل السماح باختيار ملف جديد لإعلان يملك صورة بالفعل.
+      </div>
+    </div>
+
+    <!-- ================= SHOW ================= -->
+    <h2 id="admin-show">4. عرض تفاصيل إعلان واحد</h2>
+    <div class="endpoint-line">
+      <span class="pill pill-get">GET</span>
+      <span class="path" dir="ltr">/admin/ads/{id}/show</span>
+      <span class="auth-tag">Bearer Token (Admin)</span>
+    </div>
+    <div class="card">
+      <div class="code-label">استجابة 200</div>
+      <pre class="code-block">{ "success": true, "data": { "id": "...", "title": "...", "...": "..." } }</pre>
+      <div class="code-label">استجابة 404 — id غير موجود</div>
+      <pre class="code-block">{ "message": "No query results for model [App\\Models\\Ad] b1f5c2b0-..." }</pre>
+      <div class="callout warn">
+        <b>فخ: 404 لا يتبع صيغة {success:false}</b>
+        عند إرسال id غير موجود، Laravel يرمي استثناءً افتراضياً برسالة تقنية بالإنجليزية وليست
+        بصيغة المشروع المعتادة. لا تعرض هذه الرسالة كما هي للمستخدم — اعرض رسالة عامة مثل
+        "الإعلان غير موجود أو تم حذفه" عند استقبال 404 من أي مسار من مسارات الإعلانات.
+      </div>
+    </div>
+
+    <!-- ================= UPDATE ================= -->
+    <h2 id="admin-update">5. تحديث بيانات الإعلان (مع إعادة ترتيب معقّدة)</h2>
+    <div class="endpoint-line">
+      <span class="pill pill-put">PUT</span>
+      <span class="path" dir="ltr">/admin/ads/{id}/update</span>
+      <span class="auth-tag">Bearer Token (Admin)</span>
+    </div>
+    <div class="card">
+      <p>كل الحقول اختيارية هنا (<code dir="ltr">sometimes</code>) — أرسل فقط الحقول التي تغيّرت
+      فعلاً. لكن حقل الترتيب يخضع لمنطق تلقائي مختلف تماماً حسب ما إذا غيّرت <b>المكان</b> أو
+      فقط <b>الترتيب داخل نفس المكان</b>.</p>
+
+      <div class="flow">
+        <div class="fbox manual">تم إرسال position و/أو sort_order جديد</div>
+        <div class="arrow">←</div>
+        <div class="branch">
+          <div class="fbox api">الحالة أ: تغيّر المكان (position)</div>
+          <div class="fbox api">الحالة ب: نفس المكان، تغيّر الترتيب فقط</div>
+        </div>
+      </div>
+
+      <table>
+        <tr><th>الحالة</th><th>ما يفعله الباك إند تلقائياً</th></tr>
+        <tr>
+          <td>تغيير المكان بالكامل</td>
+          <td>
+            1) يُزاح كل ما بعد الإعلان في المكان القديم للأعلى (سد الفراغ).<br>
+            2) في المكان الجديد: إذا الرقم المطلوب أكبر من (الأقصى + 1) يوضع تلقائياً في النهاية،
+            وإلا يُزاح كل ما هو ≥ الرقم المطلوب للأسفل لإفساح مكان له.
+          </td>
+        </tr>
+        <tr>
+          <td>نفس المكان، تغيّر الترتيب فقط</td>
+          <td>
+            إن كان الرقم المطلوب أكبر من الأقصى الحالي، يُخفَّض تلقائياً ليساوي الأقصى الحالي
+            (وليس +1 كما في الإنشاء — هذا فرق مهم عن store). ثم يُزاح كل ما بينهما باتجاه معاكس
+            (تقديم الإعلان يُنزل من بينهم، تأخيره يُصعد من بينهم).
+          </td>
+        </tr>
+      </table>
+
+      <div class="callout danger">
+        <b>فخ مهم جداً: سلوك تجاوز الحد الأقصى مختلف بين الإنشاء والتحديث</b>
+        عند <b>الإنشاء</b> (store)، رقم ترتيب أكبر من الحد الأقصى يُوضع في <b>نهاية</b> القائمة
+        (max + 1). لكن عند <b>التحديث</b> (update) لنفس المكان، نفس الحالة تُخفَّض الرقم ليصبح
+        <b>مساوياً</b> للحد الأقصى الحالي فقط (max، وليس max + 1). يعني لو أرسلتَ رقماً وهمياً
+        كبيراً في التحديث ظناً أنه سيضع الإعلان في آخر القائمة، فقد لا يحصل ذلك بدقة كما توقعت.
+        <b>الحل الأنسب لواجهة Angular</b>: لا تسمح للمستخدم بكتابة رقم ترتيب يدوياً من حقل نصي —
+        اجعل إعادة الترتيب عبر سحب وإفلات (Drag & Drop) في الجدول، واحسب الرقم النهائي تلقائياً
+        بناءً على الموضع الجديد الفعلي في القائمة المعروضة، ثم أرسله للـ API واعتمد فقط على
+        القيمة المُعادة في الاستجابة لتحديث الواجهة.
+      </div>
+
+      <div class="code-label">مثال طلب (تغيير الترتيب فقط داخل نفس المكان)</div>
+      <pre class="code-block">{ "sort_order": 1 }</pre>
+
+      <div class="code-label">استجابة 200</div>
+      <pre class="code-block">{ "success": true, "message": "تم تحديث البيانات بنجاح", "data": { "id": "...", "sort_order": 1, "...": "..." } }</pre>
+
+      <div class="callout warn">
+        <b>فخ: يجب إعادة تحميل القائمة كاملة بعد أي عملية ترتيب</b>
+        استجابة التحديث تُرجع فقط الإعلان الذي تم تعديله، بينما إعادة الترتيب تغيّر
+        <code dir="ltr">sort_order</code> لإعلانات <b>أخرى</b> ضمنياً في قاعدة البيانات دون
+        إرجاعها في الاستجابة. لذلك بعد أي عملية سحب/إفلات ناجحة، على Angular إعادة استدعاء
+        <code dir="ltr">GET /admin/ads</code> لتحديث كامل الجدول بدل تعديل عنصر واحد محلياً
+        فقط — وإلا ستظهر أرقام ترتيب غير متزامنة بين الشاشة وقاعدة البيانات.
+      </div>
+    </div>
+
+    <!-- ================= DELETE ================= -->
+    <h2 id="admin-delete">6. حذف الإعلان</h2>
+    <div class="endpoint-line">
+      <span class="pill pill-delete">DELETE</span>
+      <span class="path" dir="ltr">/admin/ads/{id}/delete</span>
+      <span class="auth-tag">Bearer Token (Admin)</span>
+    </div>
+    <div class="card">
+      <div class="code-label">استجابة 200</div>
+      <pre class="code-block">{ "success": true, "message": "تم حذف الإعلان بالكامل وإعادة ضبط الترتيب" }</pre>
+
+      <div class="callout danger">
+        <b>عملية غير قابلة للتراجع</b>
+        الحذف يمسح صف الإعلان من قاعدة البيانات <b>وصورته من التخزين السحابي معاً</b>، بشكل نهائي
+        بلا أرشفة (لا يوجد Soft Delete هنا كما في مسار حذف الزبائن مثلاً). يجب إظهار مودال تأكيد
+        صريح قبل الاستدعاء دائماً ("سيتم حذف هذا الإعلان وصورته نهائياً، هل أنت متأكد؟").
+      </div>
+      <div class="callout tip">
+        <b>إعادة الترتيب تلقائية</b>
+        بعد الحذف، يُعاد تلقائياً ترتيب بقية إعلانات نفس المكان (كل ما كان بعده يُنقَص ترتيبه
+        بمقدار 1) — لا حاجة لأي منطق إضافي في الفرونت سوى إعادة استدعاء القائمة بعد نجاح الحذف.
+      </div>
+    </div>
+
+    <!-- ================= TOGGLE STATUS ================= -->
+    <h2 id="admin-toggle">7. تفعيل / إيقاف سريع للإعلان</h2>
+    <div class="endpoint-line">
+      <span class="pill pill-post">POST</span>
+      <span class="path" dir="ltr">/admin/ads/{id}/toggle-status</span>
+      <span class="auth-tag">Bearer Token (Admin)</span>
+    </div>
+    <div class="card">
+      <p>مسار مخصص فقط لعكس قيمة <code dir="ltr">is_active</code> بضغطة واحدة (سويتش/Toggle في
+      الجدول)، بدون الحاجة لإرسال كل بيانات الإعلان كما في مسار التحديث الكامل. لا يستقبل أي
+      Body — الـ id في الرابط وحده كافٍ.</p>
+
+      <div class="code-label">الطلب</div>
+      <pre class="code-block">POST /admin/ads/b1f5c2b0-.../toggle-status
+(بدون Body)</pre>
+
+      <div class="code-label">استجابة 200 — نجاح</div>
+      <pre class="code-block">{
+  "success": true,
+  "message": "تم تغيير حالة الإعلان",
+  "is_active": false
+}</pre>
+
+      <div class="callout warn">
+        <b>فخ: شكل استجابة مختلف عن باقي المسارات</b>
+        كل المسارات الأخرى (store, update, show...) تُرجع الإعلان كاملاً تحت مفتاح
+        <code dir="ltr">data</code>. هذا المسار وحده <b>لا يُرجع data إطلاقاً</b> — فقط
+        <code dir="ltr">is_active</code> كحقل مستقل في جذر الاستجابة (Top-level). لا تحاول
+        قراءة <code dir="ltr">response.data.is_active</code> هنا، بل
+        <code dir="ltr">response.is_active</code> مباشرة، وحدّث فقط قيمة السويتش محلياً في
+        الجدول (Optimistic Update) دون الحاجة لإعادة تحميل الصف كاملاً.
+      </div>
+      <div class="callout tip">
+        <b>الفرق عن استخدام PUT /update لنفس الغرض</b>
+        هذا المسار أخف وأسرع للسويتش السريع في الجدول لأنه لا يمر بأي منطق تحقق (Validation) أو
+        إعادة ترتيب (سويتشات الحالة لا تُغيّر <code dir="ltr">position</code> ولا
+        <code dir="ltr">sort_order</code> إطلاقاً). استخدم هذا المسار لسويتش الحالة السريع، واحفظ
+        <code dir="ltr">PUT /update</code> لنموذج التعديل الكامل فقط.
+      </div>
+    </div>
+
+    <!-- ================= BUYER INDEX ================= -->
+    <h2 id="buyer-index">مسار المشتري: عرض الإعلانات (Flutter)</h2>
+    <div class="endpoint-line">
+      <span class="pill pill-get">GET</span>
+      <span class="path" dir="ltr">/ads</span>
+      <span class="auth-tag">بدون مصادقة — مسار عام</span>
+    </div>
+    <div class="card">
+      <p>يرجع فقط الإعلانات التي تحقق <b>كل</b> الشروط التالية معاً (فلتر
+      <code dir="ltr">activeAndValid</code> في الموديل):</p>
+      <table>
+        <tr><th>الشرط</th><th>التفصيل</th></tr>
+        <tr><td><code dir="ltr">is_active</code></td><td>يجب أن تساوي true</td></tr>
+        <tr><td><code dir="ltr">start_date</code></td><td>أقل من أو يساوي الوقت الحالي</td></tr>
+        <tr><td><code dir="ltr">end_date</code></td><td>فارغة (بلا نهاية) أو أكبر من/تساوي الوقت الحالي</td></tr>
+      </table>
+
+      <div class="code-label">استجابة 200</div>
+      <pre class="code-block">{
+  "success": true,
+  "data": {
+    "home_main_banner": [
+      { "id": "...", "title": "عرض الصيف", "image_url": "https://.../ads/xyz.jpg",
+        "target_type": "external", "target_url": "https://example.com/summer-sale", "sort_order": 1 }
+    ],
+    "popup_modal": [ /* ... */ ]
+  }
+}</pre>
+
+      <div class="callout warn">
+        <b>فخ مشترك مع مسار الأدمن: نفس بنية الكائن المفتاحي</b>
+        هذا المسار يرجع نفس بنية <code dir="ltr">data</code> ككائن مفاتيحه position
+        (وليس مصفوفة) تماماً كمسار الإدارة — نفس منطق التعامل مع الاستجابة مطلوب في Flutter
+        (المرور على المفاتيح، وليس افتراض قائمة مباشرة).
+      </div>
+      <div class="callout warn">
+        <b>فخ: لا يوجد Pagination</b>
+        هذا المسار يرجع <b>كل</b> الإعلانات الصالحة دفعة واحدة بدون أي تقسيم صفحات
+        (limit/page). إذا زاد عدد الإعلانات النشطة مستقبلاً بشكل كبير، سيزداد حجم الاستجابة
+        بدون حد أقصى. لا تفترض في Flutter وجود معاملات <code dir="ltr">page</code> أو
+        <code dir="ltr">per_page</code> — هي غير مدعومة حالياً.
+      </div>
+      <div class="callout warn">
+        <b>فخ: قوائم الأدمن والمشتري ليستا نفس الكاش</b>
+        رغم تطابق شكل البيانات، مسار الأدمن (<code dir="ltr">/admin/ads</code>) يعيد كل الإعلانات
+        بينما مسار المشتري (<code dir="ltr">/ads</code>) يعيد جزءاً منها فقط بشرط فلترة مختلف
+        تماماً (وأيضاً middleware مختلف كلياً: محمي مقابل عام). لا تشارك أي Cache أو نتيجة
+        استدعاء واحدة بين لوحة الإدارة وتطبيق المشتري حتى لو كانا يعرضان "نفس البيانات" ظاهرياً.
+      </div>
+      <div class="callout tip">
+        <b>استخدام target_type/target_url/target_id عند الضغط على الإعلان</b>
+        عند نقر المستخدم على بانر: إذا <code dir="ltr">target_type = external</code> افتح
+        <code dir="ltr">target_url</code> في متصفح خارجي/WebView. إذا كانت
+        product/shop/category استخدم <code dir="ltr">target_id</code> للانتقال داخلياً للشاشة
+        المناسبة داخل التطبيق. تذكّر: الباك إند لا يضمن اتساق هذه الحقول (انظر التحذير في قسم
+        الإنشاء)، لذا تعامل مع القيم الناقصة بأمان (مثال: لا تفتح رابطاً فارغاً).
+      </div>
+    </div>
+
+    <!-- ================= MOCKUPS ================= -->
+    <h2 id="mockups">نماذج الشاشات (Mockups)</h2>
+
+    <h3>1) شاشة إدارة الإعلانات (Angular) — جدول مجمّع حسب المكان</h3>
+    <div class="mock-wrap">
+      <div class="dashboard-mock">
+        <div class="dtop"><span>لوحة التحكم — إدارة الإعلانات</span><span>Admin</span></div>
+        <div class="dtoolbar">
+          <span style="font-size:12.5px;color:#5c6b6b;">المكان: home_main_banner</span>
+          <span class="btn">+ إعلان جديد</span>
+        </div>
+        <table>
+          <tr><th>#</th><th>العنوان</th><th>الحالة</th><th>من — إلى</th><th></th></tr>
+          <tr>
+            <td>1</td><td>عرض الصيف الكبير</td>
+            <td><span class="badge-status active">مفعّل</span></td>
+            <td>01/08 — 31/08</td>
+            <td><span class="icon-btn">تعديل</span><span class="icon-btn">حذف</span></td>
+          </tr>
+          <tr>
+            <td>2</td><td>تخفيضات نهاية الأسبوع</td>
+            <td><span class="badge-status off">موقوف</span></td>
+            <td>— بلا نهاية</td>
+            <td><span class="icon-btn">تعديل</span><span class="icon-btn">حذف</span></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <p style="font-size:13.5px;color:var(--muted);">
+      عمود "#" هنا هو نفسه <code dir="ltr">sort_order</code> ويجب أن يكون قابلاً للسحب والإفلات
+      لإعادة الترتيب داخل نفس المكان فقط (السحب بين أماكن مختلفة يعني تغيير position أيضاً).
+      شارة "الحالة" (مفعّل/موقوف) قابلة للنقر وتستدعي مباشرة
+      <span class="badge-endpoint">POST /admin/ads/{id}/toggle-status</span> — تُحدَّث محلياً
+      فوراً من قيمة <code dir="ltr">is_active</code> في الاستجابة دون إعادة تحميل الجدول كاملاً.
+    </p>
+    <div class="badge-endpoint">مرتبط بـ: GET /admin/ads · DELETE /admin/ads/{id}/delete</div>
+
+    <h3>2) مودال إنشاء / تعديل إعلان</h3>
+    <div class="mock-wrap">
+      <div class="modal-wrap">
+        <div class="modal">
+          <div class="mhead">إعلان جديد</div>
+          <div class="mbody">
+            <div class="field"><label>العنوان</label><div class="box">عرض الصيف الكبير</div></div>
+            <div class="field"><label>نوع الوجهة (target_type)</label><div class="box">external ▾</div></div>
+            <div class="field"><label>رابط الوجهة (يظهر فقط عند external)</label><div class="box">https://example.com/...</div></div>
+            <div class="field"><label>المكان (position)</label><div class="box">home_main_banner ▾</div></div>
+            <div class="field"><label>من — إلى تاريخ</label><div class="box">01/08/2026 — 31/08/2026</div></div>
+          </div>
+          <div class="mfoot">
+            <span class="btn ghost">إلغاء</span>
+            <span class="btn">حفظ ومتابعة لرفع الصورة</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:13.5px;color:var(--muted);">
+      زر "حفظ" هنا لا يُغلق المودال — بل ينتقل لخطوة رفع الصورة داخل نفس المودال (انظر تدفق
+      الإنشاء أعلاه)، لأن الإعلان يُعتبر ناقصاً بدون صورة.
+    </p>
+    <div class="badge-endpoint">مرتبط بـ: POST /admin/ads/store ثم POST /admin/ads/{id}/image</div>
+
+    <h3>3) شاشة البانر داخل تطبيق المشتري (Flutter)</h3>
+    <div class="mock-wrap">
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="navtitle">الرئيسية</div>
+        <div class="screen">
+          <div class="banner">
+            عرض الصيف الكبير
+            <div class="dots"><span class="on"></span><span></span><span></span></div>
+          </div>
+          <div class="row"><div class="thumb"></div><span>قسم المنتجات المقترحة...</span></div>
+          <div class="row"><div class="thumb"></div><span>قسم المتاجر المتابَعة...</span></div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:13.5px;color:var(--muted);">
+      البانر هنا هو أول عنصر من مصفوفة <code dir="ltr">position = home_main_banner</code> بعد
+      المرور على الكائن المُعاد؛ النقاط أسفله تمثل باقي عناصر نفس المكان (سلايدر أفقي) مرتّبة
+      حسب <code dir="ltr">sort_order</code>.
+    </p>
+    <div class="badge-endpoint">مرتبط بـ: GET /ads</div>
+
+    <!-- ================= ERRORS ================= -->
+    <h2 id="errors">جدول ملخص لكل الأخطاء المتوقعة</h2>
+    <div class="card">
+      <table>
+        <tr><th>الكود</th><th>يظهر في</th><th>المعنى</th><th>ماذا يفعل الفرونت</th></tr>
+        <tr>
+          <td>201</td><td>POST /store</td><td>تم إنشاء الإعلان (بدون صورة بعد)</td>
+          <td>الانتقال فوراً لخطوة رفع الصورة باستخدام id المُعاد</td>
+        </tr>
+        <tr>
+          <td>200</td><td>باقي المسارات الناجحة</td><td>نجاح العملية</td>
+          <td>تحديث الحالة/إعادة تحميل القائمة حسب العملية</td>
+        </tr>
+        <tr>
+          <td>404</td><td>show / update / delete / uploadImage / toggle-status</td>
+          <td>الـ id غير موجود (رسالة Laravel التقنية الافتراضية)</td>
+          <td>عرض رسالة عامة "الإعلان غير موجود أو تم حذفه"، وإعادة تحميل القائمة</td>
+        </tr>
+        <tr>
+          <td>422</td><td>store / update / uploadImage</td>
+          <td>فشل تحقق (شكل {message, errors} وليس {success})</td>
+          <td>قراءة errors وعرض الرسالة تحت الحقل المطابق في الفورم</td>
+        </tr>
+        <tr>
+          <td>401 / 403</td><td>كل مسارات /admin/ads/*</td>
+          <td>عدم إرسال توكن، أو المستخدم ليس أدمن</td>
+          <td>تحويل المستخدم لصفحة تسجيل دخول الأدمن</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- ================= TIPS ================= -->
+    <h2 id="tips">نصائح عملية لتفادي الاحتكاك مع الباك إند</h2>
+    <div class="card">
+      <ol class="tips">
+        <li>لا تبني منطق ترتيب (sort_order) بنفسك في الفرونت — أرسل فقط الموضع المطلوب واعتمد
+        دائماً على القيمة المُعادة من الـ API، وأعد تحميل القائمة كاملة بعد أي عملية سحب/إفلات.</li>
+        <li>عامل حقل <code dir="ltr">data</code> في مسار جلب القوائم (index) دائماً ككائن مفتاحي
+        (Object) مبني على position، وليس كمصفوفة — في كل من Angular وFlutter.</li>
+        <li>افرض الترابط المنطقي بين <code dir="ltr">target_type</code> و
+        <code dir="ltr">target_id</code>/<code dir="ltr">target_url</code> من طرف الفرونت بنفسك،
+        فالباك إند لا يتحقق من ذلك.</li>
+        <li>تعامل مع 404 و422 بشكل مختلف عن استجابات النجاح — أشكال JSON مختلفة تماماً وليست
+        موحّدة عبر كل الحالات.</li>
+        <li>استخدم <code dir="ltr">image_url</code> كما يُعاد من الـ API مباشرة كرابط صورة جاهز،
+        بدون أي تركيب إضافي.</li>
+        <li>أظهر تأكيداً صريحاً قبل الحذف وقبل استبدال صورة موجودة — كلاهما غير قابل للتراجع.</li>
+        <li>استخدم <code dir="ltr">POST /toggle-status</code> للسويتش السريع فقط، وتذكّر أن
+        استجابته لا تحتوي <code dir="ltr">data</code> — الحقل <code dir="ltr">is_active</code>
+        في جذر الاستجابة مباشرة.</li>
+        <li>لا تستدعِ أي مسار من مسارات <code dir="ltr">/admin/*</code> من تطبيق Flutter؛ هذه
+        المسارات لواجهة Angular الإدارية فقط. المسار العام <code dir="ltr">GET /ads</code> هو
+        الوحيد المشترك بين Angular وFlutter.</li>
+      </ol>
+    </div>
+
+    <footer>
+      دليل داخلي لفريق التطوير — وحدة إدارة الإعلانات (Ads Module) · يُحدَّث عند أي تغيير في
+      الـ Controllers أو الـ Routes الخاصة بالإعلانات.
+    </footer>
+  </main>
+</div>
+</body>
+</html>

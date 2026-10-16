@@ -1,234 +1,326 @@
-<nav class="navbar">
-<div class="navbar-container">
+<nav class="navbar" [class.scrolled]="isScrolled()">
+  <div class="navbar-container">
 
-  <!-- ===== الجانب الأيمن: اللوغو ===== -->
-  <div class="navbar-logo" routerLink="/">
-    <i class="fas fa-store"></i>
-    <span>السوق الليبي</span>
-  </div>
-
-  <!-- ===== الوسط: روابط + بحث ===== -->
-  <div class="navbar-center">
-
-    <!-- روابط للجميع -->
-    <a routerLink="/"
-       routerLinkActive="active"
-       [routerLinkActiveOptions]="{exact:true}">
-      <i class="fas fa-home"></i> الرئيسية
-    </a>
-    <a routerLink="/products"
-       routerLinkActive="active">
-      <i class="fas fa-box-open"></i> المنتجات
-    </a>
-    <a routerLink="/stores"
-       routerLinkActive="active">
-      <i class="fas fa-store-alt"></i> المتاجر
+    <!-- Logo يمين -->
+    <a class="navbar-logo" routerLink="/">
+      <img src="assets/logo.png"
+           alt="مأب"
+           class="logo-navbar"
+           onerror="this.style.display='none'" />
     </a>
 
-    <!-- رابط "عن المنصة" للزائر فقط -->
-    @if (!isLoggedIn()) {
-      <a routerLink="/about" routerLinkActive="active">
-        <i class="fas fa-info-circle"></i> عن المنصة
-      </a>
+    <!-- Links وسط — للزوار -->
+    @if (!authService.isLoggedIn()) {
+      <div class="navbar-links">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">الرئيسية</a>
+        <a routerLink="/products" routerLinkActive="active">المنتجات</a>
+        <a routerLink="/stores" routerLinkActive="active">المتاجر</a>
+        <a href="#about" (click)="scrollTo('about', $event)">عن المنصة</a>
+      </div>
     }
 
-    <!-- بحث -->
-    @if (showSearch()) {
-      <div class="search-bar">
-        <input type="text"
-               placeholder="ابحث عن منتج..."
-               [value]="searchQuery()"
-               (input)="updateSearch($any($event.target).value)"
-               (keyup.enter)="onSearch()" />
-        <button (click)="onSearch()">
-          <i class="fas fa-search"></i>
+    <!-- Links — للمشتري -->
+    @if (authService.role() === 'buyer') {
+      <div class="navbar-links">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">الرئيسية</a>
+        <a routerLink="/products" routerLinkActive="active">المنتجات</a>
+        <a routerLink="/stores" routerLinkActive="active">المتاجر</a>
+      </div>
+    }
+
+    <!-- Links — للتاجر -->
+    @if (authService.role() === 'merchant') {
+      <div class="navbar-links">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">الرئيسية</a>
+        <a routerLink="/products" routerLinkActive="active">المنتجات</a>
+        <a routerLink="/stores" routerLinkActive="active">المتاجر</a>
+      </div>
+    }
+
+    <!-- Links — للإدارة -->
+    @if (authService.role() === 'admin') {
+      <div class="navbar-links">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">الرئيسية</a>
+        <a routerLink="/products" routerLinkActive="active">المنتجات</a>
+        <a routerLink="/stores" routerLinkActive="active">المتاجر</a>
+      </div>
+    }
+
+    <!-- Actions يسار -->
+    <div class="navbar-actions">
+
+      <!-- بحث -->
+      <button class="action-icon" (click)="toggleSearch()" title="بحث" aria-label="بحث">
+        <i class="fas fa-search"></i>
+      </button>
+
+      <!-- وضع ليلي -->
+      <button class="action-icon" (click)="themeService.toggle()" title="تغيير الوضع" aria-label="تغيير الوضع">
+        @if (themeService.currentTheme() === 'dark') {
+          <i class="fas fa-sun"></i>
+        } @else {
+          <i class="fas fa-moon"></i>
+        }
+      </button>
+
+      <!-- إشعارات -->
+      @if (authService.isLoggedIn()) {
+        <button class="action-icon notification-btn"
+                routerLink="/notifications"
+                title="الإشعارات" aria-label="الإشعارات">
+          <i class="fas fa-bell"></i>
+          @if (unreadCount() > 0) {
+            <span class="notif-badge">{{ unreadCount() }}</span>
+          }
         </button>
-        <button (click)="showSearch.set(false)">
+      }
+
+      <!-- سلة — للمشتري والتاجر (غير متاح للأدمن) -->
+      @if (authService.role() !== 'admin') {
+        <button class="action-icon cart-btn"
+                routerLink="/cart"
+                title="السلة" aria-label="السلة">
+          <i class="fas fa-shopping-bag"></i>
+          @if (cartService.totalItems() > 0) {
+            <span class="cart-badge">{{ cartService.totalItems() }}</span>
+          }
+        </button>
+      }
+
+      <!-- لوحة التاجر -->
+      @if (authService.role() === 'merchant') {
+        <a routerLink="/merchant" class="btn-dashboard">
+          <i class="fas fa-store"></i>
+          <span>لوحة التاجر</span>
+        </a>
+      }
+
+      <!-- لوحة الإدارة -->
+      @if (authService.role() === 'admin') {
+        <a routerLink="/admin" class="btn-dashboard admin">
+          <i class="fas fa-shield-alt"></i>
+          <span>لوحة الإدارة</span>
+        </a>
+      }
+
+      <!-- مستخدم مسجل -->
+      @if (authService.isLoggedIn()) {
+        <div class="user-menu" (click)="toggleUserMenu()">
+          <div class="user-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <span class="user-name">
+          {{ (authService.currentUser()?.full_name ?? '') .split(' ')[0] }}
+          </span>
+          <i class="fas fa-chevron-down chevron" [class.open]="showUserMenu()"></i>
+
+          @if (showUserMenu()) {
+            <div class="user-dropdown" (click)="$event.stopPropagation()">
+              <a routerLink="/profile" (click)="showUserMenu.set(false)">
+                <i class="fas fa-user-circle"></i> الملف الشخصي
+              </a>
+              @if (authService.role() === 'admin') {
+                <a routerLink="/admin" (click)="showUserMenu.set(false)">
+                  <i class="fas fa-shield-alt"></i> لوحة الإدارة
+                </a>
+              }
+              @if (authService.role() === 'merchant') {
+                <a routerLink="/merchant" (click)="showUserMenu.set(false)">
+                  <i class="fas fa-store"></i> لوحة تحكم التاجر
+                </a>
+              }
+              @if (authService.role() !== 'admin') {
+                <a routerLink="/cart" (click)="showUserMenu.set(false)">
+                  <i class="fas fa-shopping-bag"></i> سلة المشتريات
+                  @if (cartService.totalItems() > 0) {
+                    <span class="dropdown-badge">{{ cartService.totalItems() }}</span>
+                  }
+                </a>
+                <a routerLink="/orders" (click)="showUserMenu.set(false)">
+                  <i class="fas fa-receipt"></i> طلباتي
+                </a>
+                <a routerLink="/wishlist" (click)="showUserMenu.set(false)">
+                  <i class="fas fa-heart"></i> المفضلة
+                </a>
+              }
+              <div class="dropdown-divider"></div>
+              <button class="dropdown-logout" (click)="logout()">
+                <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- زائر -->
+      @if (!authService.isLoggedIn()) {
+        <a routerLink="/auth/login" class="btn-login">دخول</a>
+        <a routerLink="/auth/register" class="btn-register">حساب جديد</a>
+      }
+
+      <!-- Hamburger -->
+      <button class="hamburger" (click)="toggleMobile()" aria-label="قائمة">
+        <span [class.open]="showMobile()"></span>
+        <span [class.open]="showMobile()"></span>
+        <span [class.open]="showMobile()"></span>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  @if (showSearch()) {
+    <div class="search-bar-expanded">
+      <div class="search-inner">
+        <i class="fas fa-search"></i>
+        <input type="text"
+               placeholder="ابحث عن منتج أو متجر..."
+               #searchInput
+               [value]="searchQuery()"
+               (input)="onSearchInput($any($event.target).value)"
+               (keyup.enter)="doSearch(searchInput.value)"
+               (keyup.escape)="showSearch.set(false)" />
+        <button (click)="showSearch.set(false)" aria-label="إغلاق البحث">
           <i class="fas fa-times"></i>
         </button>
       </div>
-    }
-  </div>
 
-  <!-- ===== الجانب الأيسر: أكشن ===== -->
-  <div class="navbar-actions">
-
-    <!-- زر البحث -->
-    <button class="icon-btn" (click)="showSearch.update(v => !v)">
-      <i class="fas fa-search"></i>
-    </button>
-
-    <!-- Dark mode toggle -->
-    <button class="icon-btn" (click)="themeService.toggle()">
-      @if (themeService.currentTheme() === 'light') {
-        <i class="fas fa-moon"></i>
-      } @else {
-        <i class="fas fa-sun"></i>
-      }
-    </button>
-
-    <!-- لو زائر: زرا الدخول والتسجيل -->
-    @if (!isLoggedIn()) {
-      <button class="btn-login" (click)="goToLogin()">
-        <i class="fas fa-sign-in-alt"></i>
-        دخول
-      </button>
-      <button class="btn-register" (click)="goToRegister()">
-        <i class="fas fa-user-plus"></i>
-        حساب جديد
-      </button>
-    }
-
-    <!-- لو مسجل: إشعارات + قائمة المستخدم -->
-    @if (isLoggedIn()) {
-
-      <!-- زر الإشعارات -->
-      <div class="notification-wrapper">
-        <button class="icon-btn" (click)="toggleNotifications()">
-          <i class="fas fa-bell"></i>
-          @if (unreadCount() > 0) {
-            <span class="badge">{{ unreadCount() }}</span>
-          }
-        </button>
-
-        <!-- قائمة الإشعارات -->
-        @if (showNotifications()) {
-          <div class="dropdown notifications-dropdown">
-            <div class="dropdown-header">
-              <span>الإشعارات</span>
-              <button (click)="markAllRead()">
-                <i class="fas fa-check-double"></i>
-                قراءة الكل
-              </button>
+      <!-- Live Search Suggestions Dropdown -->
+      @if (searchQuery().trim().length >= 2) {
+        <div class="search-suggestions-dropdown">
+          @if (isSearchingLive()) {
+            <div class="suggestions-loading">
+              <i class="fas fa-circle-notch fa-spin"></i>
+              <span>جاري البحث عن "{{ searchQuery() }}"...</span>
             </div>
-            @for (notif of notifications(); track notif.id) {
-              <div class="notif-item"
-                   [class.unread]="!notif.read">
-                <i [class]="notif.icon"></i>
-                <div>
-                  <p>{{ notif.message }}</p>
-                  <small>{{ notif.time }}</small>
+          } @else {
+            <!-- المنتجات المطابقة -->
+            @if (searchProducts().length > 0) {
+              <div class="suggestions-group">
+                <div class="group-title">
+                  <i class="fas fa-box"></i> المنتجات
+                </div>
+                <div class="group-items">
+                  @for (p of searchProducts(); track p.id) {
+                    <div class="suggestion-item" (click)="goToProduct(p)">
+                      <div class="suggestion-thumb">
+                        @if (getItemImage(p)) {
+                          <img [src]="getItemImage(p)" [alt]="p.title" />
+                        } @else {
+                          <i class="fas fa-box"></i>
+                        }
+                      </div>
+                      <div class="suggestion-details">
+                        <span class="suggestion-name">{{ p.title }}</span>
+                        @if (p.price) {
+                          <span class="suggestion-price">{{ p.price }} د.ل</span>
+                        }
+                      </div>
+                    </div>
+                  }
                 </div>
               </div>
             }
-          </div>
-        }
-      </div>
 
-      <!-- زر السلة -->
-      <button class="icon-btn" (click)="router.navigate(['/cart'])">
-        <i class="fas fa-shopping-cart"></i>
-        @if (cartCount() > 0) {
-          <span class="badge">{{ cartCount() }}</span>
-        }
-      </button>
-
-      <!-- قائمة المستخدم -->
-      <div class="user-wrapper">
-        <button class="user-btn" (click)="toggleUserMenu()">
-          <i class="fas fa-user-circle text-2xl"></i>
-          <span>{{ currentUser()?.name?.split(' ')?.[0] ?? '' }}</span>
-          <i class="fas fa-chevron-down text-xs"></i>
-        </button>
-
-        @if (showUserMenu()) {
-          <div class="dropdown user-dropdown">
-
-            <!-- معلومات المستخدم -->
-            <div class="user-info">
-              <i class="fas fa-user-circle text-3xl"></i>
-              <div>
-                <p class="user-name">{{ currentUser()?.name }}</p>
-                <p class="user-email">{{ currentUser()?.email }}</p>
-                <span class="role-badge">
-                  @if (role() === 'admin') { مدير النظام }
-                  @else if (role() === 'merchant') { تاجر }
-                  @else { مشتري }
-                </span>
+            <!-- المتاجر المطابقة -->
+            @if (searchShops().length > 0) {
+              <div class="suggestions-group">
+                <div class="group-title">
+                  <i class="fas fa-store"></i> المتاجر
+                </div>
+                <div class="group-items">
+                  @for (s of searchShops(); track s.id) {
+                    <div class="suggestion-item" (click)="goToShop(s)">
+                      <div class="suggestion-thumb shop-thumb">
+                        @if (s.logo_url) {
+                          <img [src]="s.logo_url" [alt]="s.name" />
+                        } @else {
+                          <i class="fas fa-store"></i>
+                        }
+                      </div>
+                      <div class="suggestion-details">
+                        <span class="suggestion-name">{{ s.name }}</span>
+                        <span class="suggestion-sub">{{ s.description || 'متجر محلي موثوق' }}</span>
+                      </div>
+                    </div>
+                  }
+                </div>
               </div>
+            }
+
+            @if (searchProducts().length === 0 && searchShops().length === 0) {
+              <div class="suggestions-empty">
+                <i class="fas fa-search"></i>
+                <span>لم يتم العثور على نتائج سريعة لـ "{{ searchQuery() }}"</span>
+              </div>
+            }
+
+            <div class="suggestions-footer" (click)="doSearch(searchQuery())">
+              <span>عرض كافة النتائج لـ "{{ searchQuery() }}"</span>
+              <i class="fas fa-arrow-left"></i>
             </div>
+          }
+        </div>
+      }
+    </div>
+  }
 
-            <hr />
-
-            <!-- روابط حسب الـ role -->
-            <a (click)="goToProfile(); closeAll()">
-              <i class="fas fa-user"></i> حسابي
-            </a>
-
-            @if (role() === 'merchant') {
-              <a (click)="goToMerchant(); closeAll()">
-                <i class="fas fa-store"></i> لوحة التاجر
-              </a>
-            }
-
-            @if (role() === 'admin') {
-              <a (click)="goToAdmin(); closeAll()">
-                <i class="fas fa-cog"></i> لوحة الإدارة
-              </a>
-            }
-
-            <hr />
-
-            <a class="logout-btn" (click)="logout()">
-              <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
-            </a>
-          </div>
-        }
-      </div>
-    }
-
-    <!-- Mobile hamburger -->
-    <button class="icon-btn md-hide"
-            (click)="isMobileMenuOpen.update(v => !v)">
-      <i [class]="isMobileMenuOpen() ? 'fas fa-times' : 'fas fa-bars'"></i>
-    </button>
-
-  </div>
-</div>
-
-<!-- Mobile Menu -->
-@if (isMobileMenuOpen()) {
-  <div class="mobile-menu">
-    <a routerLink="/" (click)="isMobileMenuOpen.set(false)">
-      <i class="fas fa-home"></i> الرئيسية
-    </a>
-    <a routerLink="/products" (click)="isMobileMenuOpen.set(false)">
-      <i class="fas fa-box-open"></i> المنتجات
-    </a>
-    <a routerLink="/stores" (click)="isMobileMenuOpen.set(false)">
-      <i class="fas fa-store-alt"></i> المتاجر
-    </a>
-
-    @if (!isLoggedIn()) {
-      <button (click)="goToLogin(); isMobileMenuOpen.set(false)">
-        <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
-      </button>
-      <button (click)="goToRegister(); isMobileMenuOpen.set(false)">
-        <i class="fas fa-user-plus"></i> إنشاء حساب
-      </button>
-    } @else {
-      <a (click)="goToProfile(); isMobileMenuOpen.set(false)">
-        <i class="fas fa-user"></i> حسابي
+  <!-- Mobile Menu -->
+  @if (showMobile()) {
+    <div class="mobile-menu">
+      <a routerLink="/" (click)="showMobile.set(false)">
+        <i class="fas fa-home"></i> الرئيسية
       </a>
-      @if (role() === 'merchant') {
-        <a (click)="goToMerchant(); isMobileMenuOpen.set(false)">
-          <i class="fas fa-store"></i> لوحة التاجر
+      @if (authService.role() === 'admin') {
+        <a routerLink="/admin" (click)="showMobile.set(false)" style="color: var(--primary); font-weight: bold;">
+          <i class="fas fa-shield-alt"></i> لوحة الإدارة
         </a>
       }
-      @if (role() === 'admin') {
-        <a (click)="goToAdmin(); isMobileMenuOpen.set(false)">
-          <i class="fas fa-cog"></i> لوحة الإدارة
+      @if (authService.role() === 'merchant') {
+        <a routerLink="/merchant" (click)="showMobile.set(false)" style="color: var(--primary); font-weight: bold;">
+          <i class="fas fa-store"></i> لوحة تحكم التاجر
         </a>
       }
-      <button (click)="logout()">
-        <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
-      </button>
-    }
-  </div>
-}
-
-<!-- Backdrop لإغلاق القوائم -->
-@if (showUserMenu() || showNotifications()) {
-  <div class="backdrop" (click)="closeAll()"></div>
-}
+      <a routerLink="/products" (click)="showMobile.set(false)">
+        <i class="fas fa-box"></i> المنتجات
+      </a>
+      <a routerLink="/stores" (click)="showMobile.set(false)">
+        <i class="fas fa-store-alt"></i> المتاجر
+      </a>
+      <a routerLink="/terms" (click)="showMobile.set(false)">
+        <i class="fas fa-file-contract"></i> الشروط والأحكام
+      </a>
+      <a routerLink="/support" (click)="showMobile.set(false)">
+        <i class="fas fa-headset"></i> الدعم الفني
+      </a>
+      @if (authService.isLoggedIn()) {
+        <a routerLink="/profile" (click)="showMobile.set(false)">
+          <i class="fas fa-user-circle"></i> الملف الشخصي
+        </a>
+        @if (authService.role() !== 'admin') {
+          <a routerLink="/cart" (click)="showMobile.set(false)">
+            <i class="fas fa-shopping-bag"></i> سلة المشتريات
+            @if (cartService.totalItems() > 0) {
+              <span class="dropdown-badge">{{ cartService.totalItems() }}</span>
+            }
+          </a>
+          <a routerLink="/orders" (click)="showMobile.set(false)">
+            <i class="fas fa-receipt"></i> طلباتي
+          </a>
+          <a routerLink="/wishlist" (click)="showMobile.set(false)">
+            <i class="fas fa-heart"></i> المفضلة
+          </a>
+        }
+      }
+      @if (!authService.isLoggedIn()) {
+        <a href="#about" (click)="scrollTo('about', $event); showMobile.set(false)">
+          <i class="fas fa-info-circle"></i> عن المنصة
+        </a>
+        <div class="mobile-auth">
+          <a routerLink="/auth/login" class="btn-login" (click)="showMobile.set(false)">دخول</a>
+          <a routerLink="/auth/register" class="btn-register" (click)="showMobile.set(false)">حساب جديد</a>
+        </div>
+      }
+    </div>
+  }
 </nav>

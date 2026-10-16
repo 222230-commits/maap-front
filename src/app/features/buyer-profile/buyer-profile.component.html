@@ -1,0 +1,121 @@
+<div class="buyer-profile-page" dir="rtl">
+
+  <!-- تحميل -->
+  @if (isLoading()) {
+    <div class="profile-loading">
+      <i class="fas fa-circle-notch fa-spin"></i>
+      <p>جاري تحميل البروفايل...</p>
+    </div>
+  }
+
+  <!-- خطأ -->
+  @if (!isLoading() && error()) {
+    <div class="profile-error">
+      <div class="error-icon"><i class="fas fa-user-slash"></i></div>
+      <h2>{{ error() }}</h2>
+      <p>لا يمكن عرض هذا البروفايل في الوقت الحالي.</p>
+      <button class="btn-back-home" (click)="router.navigate(['/'])">
+        <i class="fas fa-home"></i> الرجوع للرئيسية
+      </button>
+    </div>
+  }
+
+  <!-- البروفايل -->
+  @if (!isLoading() && profile(); as p) {
+    <div class="profile-card">
+      @if (p.personal_info?.avatar_url) {
+        <img [src]="p.personal_info.avatar_url"
+             [alt]="p.personal_info.full_name"
+             class="profile-avatar img" />
+      } @else {
+        <div class="profile-avatar placeholder">{{ getInitial() }}</div>
+      }
+
+      <h1 class="profile-name">{{ p.personal_info?.full_name }}</h1>
+
+      @if (p.personal_info?.joined_at) {
+        <p class="joined-date">
+          <i class="fas fa-calendar-alt"></i>
+          عضو منذ {{ p.personal_info.joined_at }}
+        </p>
+      }
+
+      <!-- الإحصائيات -->
+      <div class="stats-row">
+        <div class="stat-box">
+          <span class="stat-number">{{ p.statistics?.total_orders ?? 0 }}</span>
+          <span class="stat-label">طلب</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-box">
+          <span class="stat-number">{{ p.statistics?.total_reviews_written ?? 0 }}</span>
+          <span class="stat-label">تقييم</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-box">
+          <span class="stat-number">{{ p.statistics?.followed_shops_count ?? 0 }}</span>
+          <span class="stat-label">متجر متابَع</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- المتاجر المتابَعة -->
+    <div class="shops-section">
+      <h2><i class="fas fa-store"></i> المتاجر المتابَعة</h2>
+
+      @if (isLoadingShops()) {
+        <div class="shops-loading">
+          <i class="fas fa-circle-notch fa-spin"></i>
+        </div>
+      }
+
+      @if (!isLoadingShops() && shops().length === 0) {
+        <div class="shops-empty">
+          <i class="fas fa-store-slash"></i>
+          <p>لا يتابع أي متجر بعد</p>
+        </div>
+      }
+
+      @if (!isLoadingShops()) {
+        <div class="shops-list">
+          @for (shop of shops(); track shop.id) {
+            <div class="shop-row" (click)="router.navigate(['/stores', shop.slug])">
+              @if (shop.logo_url) {
+                <img [src]="shop.logo_url" [alt]="shop.name" class="shop-logo" />
+              } @else {
+                <div class="shop-logo placeholder">
+                  <i class="fas fa-store"></i>
+                </div>
+              }
+              <div class="shop-info">
+                <p class="shop-name">{{ shop.name }}</p>
+                @if (shop.followed_at) {
+                  <p class="followed-date">
+                    <i class="fas fa-heart"></i> يتابع منذ {{ shop.followed_at }}
+                  </p>
+                }
+              </div>
+              <i class="fas fa-chevron-left shop-arrow"></i>
+            </div>
+          }
+        </div>
+
+        <!-- ترقيم صفحات -->
+        @if (shopsLastPage() > 1) {
+          <div class="pagination-row">
+            <button [disabled]="shopsCurrentPage() === 1"
+                    (click)="goToShopsPage(shopsCurrentPage() - 1)">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+            <span>{{ shopsCurrentPage() }} / {{ shopsLastPage() }}</span>
+            <button [disabled]="shopsCurrentPage() === shopsLastPage()"
+                    (click)="goToShopsPage(shopsCurrentPage() + 1)">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+          </div>
+        }
+      }
+    </div>
+  }
+
+</div>

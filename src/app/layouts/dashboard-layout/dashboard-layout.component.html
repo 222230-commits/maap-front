@@ -7,28 +7,84 @@
     [class.overflow-hidden]="!sidebarOpen()"
   >
     <div class="p-4 flex items-center justify-center border-b border-gray-700 min-h-[64px]">
-      <h1 class="text-xl font-bold whitespace-nowrap">السوق الليبي</h1>
+      <img src="assets/logo.png" alt="مأب" class="h-9 w-auto object-contain" style="filter: brightness(0) invert(1);" />
     </div>
 
     <nav class="flex-1 p-4 flex flex-col gap-2 overflow-y-auto whitespace-nowrap">
       
       @if (isMerchant()) {
-        <a routerLink="/merchant" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary" [routerLinkActiveOptions]="{exact: true}">الرئيسية</a>
-        <a routerLink="/merchant/products" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">منتجاتي</a>
-        <a routerLink="/merchant/orders" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">الطلبات</a>
-        <a routerLink="/merchant/store-settings" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">بيانات المتجر</a>
+        <a routerLink="/merchant" class="flex items-center gap-2.5 p-2.5 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary" [routerLinkActiveOptions]="{exact: true}">
+          <i class="fas fa-chart-bar w-5 text-center"></i>
+          <span>الرئيسية</span>
+        </a>
+        <a routerLink="/merchant/products" class="flex items-center gap-2.5 p-2.5 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">
+          <i class="fas fa-box w-5 text-center"></i>
+          <span>منتجاتي</span>
+        </a>
+        <a routerLink="/merchant/orders" class="flex items-center gap-2.5 p-2.5 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">
+          <i class="fas fa-shopping-bag w-5 text-center"></i>
+          <span>الطلبات</span>
+        </a>
+        <a routerLink="/merchant/store-settings" class="flex items-center gap-2.5 p-2.5 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">
+          <i class="fas fa-cog w-5 text-center"></i>
+          <span>بيانات المتجر</span>
+        </a>
+        <a routerLink="/merchant/notifications" class="flex items-center gap-2.5 p-2.5 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">
+          <i class="fas fa-bell w-5 text-center"></i>
+          <span>الإشعارات</span>
+        </a>
+        <a routerLink="/merchant/profile" class="flex items-center gap-2.5 p-2.5 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">
+          <i class="fas fa-user-circle w-5 text-center"></i>
+          <span>بروفايل المتجر</span>
+        </a>
       }
 
       @if (isAdmin()) {
-        <a routerLink="/admin" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary" [routerLinkActiveOptions]="{exact: true}">الرئيسية</a>
-        <a routerLink="/admin/applications" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">طلبات التجار</a>
-        <a routerLink="/admin/users" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">المستخدمون</a>
-        <a routerLink="/admin/reports" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">البلاغات</a>
-        <a routerLink="/admin/categories" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">التصنيفات</a>
-        <a routerLink="/admin/seasons" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">المواسم</a>
+        <a routerLink="/admin" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary" [routerLinkActiveOptions]="{exact: true}">
+          <i class="fas fa-tachometer-alt"></i> الرئيسية
+        </a>
+        <a routerLink="/admin/users" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">
+          <i class="fas fa-users"></i> المستخدمون
+        </a>
+        <a routerLink="/admin/applications" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">
+          <i class="fas fa-file-alt"></i> طلبات التجار
+        </a>
+        <a routerLink="/admin/shops" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">
+          <i class="fas fa-store"></i> المتاجر
+        </a>
+        <a routerLink="/admin/products" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">
+          <i class="fas fa-box"></i> المنتجات
+        </a>
+        <a routerLink="/admin/categories" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">
+          <i class="fas fa-sitemap"></i> التصنيفات
+        </a>
+        <a routerLink="/admin/reports" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">
+          <i class="fas fa-flag"></i> البلاغات
+        </a>
+        <a routerLink="/admin/shades" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">
+          <i class="fas fa-palette"></i> الدرجات
+        </a>
+        <a routerLink="/admin/colors" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">
+          <i class="fas fa-swatchbook"></i> الألوان
+        </a>
+        <a routerLink="/admin/sizes" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">
+          <i class="fas fa-ruler"></i> المقاسات
+        </a>
+        <a routerLink="/admin/ads" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">
+          <i class="fas fa-ad"></i> الإعلانات
+        </a>
+        <a routerLink="/admin/admins" class="block p-2 rounded hover:bg-gray-800 transition-colors" routerLinkActive="bg-primary">
+          <i class="fas fa-user-shield"></i> المديرون
+        </a>
       }
 
       <div class="mt-auto pt-4 border-t border-gray-700">
+        @if (isMerchant()) {
+          <a routerLink="/" class="sidebar-link visit-link block p-2 rounded hover:bg-gray-800 transition-colors mb-2 text-white">
+            <i class="fas fa-globe"></i>
+            <span>زيارة الموقع</span>
+          </a>
+        }
         <button (click)="logout()" class="w-full text-right p-2 rounded hover:bg-red-900 transition-colors text-red-300">
           تسجيل الخروج
         </button>
@@ -45,13 +101,13 @@
           ☰
         </button>
         <span class="font-bold text-gray-800">
-          مرحباً بك، {{ authService.currentUser()?.name || 'مستخدم' }}
+          مرحباً بك، {{ authService.currentUser()?.full_name || 'مستخدم' }}
         </span>
       </div>
     </header>
 
     <!-- Page Content -->
-    <div class="flex-1 overflow-auto p-6">
+    <div class="flex-1 overflow-auto p-6" #pageContent>
       <router-outlet />
     </div>
   </main>

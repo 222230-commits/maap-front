@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>دليل الفرونت إند — نظام الطلبات (Orders API)</title>
+<style>
+  :root{
+    --bg:#F7F6F2; --card:#FFFFFF; --border:#E3E1D9;
+    --teal:#0F6E56; --teal-light:#E1F5EE; --teal-dark:#04342C;
+    --coral:#993C1D; --coral-light:#FAECE7; --coral-border:#D85A30;
+    --purple:#3C3489; --purple-light:#EEEDFE; --purple-border:#7F77DD;
+    --gray:#5F5E5A; --text:#2C2C2A; --text-soft:#5F5E5A;
+    --code-bg:#1E2430; --code-text:#E7ECF4;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:"Segoe UI","Tahoma",Arial,sans-serif; line-height:1.8;
+    display:flex; min-height:100vh;
+  }
+  code, .mono{ font-family:"Consolas","Courier New",monospace; }
+  code[dir="ltr"], .mono[dir="ltr"]{ unicode-bidi:embed; }
+
+  nav.side{
+    position:sticky; top:0; align-self:flex-start; height:100vh; overflow-y:auto;
+    width:260px; flex:0 0 260px; background:var(--card); border-left:1px solid var(--border);
+    padding:24px 18px;
+  }
+  nav.side h3{ font-size:12px; color:var(--gray); text-transform:uppercase; letter-spacing:.5px; margin:22px 0 8px; }
+  nav.side h3:first-child{ margin-top:0; }
+  nav.side a{ display:block; color:var(--text); text-decoration:none; font-size:14px; padding:6px 8px; border-radius:6px; }
+  nav.side a:hover{ background:var(--teal-light); color:var(--teal-dark); }
+
+  main{ flex:1; padding:36px 48px 80px; max-width:980px; }
+  .eyebrow{ color:var(--teal); font-size:13px; font-weight:bold; letter-spacing:.5px; }
+  h1{ margin:6px 0 10px; font-size:30px; }
+  .lead{ color:var(--text-soft); font-size:16px; max-width:760px; }
+
+  h2{ margin-top:52px; font-size:22px; border-bottom:2px solid var(--border); padding-bottom:10px; }
+  h3{ font-size:17px; margin-top:26px; }
+
+  .card{ background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px 22px; margin:16px 0; }
+
+  table{ width:100%; border-collapse:collapse; margin:14px 0; font-size:14px; }
+  table th{ background:var(--teal-light); color:var(--teal-dark); text-align:right; padding:10px 12px; border:1px solid var(--border); }
+  table td{ padding:9px 12px; border:1px solid var(--border); vertical-align:top; }
+
+  .badge{ display:inline-block; padding:3px 10px; border-radius:5px; font-size:12px; font-weight:bold; font-family:monospace; }
+  .pill-get{ background:#DCEBFB; color:#0C447C; }
+  .pill-post{ background:var(--teal-light); color:var(--teal-dark); }
+  .pill-put{ background:#FBEAF0; color:#72243E; }
+  .pill-delete{ background:#FCEBEB; color:#791F1F; }
+  .route-line{ display:flex; align-items:center; gap:10px; margin:14px 0 6px; flex-wrap:wrap; }
+  .route-line code{ font-size:15px; }
+
+  pre{ background:var(--code-bg); color:var(--code-text); padding:14px 16px; border-radius:8px;
+       overflow-x:auto; font-size:13px; direction:ltr; text-align:left; }
+  pre code{ background:none; color:inherit; }
+
+  .callout{ border-radius:8px; padding:14px 16px; margin:14px 0; font-size:14px; border:1px solid; }
+  .warn{ background:#FAEEDA; border-color:#EF9F27; color:#633806; }
+  .danger{ background:var(--coral-light); border-color:var(--coral-border); color:var(--coral); }
+  .tip{ background:var(--teal-light); border-color:#5DCAA5; color:var(--teal-dark); }
+  .callout b{ display:block; margin-bottom:4px; }
+
+  /* Flow diagram */
+  .flow{ display:flex; flex-direction:column; gap:10px; margin:20px 0; }
+  .frow{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .fbox{ border-radius:8px; padding:10px 14px; font-size:13px; border:1px solid; min-width:150px; text-align:center; }
+  .fbox.api{ background:var(--purple-light); border-color:var(--purple-border); color:var(--purple); }
+  .fbox.state{ background:var(--teal-light); border-color:#5DCAA5; color:var(--teal-dark); }
+  .fbox.wait{ background:var(--coral-light); border-color:var(--coral-border); color:var(--coral); }
+  .fbox.end{ background:#F1EFE8; border-color:#B4B2A9; color:#444441; }
+  .branch{ font-size:12px; color:var(--gray); padding:2px 10px; }
+  .arrow{ color:var(--gray); font-size:18px; }
+
+  /* Mockups */
+  .phone{ width:300px; border:10px solid #26211c; border-radius:30px; background:#fff; margin:16px 0; overflow:hidden; box-shadow:0 0 0 1px var(--border); }
+  .screen{ padding:0; }
+  .screen .topbar{ background:var(--teal); color:#fff; padding:14px 16px; font-size:15px; font-weight:bold; }
+  .tabs{ display:flex; border-bottom:1px solid var(--border); font-size:12px; }
+  .tabs div{ flex:1; text-align:center; padding:10px 4px; color:var(--gray); position:relative; }
+  .tabs div.active{ color:var(--teal); font-weight:bold; border-bottom:2px solid var(--teal); }
+  .tabs div .count{ display:inline-block; background:var(--coral-light); color:var(--coral); border-radius:10px; padding:0 6px; font-size:10px; margin-inline-start:4px; }
+  .row{ display:flex; gap:10px; padding:12px 14px; border-bottom:1px solid var(--border); font-size:13px; align-items:center; }
+  .row img.thumb{ width:44px; height:44px; background:var(--border); border-radius:6px; flex:none; }
+  .row .info{ flex:1; }
+  .row .info small{ color:var(--gray); display:block; }
+  .status-chip{ font-size:11px; padding:2px 8px; border-radius:10px; }
+  .status-chip.pending{ background:#FAEEDA; color:#633806; }
+  .status-chip.preparing{ background:var(--purple-light); color:var(--purple); }
+  .status-chip.awaiting{ background:#DCEBFB; color:#0C447C; }
+  .status-chip.completed{ background:var(--teal-light); color:var(--teal-dark); }
+  .status-chip.cancelled{ background:#FCEBEB; color:#791F1F; }
+
+  .badge-endpoint{ display:inline-block; margin-top:10px; background:#2C2C2A; color:#fff; font-family:monospace;
+                    font-size:11px; padding:5px 10px; border-radius:6px; direction:ltr; }
+
+  .modal-wrap{ background:rgba(0,0,0,.45); border-radius:12px; padding:30px; display:flex; align-items:center; justify-content:center; margin:16px 0; }
+  .modal{ background:#fff; border-radius:10px; width:320px; padding:18px 20px; }
+  .modal h4{ margin:0 0 10px; font-size:15px; }
+  .modal .item-review{ display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); font-size:13px; }
+  .modal .toggle{ font-size:11px; }
+  .modal .toggle .avail{ color:var(--teal); }
+  .modal .toggle .unavail{ color:var(--coral); }
+  .modal button{ width:100%; background:var(--teal); color:#fff; border:none; padding:10px; border-radius:6px; margin-top:14px; font-size:14px; cursor:default; }
+
+  footer{ margin-top:60px; padding-top:20px; border-top:1px solid var(--border); font-size:12px; color:var(--gray); }
+</style>
+</head>
+<body>
+
+<nav class="side">
+  <h3>تصفح المشتري (Buyer)</h3>
+  <a href="#buyer-index">قائمة الطلبات + التابات</a>
+  <a href="#buyer-checkout">معاينة إتمام الطلب</a>
+  <a href="#buyer-store">إنشاء الطلب</a>
+  <a href="#buyer-show">تفاصيل الطلب / الفاتورة</a>
+  <a href="#buyer-respond">الرد على طلب جزئي</a>
+  <a href="#buyer-confirm">تأكيد الاستلام</a>
+  <a href="#buyer-cancel">إلغاء الطلب</a>
+
+  <h3>إدارة التاجر (Seller)</h3>
+  <a href="#seller-index">قائمة طلبات المتجر</a>
+  <a href="#seller-review">مراجعة توفر المنتجات</a>
+  <a href="#seller-ready">تحويل لجاهز للاستلام</a>
+  <a href="#seller-cancel">إلغاء من التاجر</a>
+
+  <h3>مرجع سريع</h3>
+  <a href="#flow">مخطط دورة حياة الطلب</a>
+  <a href="#errors">جدول الأخطاء</a>
+  <a href="#tips">نصائح عملية</a>
+  <a href="#backend-note">ملاحظة للباك إند</a>
+</nav>
+
+<main>
+  <div class="eyebrow">توثيق فرونت إند · Orders Module</div>
+  <h1>دليل ربط الفرونت إند بنظام الطلبات (Buyer &amp; Seller Orders)</h1>
+  <p class="lead">
+    هذا الدليل يغطي جميع مسارات الطلبات الخاصة بالمشتري والتاجر: شكل كل طلب واستجابة،
+    قواعد العمل غير الظاهرة من اسم الدالة، والفخاخ التي يجب الانتباه لها قبل البناء عليها،
+    بالإضافة لتصميم مقترح للشاشات الرئيسية وربطها بكل Endpoint.
+  </p>
+
+  <h2>نظرة عامة واختيار الأداة</h2>
+  <table>
+    <tr><th>الميزة</th><th>الأداة المقترحة</th><th>السبب</th></tr>
+    <tr>
+      <td>قائمة طلبات المشتري بتابات (الكل / قيد الانتظار / تجهيز...)</td>
+      <td>Flutter (موبايل)</td>
+      <td>تصفح متسلسل بتمرير لانهائي (pagination) وتفاعل بسيط مع كل بطاقة طلب — تجربة موبايل نموذجية.</td>
+    </tr>
+    <tr>
+      <td>شاشة إتمام الطلب (Checkout)</td>
+      <td>Flutter (موبايل)</td>
+      <td>تدفق خطي واحد (عنوان → دفع → تأكيد) مناسب لشاشة هاتف وليس لوحة تحكم.</td>
+    </tr>
+    <tr>
+      <td>مودال مراجعة التاجر لتوفر المنتجات</td>
+      <td>Angular / React (لوحة تحكم)</td>
+      <td>قائمة عناصر بحاجة لتبديل حالة (Toggle) لكل عنصر بشكل جماعي مع إرسال دفعة واحدة — مناسب لجدول تفاعلي وليس لتمرير موبايل.</td>
+    </tr>
+    <tr>
+      <td>لوحة إدارة طلبات التاجر (جدول + فلاتر تاب)</td>
+      <td>Angular / React</td>
+      <td>جدول بيانات مع فرز وفلترة وأعداد لكل حالة، أقرب لتجربة لوحة تحكم من تجربة موبايل.</td>
+    </tr>
+  </table>
+
+  <!-- ============ BUYER: INDEX ============ -->
+  <h2 id="buyer-index">1. قائمة طلبات المشتري</h2>
+  <div class="route-line">
+    <span class="badge pill-get">GET</span>
+    <code dir="ltr">/Buyer/orders?tab=pending&amp;per_page=10&amp;page=1</code>
+  </div>
+  <p>يتطلب مصادقة <code dir="ltr">auth:sanctum</code>. لا يوجد Body — فقط Query Params اختيارية: <code dir="ltr">tab</code> و <code dir="ltr">per_page</code> و <code dir="ltr">page</code>.</p>
+
+  <h3>مثال الاستجابة</h3>
+  <pre><code>{
+  "success": true,
+  "tabs_count": {
+    "all": 24,
+    "pending": 3,
+    "waiting_buyer": 2,
+    "preparing": 5,
+    "awaiting": 1,
+    "completed": 12,
+    "cancelled": 1
+  },
+  "data": {
+    "current_page": 1,
+    "data": [ { "id": "...", "status": "pending", "shop": {...}, "items": [...] } ],
+    "last_page": 3,
+    "per_page": 10,
+    "total": 24
+  }
+}</code></pre>
+
+  <div class="callout danger">
+    <b>فخ: عداد التاب المدمج ليس مُجمّعاً مسبقاً</b>
+    التاب المعروض للمستخدم هو "قيد الانتظار" ويضم فعلياً حالتي <code dir="ltr">pending</code> و <code dir="ltr">waiting_buyer</code> معاً (هذا واضح من منطق الفلترة: عند إرسال <code dir="ltr">tab=pending</code> يتم جلب الحالتين معاً). لكن <code dir="ltr">tabs_count</code> يعيدهما كحقلين منفصلين ولا يعيد رقماً مُجمّعاً جاهزاً باسم "قيد الانتظار". يجب على الفرونت جمع <code dir="ltr">pending + waiting_buyer</code> بنفسه ليطابق الرقم الفعلي الذي سيحصل عليه عند فتح ذلك التاب.
+  </div>
+  <div class="callout warn">
+    <b>فرق عن نفس الميزة عند التاجر</b>
+    مسار التاجر المكافئ (أدناه) يعيد الرقم المدمج جاهزاً تحت مفتاح <code dir="ltr">new</code>. أي أن نفس الفكرة (دمج حالتين تحت تاب واحد) مُنفّذة بطريقتين مختلفتين بين شاشتي المشتري والتاجر — لا تفترض أن الكود قابل لإعادة الاستخدام بينهما بدون تعديل.
+  </div>
+
+  <div class="phone">
+    <div class="screen">
+      <div class="topbar">طلباتي</div>
+      <div class="tabs">
+        <div class="active">الكل<span class="count">24</span></div>
+        <div>قيد الانتظار<span class="count">5</span></div>
+        <div>تجهيز<span class="count">5</span></div>
+        <div>مكتملة<span class="count">12</span></div>
+      </div>
+      <div class="row">
+        <div class="thumb"></div>
+        <div class="info">متجر الأناقة<small>3 منتجات · 145 د.ل</small></div>
+        <span class="status-chip pending">قيد الانتظار</span>
+      </div>
+      <div class="row">
+        <div class="thumb"></div>
+        <div class="info">سوق الهدايا<small>1 منتج · 60 د.ل</small></div>
+        <span class="status-chip preparing">تجهيز</span>
+      </div>
+    </div>
+  </div>
+  <div class="badge-endpoint">GET /Buyer/orders?tab=...</div>
+  <p>عدّاد تاب "قيد الانتظار" في هذه الشاشة = مجموع <code dir="ltr">pending</code> و <code dir="ltr">waiting_buyer</code> يُحسب في الفرونت وليس من قيمة جاهزة.</p>
+
+  <!-- ============ CHECKOUT PREVIEW ============ -->
+  <h2 id="buyer-checkout">2. معاينة إتمام الطلب (Checkout Preview)</h2>
+  <div class="route-line">
+    <span class="badge pill-get">GET</span>
+    <code dir="ltr">/Buyer/orders/checkout-preview?shop_id={uuid}</code>
+  </div>
+  <table>
+    <tr><th>الحقل</th><th>القاعدة</th></tr>
+    <tr><td><code dir="ltr">shop_id</code></td><td>مطلوب، uuid، يجب أن يكون موجوداً في جدول shops</td></tr>
+  </table>
+
+  <h3>استجابة النجاح 200</h3>
+  <pre><code>{
+  "success": true,
+  "checkout_data": {
+    "shop_info": { "shop_id": "...", "shop_name": "...", "accepts_returns": true, "policy_description": "..." },
+    "customer": { "saved_addresses": {...} },
+    "payment": { "methods": [
+      { "id": "Cash on Delivery", "name": "الدفع عند الاستلام", "is_available": true },
+      { "id": "Credit Card", "name": "البطاقة الائتمانية", "is_available": false,
+        "disable_reason": "هذا المتجر لا يدعم الدفع بالبطاقة." }
+    ]},
+    "invoice_summary": { "original_total": 200, "total_discount": 20, "final_total": 180, "currency": "د.ل" },
+    "items": [ { "item_id": "...", "product_name": "...", "attributes": {"color":"أحمر","size":"L"},
+                 "quantity": 2, "pricing": { "unit_old_price": 100, "unit_current_price": 90,
+                 "unit_discount": 10, "subtotal_final": 180 } } ]
+  }
+}</code></pre>
+
+  <h3>استجابة الفشل 400</h3>
+  <pre><code>{ "success": false, "message": "لا توجد منتجات في سلتك تابعة لهذا المتجر." }</code></pre>
+
+  <div class="callout danger">
+    <b>فخ: اسم الحقل "saved_addresses" مضلل</b>
+    الحقل مسمى بصيغة الجمع (<code dir="ltr">saved_addresses</code>) لكنه فعلياً يعيد قيمة <code dir="ltr">$user-&gt;address</code> المفردة كما هي (قد تكون نصاً أو كائناً واحداً وليست مصفوفة عناوين متعددة). لا تفترض إمكانية بناء قائمة اختيار من عدة عناوين محفوظة اعتماداً على هذا الحقل فقط.
+  </div>
+  <div class="callout warn">
+    <b>طريقة الدفع المعطّلة لا تزال تظهر في القائمة</b>
+    عند عدم دعم المتجر للبطاقة الائتمانية، لا يُحذف الخيار من <code dir="ltr">methods</code> بل يبقى ظاهراً مع <code dir="ltr">is_available: false</code> وحقل <code dir="ltr">disable_reason</code> إضافي (لا يظهر إطلاقاً إن كانت الطريقة متاحة). يجب على الفرونت تعطيل الزر بصرياً وعرض السبب بدل حذف الخيار من الواجهة.
+  </div>
+  <div class="callout tip">
+    <b>الخصم يُحسب هنا مسبقاً</b>
+    <code dir="ltr">unit_discount</code> و<code dir="ltr">total_discount</code> جاهزان من الباك إند، لا داعي لإعادة حسابهما يدوياً في الفرونت — استخدمهما مباشرة لتفادي فروقات تقريب.
+  </div>
+
+  <!-- ============ FLOW DIAGRAM ============ -->
+  <h2 id="flow">مخطط دورة حياة الطلب (متعدد الخطوات)</h2>
+  <p>هذا التدفق يوضح جميع المسارات الممكنة للطلب بدءاً من الإنشاء وحتى الحالة النهائية، وهو أساس فهم بقية المسارات أدناه (يظهر مصوّراً في المحادثة أعلاه أيضاً).</p>
+  <div class="flow">
+    <div class="frow"><div class="fbox api">POST /orders/store<br><small>status = pending</small></div></div>
+    <div class="frow"><span class="arrow">↓</span></div>
+    <div class="frow"><div class="fbox api">مراجعة التاجر<br><small>POST .../review</small></div></div>
+    <div class="frow">
+      <div class="branch">الكل متوفر →</div><div class="fbox state">preparing</div>
+      <div class="branch">جزئي →</div><div class="fbox wait">waiting_buyer</div>
+      <div class="branch">لا شيء متوفر →</div><div class="fbox end">cancelled (تلقائي)</div>
+    </div>
+    <div class="frow"><span class="arrow">↓ (من waiting_buyer)</span></div>
+    <div class="frow"><div class="fbox api">رد الزبون respond-review<br><small>accept: true/false</small></div></div>
+    <div class="frow">
+      <div class="branch">قبول →</div><div class="fbox state">preparing</div>
+      <div class="branch">رفض →</div><div class="fbox end">cancelled</div>
+    </div>
+    <div class="frow"><span class="arrow">↓ (من preparing)</span></div>
+    <div class="frow"><div class="fbox api">mark-ready (تاجر)</div></div>
+    <div class="frow"><span class="arrow">↓</span></div>
+    <div class="frow"><div class="fbox state">awaiting</div></div>
+    <div class="frow"><span class="arrow">↓</span></div>
+    <div class="frow"><div class="fbox api">confirm-receipt (زبون)</div></div>
+    <div class="frow"><span class="arrow">↓</span></div>
+    <div class="frow"><div class="fbox state">completed</div></div>
+  </div>
+  <div class="callout warn">
+    <b>الإلغاء cancel متاح كخط رجعة من أي حالة نشطة</b>
+    من <code dir="ltr">pending</code> وحتى <code dir="ltr">awaiting</code> يمكن للزبون أو التاجر الإلغاء عبر مساري الإلغاء المستقلين (وليس فقط من الفروع الظاهرة أعلاه). لا يمكن الإلغاء بعد <code dir="ltr">completed</code> أو <code dir="ltr">cancelled</code>.
+  </div>
+
+  <!-- ============ STORE ============ -->
+  <h2 id="buyer-store">3. إنشاء الطلب من السلة</h2>
+  <div class="route-line">
+    <span class="badge pill-post">POST</span>
+    <code dir="ltr">/Buyer/orders/store</code>
+  </div>
+  <h3>Request Body</h3>
+  <pre><code>{
+  "shop_id": "uuid",
+  "shipping_address": { "city": "...", "street": "..." },
+  "payment_method": "Cash on Delivery"
+}</code></pre>
+  <table>
+    <tr><th>الحقل</th><th>القاعدة</th></tr>
+    <tr><td><code dir="ltr">shop_id</code></td><td>مطلوب، uuid، exists:shops</td></tr>
+    <tr><td><code dir="ltr">shipping_address</code></td><td>مطلوب — يقبل نصاً أو كائن JSON، لا يوجد تحقق من الشكل الداخلي</td></tr>
+    <tr><td><code dir="ltr">payment_method</code></td><td>مطلوب، من: Cash on Delivery / Credit Card / Wallet</td></tr>
+  </table>
+
+  <h3>استجابة النجاح 201</h3>
+  <pre><code>{ "success": true, "message": "تم إنشاء الطلب بنجاح.", "data": [ { "id": "...", "status": "pending", ... } ] }</code></pre>
+  <h3>استجابة خطأ عمل (Business) 400</h3>
+  <pre><code>{ "success": false, "message": "لديك 5 طلبات مفتوحة، يرجى استكمالها أو إلغاؤها أولاً." }</code></pre>
+  <h3>استجابة خطأ غير متوقع 500</h3>
+  <pre><code>{ "success": false, "message": "حدث خطأ غير متوقع أثناء إتمام الطلب.", "error": null }</code></pre>
+
+  <div class="callout danger">
+    <b>فخ: data دائماً مصفوفة وليست كائناً واحداً</b>
+    رغم أن الطلب مرتبط بمتجر واحد (<code dir="ltr">shop_id</code>) وأن سلة الشراء المُمرَّرة للخدمة مُفلترة مسبقاً لهذا المتجر فقط، فإن الكود الداخلي يُعيد تجميع العناصر حسب المتجر من جديد (<code dir="ltr">groupBy shop_id</code>) وينشئ مصفوفة طلبات. النتيجة عملياً عنصر واحد دائماً حالياً، لكن شكل الاستجابة <b>مصفوفة</b> — تعامل مع <code dir="ltr">data[0]</code> ولا تتوقع كائناً مفرداً، خصوصاً إن تغيّرت منطق التجميع مستقبلاً لدعم سلة متعددة المتاجر في نفس الطلب.
+  </div>
+  <div class="callout warn">
+    <b>قائمة الأسباب التي تُرجع 400 كثيرة ومتنوعة</b>
+    من بينها: تجاوز 5 طلبات مفتوحة، حظر مؤقت للمستخدم بسبب تجاوز حد الإلغاءات، السلة فارغة لهذا المتجر، منتج غير متاح أو نُشر لاحقاً، نقص المخزون، لون أو مقاس لم يعد متوفراً، أو رفض المتجر للدفع بالبطاقة الائتمانية. جميعها تصل بنفس الشكل (<code dir="ltr">success:false</code> + <code dir="ltr">message</code> نصي فقط بدون كود مميز) — يجب عرض الرسالة كما هي للمستخدم وليس بناء منطق قرار عليها، لأنه لا يوجد حقل <code dir="ltr">error_code</code> يمكن الاعتماد عليه للتفريق برمجياً بين الأسباب.
+  </div>
+  <div class="callout danger">
+    <b>الحظر التلقائي للمشتري لا يظهر إلا لاحقاً</b>
+    إذا تجاوز الزبون 7 عمليات إلغاء (لأسباب خاصة به، ما عدا الإلغاء بسبب نقص المخزون) خلال 30 يوماً، يُحظر تلقائياً من الطلب لمدة 14 يوماً. لا تصل أي إشارة لهذا الحظر في استجابة الإلغاء نفسه — سيكتشفه المستخدم فقط عند محاولة إنشاء طلب جديد لاحقاً ويحصل على رسالة حظر. يُستحسن للفرونت عرض تنبيه استباقي عند اقتراب المستخدم من هذا الحد إن توفر مصدر بيانات لذلك مستقبلاً.
+  </div>
+
+  <!-- ============ SHOW ============ -->
+  <h2 id="buyer-show">4. تفاصيل الطلب / الفاتورة</h2>
+  <div class="route-line"><span class="badge pill-get">GET</span><code dir="ltr">/Buyer/orders/{id}</code></div>
+  <pre><code>{
+  "success": true,
+  "invoice": {
+    "order_number": "...", "order_date": "2026-07-20 10:30 AM",
+    "status": "preparing", "payment_method": "Cash on Delivery", "total_price": 180,
+    "shipping_address": {...}, "shop_details": {...},
+    "items": [
+      { "product_title": "قميص قطن", "quantity": 2, "unit_price": 90,
+        "total_item_price": 180, "color": "أحمر", "size": "L",
+        "availability": "pending", "image": "https://..." }
+    ]
+  }
+}</code></pre>
+  <h3>404</h3>
+  <pre><code>{ "success": false, "message": "الطلب غير موجود." }</code></pre>
+
+  <div class="callout danger">
+    <b>فخ: تسمية مختلفة لنفس المفهوم بين هذا المسار ومسار checkout-preview</b>
+    هنا اسم المنتج <code dir="ltr">product_title</code>، بينما في <code dir="ltr">checkout-preview</code> نفس المفهوم اسمه <code dir="ltr">product_name</code>. لا تشارك أي دالة عرض/تحويل (mapper) واحدة بين الشاشتين بافتراض تطابق أسماء الحقول.
+  </div>
+  <div class="callout warn">
+    <b>availability تبقى "pending" طالما لم تتم المراجعة</b>
+    الحقل مبني على استعلام منفصل لجدول المراجعات لكل عنصر. لأي طلب لم يخضع بعد لمراجعة التاجر (status = pending) ستكون القيمة دائماً <code dir="ltr">pending</code> لكل العناصر — لا تعرض شارة "غير متوفر/متوفر" قبل أن تتغير حالة الطلب فعلياً.
+  </div>
+  <div class="callout tip">
+    <b>اللون والمقاس هنا Snapshot ثابت</b>
+    <code dir="ltr">color</code> و <code dir="ltr">size</code> يُقرآن من لقطة محفوظة وقت إنشاء الطلب وليس من بيانات المنتج الحالية، لذا ستبقى صحيحة حتى لو عدّل التاجر ألوان/مقاسات المنتج لاحقاً.
+  </div>
+
+  <!-- ============ RESPOND REVIEW ============ -->
+  <h2 id="buyer-respond">5. رد الزبون على طلب جزئي التوفر</h2>
+  <div class="route-line"><span class="badge pill-post">POST</span><code dir="ltr">/Buyer/orders/{order}/respond-review</code></div>
+  <pre><code>{ "accept": true }</code></pre>
+  <pre><code>{ "success": true, "message": "تم اعتماد الطلب للمنتجات المتوفرة." }</code></pre>
+  <div class="callout danger">
+    <b>فخ: لا يوجد try/catch حول هذا المسار</b>
+    استدعاء الخدمة هنا غير مغلّف بمعالجة استثناءات في الـ Controller. إن حاول مشتري آخر غير مالك الطلب الوصول لهذا المسار، أو أُرسل الطلب وهو ليس بحالة تتطلب موافقة (<code dir="ltr">requires_buyer_approval = false</code>)، فسيرمي الكود استثناء <code dir="ltr">BusinessException</code> لن يُلتقط هنا، والنتيجة صفحة خطأ خادم قياسية (غير JSON منسّق بـ success/message) بدل استجابة نظيفة 400/403. يجب على الفرونت عدم الاعتماد على شكل <code dir="ltr">{success:false}</code> لهذا المسار تحديداً عند التعامل مع الفشل، والتعامل مع أي استجابة غير JSON كخطأ عام.
+  </div>
+  <div class="callout tip">
+    <b>الإجمالي يُعاد حسابه تلقائياً عند القبول الجزئي</b>
+    <code dir="ltr">total_price</code> يُعاد احتسابه بالخادم بناءً على العناصر المتوفرة فقط — لا تعرض للمستخدم مجموعاً محسوباً في الفرونت من قبل، بل اطلب الفاتورة المحدثة عبر <code dir="ltr">GET /orders/{id}</code> بعد الرد.
+  </div>
+
+  <!-- ============ CONFIRM RECEIPT ============ -->
+  <h2 id="buyer-confirm">6. تأكيد استلام الطلب</h2>
+  <div class="route-line"><span class="badge pill-post">POST</span><code dir="ltr">/Buyer/orders/{order}/confirm-receipt</code></div>
+  <pre><code>{ "success": true, "message": "تم تأكيد الاستلام بنجاح، شكراً لك." }</code></pre>
+  <div class="callout danger">
+    <b>فخ: عملية نهائية غير قابلة للتراجع + لا يوجد try/catch</b>
+    بعد هذا الاستدعاء تتحول الحالة إلى <code dir="ltr">completed</code> نهائياً — لا يوجد مسار رجوع أو إلغاء بعدها في الكود. تأكد من وجود تأكيد صريح (نافذة "هل أنت متأكد؟") قبل الاستدعاء. كذلك هذا المسار غير مغلّف بمعالجة استثناءات، فمحاولة التأكيد على طلب ليس بحالة <code dir="ltr">awaiting</code> أو لا يخص المستخدم سترمي خطأ غير منسّق (وليس JSON نظيفاً).
+  </div>
+
+  <!-- ============ CANCEL BUYER ============ -->
+  <h2 id="buyer-cancel">7. إلغاء الطلب (من المشتري)</h2>
+  <div class="route-line"><span class="badge pill-post">POST</span><code dir="ltr">/Buyer/orders/{order}/cancel</code></div>
+  <pre><code>{ "reason": "غيّرت رأيي" }</code></pre>
+  <pre><code>{ "success": true, "message": "تم إلغاء الطلب." }</code></pre>
+  <div class="callout danger">
+    <b>فخ مكرر: نفس غياب معالجة الاستثناءات</b>
+    محاولة إلغاء طلب مكتمل بالفعل أو ملغي سابقاً سترمي <code dir="ltr">BusinessException</code> غير مُلتقطة هنا أيضاً → استجابة غير منسّقة. يُستحسن أن يُخفي الفرونت زر "إلغاء" أصلاً عن أي طلب بحالة <code dir="ltr">completed</code> أو <code dir="ltr">cancelled</code> لتفادي الوصول لهذا المسار أصلاً بدل الاعتماد على رسالة خطأ نظيفة من الخادم.
+  </div>
+  <div class="callout warn">
+    <b>هذا الإلغاء قد يُحتسب ضمن حد الحظر</b>
+    كل إلغاء من هذا المسار (بسبب غير نقص المخزون) يُحسب ضمن عداد الإلغاءات الشهري الذي قد يؤدي لحظر 14 يوماً عند تجاوز 7 مرات. راجع الفخ في قسم "إنشاء الطلب" أعلاه.
+  </div>
+
+  <!-- ============ SELLER INDEX ============ -->
+  <h2 id="seller-index">8. قائمة طلبات المتجر (للتاجر)</h2>
+  <div class="route-line"><span class="badge pill-get">GET</span><code dir="ltr">/store/orders?tab=new</code></div>
+  <pre><code>{
+  "success": true,
+  "tabs_count": { "all": 40, "new": 5, "preparing": 8, "awaiting": 2, "completed": 24, "cancelled": 1 },
+  "data": { "current_page": 1, "data": [...], "per_page": 15, "total": 40 }
+}</code></pre>
+  <div class="callout tip">
+    <b>هنا العد مُجمّع مسبقاً</b>
+    مفتاح <code dir="ltr">new</code> يمثل مجموع <code dir="ltr">pending + waiting_buyer</code> جاهزاً من الخادم (بعكس شاشة المشتري في القسم 1). لا حاجة لأي جمع يدوي هنا.
+  </div>
+  <div class="callout warn">
+    <b>عدد العناصر بالصفحة ثابت هنا: 15</b>
+    بعكس مسار المشتري الذي يقبل <code dir="ltr">per_page</code> اختياري، هذا المسار يتجاهل أي قيمة تُرسل من الفرونت ويستخدم 15 دائماً — لا تبني منطق ترقيم (pagination) في الواجهة بافتراض إمكانية التحكم بحجم الصفحة.
+  </div>
+  <div class="callout danger">
+    <b>404 بدون status code JSON منسق دائماً، لكن هذه الحالة نفسها منسّقة فعلاً</b>
+    إن لم يملك المستخدم الحالي متجراً (<code dir="ltr">shop = null</code>) يعيد الكود JSON نظيفاً بحالة 404 ورسالة "متجر غير موجود." — وهذه حالة متسقة، لكنها الاستثناء الوحيد المنسق ضمن كل مسارات التاجر كما سترى أدناه.
+  </div>
+
+  <!-- ============ SELLER REVIEW ============ -->
+  <h2 id="seller-review">9. مراجعة التاجر لتوفر المنتجات</h2>
+  <div class="route-line"><span class="badge pill-post">POST</span><code dir="ltr">/store/orders/{order}/review</code></div>
+  <pre><code>{
+  "items": [
+    { "id": "order-item-uuid-1", "is_available": true },
+    { "id": "order-item-uuid-2", "is_available": false, "notes": "نفذت الكمية من هذا اللون" }
+  ]
+}</code></pre>
+  <table>
+    <tr><th>الحقل</th><th>القاعدة</th></tr>
+    <tr><td><code dir="ltr">items</code></td><td>مطلوب، مصفوفة</td></tr>
+    <tr><td><code dir="ltr">items.*.id</code></td><td>مطلوب، موجود في order_items</td></tr>
+    <tr><td><code dir="ltr">items.*.is_available</code></td><td>مطلوب، boolean</td></tr>
+    <tr><td><code dir="ltr">items.*.notes</code></td><td>اختياري، نص حتى 255 حرفاً</td></tr>
+  </table>
+  <h3>ثلاث استجابات نجاح مختلفة بنفس الشكل الظاهري (200)</h3>
+  <pre><code>// كل العناصر متوفرة
+{ "success": true, "message": "تم مراجعة الطلب وجميع المنتجات متوفرة (انتقل إلى قيد التجهيز)." }
+
+// بعض العناصر غير متوفرة
+{ "success": true, "message": "يوجد منتجات غير متوفرة، تم تعليق الطلب بانتظار قرار الزبون." }
+
+// كل العناصر غير متوفرة
+{ "success": true, "message": "تم إلغاء الطلب بالكامل لعدم توفر جميع المنتجات." }</code></pre>
+  <div class="callout danger">
+    <b>فخ: النتيجة الفعلية غير معروفة إلا من نص الرسالة</b>
+    الاستجابة الناجحة لا تعيد الحالة الجديدة للطلب <code dir="ltr">status</code> ولا أي حقل مهيكل يوضح أي سيناريو من الثلاثة تحقق — فقط رسالة نصية موجهة للعرض المباشر للمستخدم. إن احتجت التصرف برمجياً (مثلاً إغلاق المودال أو تحديث شارة الحالة في القائمة)، يجب عليك استدعاء <code dir="ltr">GET /store/orders</code> أو تفاصيل الطلب من جديد بعد نجاح هذا الاستدعاء لمعرفة الحالة الفعلية، ولا تعتمد على تحليل نص الرسالة.
+  </div>
+  <div class="callout danger">
+    <b>فخ: عدم وجود صلاحية مالكة مرئية في الكود هنا يعتمد على الخدمة فقط</b>
+    التحقق من كون التاجر هو مالك المتجر الفعلي للطلب يتم داخل الخدمة عبر استثناء غير مُلتقط في الـ Controller — أي محاولة تاجر مراجعة طلب لا يخصه سترمي خطأ خادم غير منسّق (وليس 403 نظيفاً كما في مسار الإلغاء أدناه الذي يتحقق صراحة في الـ Controller).
+  </div>
+  <div class="callout warn">
+    <b>المخزون يُعاد فوراً عند تحديد "غير متوفر"</b>
+    أي عنصر يُحدَّد <code dir="ltr">is_available:false</code> تُعاد كميته للمخزون فوراً ضمن نفس المعاملة، بغض النظر عن قرار الزبون اللاحق. لا تعرض للتاجر أي خيار "تراجع" بعد الإرسال دون إعادة تحميل بيانات المنتج، لأن المخزون يكون قد تغيّر فعلياً.
+  </div>
+
+  <div class="modal-wrap">
+    <div class="modal">
+      <h4>مراجعة توفر المنتجات</h4>
+      <div class="item-review">
+        <span>قميص قطن أحمر / L</span>
+        <span class="toggle"><span class="avail">متوفر</span> / <span class="unavail">غير متوفر</span></span>
+      </div>
+      <div class="item-review">
+        <span>حذاء رياضي / 42</span>
+        <span class="toggle"><span class="avail">متوفر</span> / <span class="unavail">غير متوفر</span></span>
+      </div>
+      <button>إرسال المراجعة</button>
+    </div>
+  </div>
+  <div class="badge-endpoint">POST /store/orders/{order}/review</div>
+  <p>زر "إرسال المراجعة" يبقى مفعّلاً حتى لو لم يُبدَّل أي عنصر (الافتراضي "متوفر" لكل العناصر يعني موافقة كاملة). بعد الإرسال الناجح أعد جلب تفاصيل الطلب لتحديث شارة الحالة بدل قراءة النتيجة من الرسالة النصية.</p>
+
+  <!-- ============ SELLER MARK READY ============ -->
+  <h2 id="seller-ready">10. تحويل الطلب لانتظار استلام الزبون</h2>
+  <div class="route-line"><span class="badge pill-post">POST</span><code dir="ltr">/store/orders/{order}/mark-ready</code></div>
+  <pre><code>{ "success": true, "message": "تم تحويل الطلب إلى انتظار تأكيد استلام الزبون." }</code></pre>
+  <div class="callout danger">
+    <b>فخ: يشترط أن يكون الطلب preparing فعلاً، بدون التقاط الاستثناء</b>
+    محاولة استدعاء هذا المسار على طلب ليس في حالة <code dir="ltr">preparing</code> (مثلاً ما زال pending) سترمي استثناء غير مُلتقط هنا أيضاً. أخفِ هذا الزر في الواجهة إلا عندما تكون حالة الطلب المعروضة فعلياً <code dir="ltr">preparing</code>.
+  </div>
+
+  <!-- ============ SELLER CANCEL ============ -->
+  <h2 id="seller-cancel">11. إلغاء الطلب من التاجر</h2>
+  <div class="route-line"><span class="badge pill-post">POST</span><code dir="ltr">/store/orders/{order}/cancel</code></div>
+  <pre><code>{ "reason": "نفذت الكمية بالكامل" }</code></pre>
+  <h3>403 — التاجر لا يملك هذا الطلب</h3>
+  <pre><code>{ "success": false, "message": "غير مصرح لك بإلغاء هذا الطلب." }</code></pre>
+  <div class="callout tip">
+    <b>هذا المسار الوحيد بين مسارات التاجر الذي يتحقق من الصلاحية بشكل صريح في الـ Controller</b>
+    لذلك هو المسار الوحيد الذي يمكن الاعتماد فيه فعلياً على استجابة JSON منسّقة (403) عند محاولة الوصول لطلب لا يخص التاجر. باقي مسارات التاجر (المراجعة، mark-ready) تعتمد على استثناء داخلي غير مُلتقط لنفس السيناريو.
+  </div>
+  <div class="callout warn">
+    <b>هذا الإلغاء لا يُحسب على الزبون</b>
+    الإلغاء من طرف التاجر يُسجَّل بعلامة <code dir="ltr">is_seller_fault = true</code> ولا يدخل ضمن عداد الإلغاءات المؤدي لحظر المشتري — بعكس إلغاء المشتري لنفس الطلب.
+  </div>
+
+  <!-- ============ ERRORS TABLE ============ -->
+  <h2 id="errors">جدول ملخص لكل الأخطاء المتوقعة</h2>
+  <table>
+    <tr><th>الكود</th><th>يظهر في</th><th>المعنى</th><th>ماذا يفعل الفرونت</th></tr>
+    <tr><td>200 / 201</td><td>جميع المسارات الناجحة</td><td>نجاح العملية</td><td>عرض البيانات أو الرسالة، وإعادة جلب البيانات المرتبطة إن لزم</td></tr>
+    <tr><td>400</td><td>store, checkout-preview</td><td>خطأ عمل معروف (مخزون، حظر، سلة فارغة...)</td><td>عرض <code dir="ltr">message</code> مباشرة للمستخدم دون تفسير إضافي</td></tr>
+    <tr><td>403</td><td>seller cancelOrder فقط</td><td>الطلب لا يخص التاجر الحالي</td><td>هذا سيناريو غير متوقع أصلاً في تدفق سليم — سجّله وأعد توجيه المستخدم</td></tr>
+    <tr><td>404</td><td>buyer show, seller index (متجر غير موجود)</td><td>الطلب أو المتجر غير موجود</td><td>عرض شاشة "غير موجود" والعودة للقائمة</td></tr>
+    <tr><td>500 (بدون JSON منسّق)</td><td>respond-review, confirm-receipt, buyer cancel, seller review, mark-ready</td><td>استثناء عمل لم يُلتقط في الـ Controller (حالة غير صالحة أو صلاحية مرفوضة)</td><td>عامله كخطأ عام غير معروف؛ الوقاية الحقيقية هي إخفاء الزر المؤدي لهذا المسار إلا في الحالة الصحيحة للطلب</td></tr>
+    <tr><td>500 (JSON منسّق)</td><td>store فقط</td><td>خطأ غير متوقع تم التقاطه صراحة</td><td>عرض رسالة عامة؛ حقل <code dir="ltr">error</code> يظهر فقط في بيئة التطوير</td></tr>
+  </table>
+
+  <!-- ============ TIPS ============ -->
+  <h2 id="tips">نصائح عملية لتفادي الاحتكاك مع الباك إند</h2>
+  <div class="card">
+    <ol>
+      <li>لا تعتمد على تحليل نص رسائل النجاح لمعرفة النتيجة الفعلية (خصوصاً مسار مراجعة التاجر) — أعد جلب حالة الطلب بعد كل عملية تغيّر الحالة.</li>
+      <li>أخفِ الأزرار التي تؤدي لمسارات بلا معالجة استثناءات (respond-review, confirm-receipt, cancel, review, mark-ready) إلا عندما تكون حالة الطلب الحالية مطابقة فعلياً لما يقبله المسار، لتفادي الوصول لخطأ خادم غير منسّق.</li>
+      <li>لا تشارك دالة تحويل بيانات (mapper) واحدة بين استجابة <code dir="ltr">checkout-preview</code> واستجابة <code dir="ltr">show</code> — أسماء الحقول لنفس المفهوم مختلفة بينهما.</li>
+      <li>احسب عدّاد التاب "قيد الانتظار" عند المشتري يدوياً (pending + waiting_buyer)، وعند التاجر استخدم مفتاح <code dir="ltr">new</code> الجاهز مباشرة.</li>
+      <li>لا تمرر <code dir="ltr">per_page</code> في قائمة طلبات التاجر — يتم تجاهله دائماً (15 ثابتة).</li>
+      <li>تعامل مع <code dir="ltr">data</code> في استجابة إنشاء الطلب كمصفوفة دائماً، حتى عند توقع عنصر واحد فقط.</li>
+      <li>اطلب من المستخدم تأكيداً صريحاً قبل استدعاء <code dir="ltr">confirm-receipt</code>، فهي عملية نهائية بلا رجعة في الكود الحالي.</li>
+    </ol>
+  </div>
+
+  <!-- ============ BACKEND NOTE ============ -->
+  <h2 id="backend-note">ملاحظة مقترحة لفريق الباك إند</h2>
+  <div class="callout warn">
+    <b>توحيد معالجة الاستثناءات عبر مسارات الطلبات</b>
+    خمسة من أصل تسعة مسارات (respond-review, confirm-receipt, buyer cancel, seller review, seller mark-ready) لا تُغلّف استدعاء الخدمة بـ try/catch، بعكس مسار <code dir="ltr">store</code> الذي يعالج <code dir="ltr">BusinessException</code> بشكل نظيف. يُقترح تطبيق نفس نمط المعالجة (أو Exception Handler عام على مستوى التطبيق لـ BusinessException) على بقية المسارات، وإضافة حقل <code dir="ltr">error_code</code> ثابت بجانب <code dir="ltr">message</code> ليتمكن الفرونت من التفريق البرمجي بين أنواع الأخطاء دون تحليل النص العربي.
+  </div>
+
+  <footer>
+    دليل داخلي لفريق الفرونت إند — تم إنشاؤه بواسطة تحليل مباشر لكود Orders Module (Controllers + Service + Routes).
+  </footer>
+</main>
+
+</body>
+</html>

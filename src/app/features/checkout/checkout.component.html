@@ -1,0 +1,269 @@
+<div class="checkout-page" dir="rtl">
+
+  <!-- شريط التقدم -->
+  <div class="checkout-progress">
+    <button class="back-btn" (click)="router.navigate(['/cart'])" aria-label="الرجوع للسلة">
+      <i class="fas fa-arrow-right"></i>
+    </button>
+    <div class="steps">
+      <div class="step" [class.active]="step() === 1" [class.done]="step() === 2">
+        <div class="step-circle"><i class="fas fa-shopping-cart"></i></div>
+        <span>مراجعة الطلب</span>
+      </div>
+      <div class="step-line" [class.done]="step() === 2"></div>
+      <div class="step" [class.active]="step() === 2">
+        <div class="step-circle"><i class="fas fa-check"></i></div>
+        <span>تأكيد</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- تحميل -->
+  @if (isLoading()) {
+    <div class="loading-state">
+      <i class="fas fa-circle-notch fa-spin"></i>
+      <p>جاري تحضير الطلب...</p>
+    </div>
+  }
+
+  <!-- خطأ فادح (لا بيانات) -->
+  @if (!isLoading() && error() && !checkoutData()) {
+    <div class="error-card">
+      <div class="error-icon"><i class="fas fa-cart-xmark"></i></div>
+      <h2>تعذّر إتمام الطلب</h2>
+      <p>{{ error() }}</p>
+      <div class="error-actions">
+        <button class="btn-primary" (click)="router.navigate(['/cart'])">
+          <i class="fas fa-shopping-cart"></i> الرجوع للسلة
+        </button>
+        <button class="btn-secondary" (click)="router.navigate(['/stores'])">
+          <i class="fas fa-store"></i> تصفح المتاجر
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- الخطوة 1: مراجعة وتأكيد -->
+  @if (!isLoading() && checkoutData() && step() === 1) {
+    <div class="checkout-content">
+
+      @if (otherShopsCount() > 0) {
+        <div class="checkout-multishop-banner">
+          <div class="banner-icon"><i class="fas fa-store"></i></div>
+          <div class="banner-text">
+            <strong>طلب خاص بمتجر: {{ checkoutData()?.shop_info?.shop_name || 'هذا المتجر' }}</strong>
+            <p>لديك منتجات أخرى في السلة تابعة لـ {{ otherShopsCount() }} متجر آخر، ستتمكن من إتمامها فور تأكيد هذا الطلب.</p>
+          </div>
+        </div>
+      }
+
+      <!-- معلومات المتجر -->
+      <div class="info-card shop-card">
+        <div class="card-header">
+          <i class="fas fa-store-alt"></i>
+          <h3>{{ checkoutData().shop_info?.shop_name ?? 'المتجر' }}</h3>
+        </div>
+        @if (checkoutData().shop_info?.policy_description) {
+          <p class="shop-policy">{{ checkoutData().shop_info.policy_description }}</p>
+        }
+      </div>
+
+      <!-- المنتجات -->
+      @if (checkoutData().items?.length > 0) {
+        <div class="info-card">
+          <div class="card-header">
+            <i class="fas fa-box-open"></i>
+            <h3>المنتجات ({{ checkoutData().items.length }})</h3>
+          </div>
+          <div class="items-list">
+            @for (item of checkoutData().items; track item.item_id) {
+              <div class="checkout-item">
+                @if (item.image_url) {
+                  <img [src]="item.image_url" [alt]="item.product_name" class="item-img" />
+                } @else {
+                  <div class="item-img-placeholder"><i class="fas fa-image"></i></div>
+                }
+                <div class="item-details">
+                  <p class="item-name">{{ item.product_name }}</p>
+                  <p class="item-attrs">
+                    @if (item.attributes?.color) { <span>{{ item.attributes.color }}</span> }
+                    @if (item.attributes?.shade) { <span>درجة: {{ item.attributes.shade }}</span> }
+                    @if (item.attributes?.size) { <span>{{ item.attributes.size }}</span> }
+                    <span>{{ item.quantity }} قطعة</span>
+                  </p>
+                </div>
+                <span class="item-price">
+                  {{ formatPrice(item.pricing?.subtotal_final ?? item.pricing?.subtotal ?? 0) }}
+                </span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- الفاتورة -->
+      @if (checkoutData().invoice_summary) {
+        <div class="info-card invoice-card">
+          <div class="card-header">
+            <i class="fas fa-receipt"></i>
+            <h3>ملخص الفاتورة</h3>
+          </div>
+          <div class="invoice-rows">
+            <div class="invoice-row">
+              <span>المجموع الفرعي</span>
+              <span>{{ formatPrice(checkoutData().invoice_summary.original_total) }}</span>
+            </div>
+            @if ((checkoutData().invoice_summary.total_discount ?? 0) > 0) {
+              <div class="invoice-row discount">
+                <span>الخصم</span>
+                <span>- {{ formatPrice(checkoutData().invoice_summary.total_discount) }}</span>
+              </div>
+            }
+            <div class="invoice-row total">
+              <span>الإجمالي</span>
+              <strong>{{ formatPrice(checkoutData().invoice_summary.final_total) }}</strong>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- عنوان الشحن -->
+      <div class="info-card">
+        <div class="card-header">
+          <i class="fas fa-map-marker-alt"></i>
+          <h3>عنوان التوصيل</h3>
+        </div>
+        <textarea class="address-input"
+                  rows="3"
+                  placeholder="مثال: طرابلس، شارع الجمهورية، بجوار مسجد..."
+                  [value]="shippingAddress()"
+                  (input)="shippingAddress.set($any($event.target).value)">
+        </textarea>
+      </div>
+
+      <!-- طريقة الدفع -->
+      @if (checkoutData().payment?.methods?.length > 0) {
+        <div class="info-card">
+          <div class="card-header">
+            <i class="fas fa-wallet"></i>
+            <h3>طريقة الدفع</h3>
+          </div>
+          <div class="payment-options">
+            @for (method of checkoutData().payment.methods; track method.id) {
+              <div class="payment-option"
+                   [class.selected]="selectedPaymentMethod() === method.id"
+                   [class.disabled]="!method.is_available"
+                   (click)="selectPayment(method.id, method.is_available)">
+                <div class="radio-dot" [class.active]="selectedPaymentMethod() === method.id"></div>
+                <div class="payment-info">
+                  <span class="payment-name">{{ method.name }}</span>
+                  @if (!method.is_available && method.disable_reason) {
+                    <span class="disable-reason">{{ method.disable_reason }}</span>
+                  }
+                </div>
+                <i class="fas"
+                   [class.fa-money-bill-wave]="method.id === 'Cash on Delivery'"
+                   [class.fa-credit-card]="method.id !== 'Cash on Delivery'"></i>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- خطأ في الإرسال -->
+      @if (error()) {
+        <div class="alert-error">
+          <i class="fas fa-exclamation-circle"></i> {{ error() }}
+        </div>
+      }
+
+      <!-- زر التأكيد -->
+      <button class="btn-confirm"
+              [disabled]="isSubmitting() || !shippingAddress().trim()"
+              (click)="submitOrder()">
+        @if (isSubmitting()) {
+          <i class="fas fa-spinner fa-spin"></i> جاري إرسال الطلب...
+        } @else {
+          <i class="fas fa-paper-plane"></i> تأكيد وإرسال الطلب
+        }
+      </button>
+
+    </div>
+  }
+
+  <!-- الخطوة 2: نجاح! -->
+  @if (step() === 2) {
+    <div class="success-card">
+      <div class="success-animation">
+        <div class="success-circle">
+          <i class="fas fa-check"></i>
+        </div>
+      </div>
+      <h2>تم إرسال طلبك بنجاح! 🎉</h2>
+      <p class="success-subtitle">سيتواصل معك المتجر قريباً لتأكيد الطلب وتحديد موعد التوصيل.</p>
+
+      @if (placedOrder()) {
+        <div class="order-summary-box">
+          <div class="order-id-row">
+            <div class="order-id">
+              <i class="fas fa-hashtag"></i>
+              <span>رقم الطلب:</span>
+              <strong class="order-num">{{ placedOrder().id }}</strong>
+            </div>
+            <button class="btn-copy-id"
+                    (click)="copyOrderId(placedOrder().id)"
+                    [class.copied]="copiedOrderNumber()"
+                    title="نسخ رقم الطلب">
+              @if (copiedOrderNumber()) {
+                <i class="fas fa-check"></i> تم النسخ
+              } @else {
+                <i class="far fa-copy"></i> نسخ
+              }
+            </button>
+          </div>
+
+          @if (placedOrder().total_price) {
+            <div class="order-total">
+              <span>المجموع:</span>
+              <strong>{{ formatPrice(placedOrder().total_price) }}</strong>
+            </div>
+          }
+        </div>
+      }
+
+      <div class="next-steps-guide">
+        <div class="step-guide-item">
+          <i class="fas fa-phone-alt"></i>
+          <span>تأكيد المتجر هاتفياً</span>
+        </div>
+        <div class="step-guide-arrow"><i class="fas fa-chevron-left"></i></div>
+        <div class="step-guide-item">
+          <i class="fas fa-box-open"></i>
+          <span>تجهيز الشحنة</span>
+        </div>
+        <div class="step-guide-arrow"><i class="fas fa-chevron-left"></i></div>
+        <div class="step-guide-item">
+          <i class="fas fa-shipping-fast"></i>
+          <span>التوصيل والاستلام</span>
+        </div>
+      </div>
+
+      <div class="success-actions">
+        <button class="btn-primary" (click)="goToOrder()">
+          <i class="fas fa-box"></i> تتبع تفاصيل الطلب
+        </button>
+
+        @if (otherShopsCount() > 0) {
+          <button class="btn-next-shop" (click)="goToNextShopInCart()">
+            <i class="fas fa-shopping-bag"></i> متابعة طلب المتجر التالي في السلة
+          </button>
+        }
+
+        <button class="btn-outline" (click)="router.navigate(['/'])">
+          <i class="fas fa-home"></i> العودة للرئيسية
+        </button>
+      </div>
+    </div>
+  }
+
+</div>

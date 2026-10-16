@@ -1,0 +1,91 @@
+<div class="send-notification-page">
+  <div class="page-header">
+    <h1><i class="fas fa-paper-plane"></i> إرسال إشعار للتجار</h1>
+    <p>أرسل إشعارات مباشرة لتجار المنصة حسب التصنيف</p>
+  </div>
+
+  @if (sent()) {
+    <div class="success-banner">
+      <i class="fas fa-check-circle"></i>
+      تم إرسال الإشعار بنجاح إلى {{ sentCount() }} تاجر!
+    </div>
+  }
+
+  <div class="notification-form">
+
+    <!-- نوع الإشعار -->
+    <div class="form-section">
+      <h3><i class="fas fa-tag"></i> نوع الإشعار</h3>
+      <div class="type-options">
+        @for (type of notificationTypes; track type.id) {
+          <div class="type-option"
+               [class.selected]="notificationType() === type.id"
+               (click)="notificationType.set($any(type.id))">
+            <i [class]="type.icon" [style.color]="type.color"></i>
+            <span>{{ type.name }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- الفئة المستهدفة -->
+    <div class="form-section">
+      <h3><i class="fas fa-users"></i> الفئة المستهدفة</h3>
+      <div class="category-options">
+        @for (cat of categories; track cat.id) {
+          <button [class.active]="targetCategory() === cat.id"
+                  (click)="targetCategory.set(cat.id)">
+            {{ cat.name }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- محتوى الإشعار -->
+    <div class="form-section">
+      <h3><i class="fas fa-edit"></i> محتوى الإشعار</h3>
+      <div class="form-group">
+        <label>عنوان الإشعار</label>
+        <input type="text" placeholder="مثال: موسم التخرج قادم!"
+               [value]="title()"
+               (input)="updateTitle($any($event.target).value)" />
+      </div>
+      <div class="form-group">
+        <label>نص الرسالة</label>
+        <textarea rows="4"
+                  placeholder="اكتب محتوى الإشعار هنا..."
+                  [value]="message()"
+                  (input)="updateMessage($any($event.target).value)"></textarea>
+      </div>
+    </div>
+
+    <!-- معاينة -->
+    @if (title() || message()) {
+      <div class="preview-section">
+        <h3><i class="fas fa-eye"></i> معاينة الإشعار</h3>
+        <div class="notif-preview">
+          <div class="preview-icon"
+               [style.background]="notificationTypes.find(t => t.id === notificationType())?.color + '20'"
+               [style.color]="notificationTypes.find(t => t.id === notificationType())?.color">
+            <i [class]="notificationTypes.find(t => t.id === notificationType())?.icon"></i>
+          </div>
+          <div>
+            <h4>{{ title() || 'عنوان الإشعار' }}</h4>
+            <p>{{ message() || 'نص الرسالة' }}</p>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- زر الإرسال -->
+    <button class="send-btn"
+            [disabled]="!title() || !message()"
+            (click)="sendNotification()">
+      <i class="fas fa-paper-plane"></i>
+      إرسال لـ
+      {{ targetCategory() === 'all' ? 'كل التجار (23)' :
+         categories.find(c => c.id === targetCategory())?.name }}
+    </button>
+
+  </div>
+</div>

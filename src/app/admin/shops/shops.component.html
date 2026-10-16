@@ -1,0 +1,248 @@
+<div class="shops-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1><i class="fas fa-store"></i> إدارة المتاجر</h1>
+      <p>{{ totalShops() || filteredShops().length }} متجر</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="controls">
+    <div class="search-bar">
+      <i class="fas fa-search"></i>
+      <input type="text"
+             placeholder="ابحث باسم المتجر أو التاجر..."
+             [value]="searchQuery()"
+             (input)="updateSearch($any($event.target).value)" />
+    </div>
+    <div class="tabs">
+      <button [class.active]="statusFilter() === ''"
+              (click)="changeStatus('')">
+        <i class="fas fa-store"></i> الكل
+      </button>
+      <button [class.active]="statusFilter() === 'active'"
+              (click)="changeStatus('active')">
+        <i class="fas fa-check-circle"></i> نشط
+      </button>
+      <button [class.active]="statusFilter() === 'banned'"
+              (click)="changeStatus('banned')">
+        <i class="fas fa-pause-circle"></i> موقوف
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <i class="fas fa-circle-notch fa-spin"></i>
+      <p>جاري التحميل...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-state">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p>{{ error() }}</p>
+      <button (click)="loadShops()">
+        <i class="fas fa-redo"></i> إعادة المحاولة
+      </button>
+    </div>
+  }
+
+  @if (!isLoading() && !error()) {
+    @if (filteredShops().length === 0) {
+      <div class="empty-state">
+        <i class="fas fa-store-slash"></i>
+        <p>لا توجد متاجر</p>
+      </div>
+    } @else {
+      <div class="shops-grid">
+        @for (shop of filteredShops(); track shop.id) {
+          <div class="shop-card" [class.inactive]="!shop.is_active">
+            <!-- Logo -->
+            <div class="shop-logo">
+              @if (shop.business_logo_url || shop.logo_url) {
+                <img [src]="shop.business_logo_url ?? shop.logo_url" [alt]="shop.business_name ?? shop.name" />
+              } @else {
+                <i class="fas fa-store"></i>
+              }
+            </div>
+
+            <!-- Info -->
+            <div class="shop-info">
+              <h3>{{ shop.business_name ?? shop.name }}</h3>
+              <p class="shop-owner">
+                <i class="fas fa-user"></i>
+                {{ shop.seller?.full_name ?? shop.owner_name ?? '—' }}
+              </p>
+              <div class="shop-stats">
+                <span><i class="fas fa-box"></i> {{ shop.products_count ?? 0 }} منتج</span>
+                <span><i class="fas fa-shopping-bag"></i> {{ shop.orders_count ?? 0 }} طلب</span>
+              </div>
+            </div>
+
+            <!-- Status Badge -->
+            <span class="status-badge"
+                  [class.active]="shop.is_active"
+                  [class.banned]="!shop.is_active">
+              @if (shop.is_active) {
+                <i class="fas fa-check-circle"></i> نشط
+              } @else {
+                <i class="fas fa-pause-circle"></i> موقوف
+              }
+            </span>
+
+            <!-- Actions -->
+            <div class="shop-actions">
+              <button class="view-btn" (click)="openDetail(shop)" title="التفاصيل">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="action-btn toggle-btn"
+                      [class.active]="shop.is_active"
+                      [disabled]="isTogglingId() === shop.id"
+                      (click)="toggleStatus(shop)"
+                      [title]="shop.is_active ? 'إيقاف المتجر' : 'تفعيل المتجر'">
+                @if (isTogglingId() === shop.id) {
+                  <i class="fas fa-spinner fa-spin"></i>
+                } @else if (shop.is_active) {
+                  <i class="fas fa-pause"></i>
+                } @else {
+                  <i class="fas fa-play"></i>
+                }
+              </button>
+              <button class="action-btn delete-btn"
+                      (click)="confirmDelete(shop.id)"
+                      title="حذف المتجر نهائياً">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- شريط ترقيم الصفحات (Pagination) -->
+      @if (lastPage() > 1) {
+        <div class="pagination-container">
+          <button class="page-btn nav-btn"
+                  [disabled]="currentPage() === 1"
+                  (click)="goToPage(currentPage() - 1)">
+            <i class="fas fa-chevron-right"></i> السابق
+          </button>
+
+          @for (p of pages(); track p) {
+            <button class="page-btn"
+                    [class.active]="p === currentPage()"
+                    (click)="goToPage(p)">
+              {{ p }}
+            </button>
+          }
+
+          <button class="page-btn nav-btn"
+                  [disabled]="currentPage() === lastPage()"
+                  (click)="goToPage(currentPage() + 1)">
+            التالي <i class="fas fa-chevron-left"></i>
+          </button>
+        </div>
+      }
+    }
+  }
+
+  <!-- Detail Modal -->
+  @if (showDetail() && selectedShop()) {
+    <div class="modal-backdrop" (click)="closeDetail()"></div>
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-avatar">
+          @if (selectedShop()!.business_logo_url) {
+            <img [src]="selectedShop()!.business_logo_url" [alt]="selectedShop()!.business_name" />
+          } @else {
+            <i class="fas fa-store"></i>
+          }
+        </div>
+        <div>
+          <h2>{{ selectedShop()!.business_name ?? selectedShop()!.name }}</h2>
+          <p>{{ selectedShop()!.seller?.email ?? selectedShop()!.seller?.full_name ?? '' }}</p>
+        </div>
+        <button class="close-btn" (click)="closeDetail()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="info-row">
+          <i class="fas fa-user"></i>
+          <span>التاجر: {{ selectedShop()!.seller?.full_name ?? '—' }}</span>
+        </div>
+        <div class="info-row">
+          <i class="fas fa-box"></i>
+          <span>المنتجات: {{ selectedShop()!.products_count ?? 0 }}</span>
+        </div>
+        <div class="info-row">
+          <i class="fas fa-shopping-bag"></i>
+          <span>الطلبات: {{ selectedShop()!.orders_count ?? 0 }}</span>
+        </div>
+        <div class="info-row">
+          <i class="fas fa-heart"></i>
+          <span>المتابعون: {{ selectedShop()!.followers_count ?? 0 }}</span>
+        </div>
+        <div class="info-row">
+          <i class="fas fa-calendar"></i>
+          <span>تاريخ الإنشاء: {{ formatDate(selectedShop()!.created_at) }}</span>
+        </div>
+
+        <!-- Analytics -->
+        @if (!showAnalytics()) {
+          <button class="analytics-btn" (click)="loadAnalytics(selectedShop()!.id)"
+                  [disabled]="isLoadingDetails()">
+            @if (isLoadingDetails()) {
+              <i class="fas fa-spinner fa-spin"></i> جاري التحميل...
+            } @else {
+              <i class="fas fa-chart-bar"></i> عرض إحصائيات المبيعات
+            }
+          </button>
+        }
+        @if (showAnalytics() && analytics()) {
+          <div class="analytics-box">
+            <h4><i class="fas fa-chart-line"></i> إحصائيات المبيعات</h4>
+            <div class="analytics-stats">
+              <div class="stat">
+                <span class="stat-label">إجمالي المبيعات</span>
+                <span class="stat-value">{{ analytics()!.total_sales ?? 0 | number }} د.ل</span>
+              </div>
+              <div class="stat">
+                <span class="stat-label">الطلبات المؤكدة</span>
+                <span class="stat-value">{{ analytics()!.total_orders ?? 0 }}</span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Delete Confirm -->
+  @if (showDeleteConfirm()) {
+    <div class="modal-backdrop" (click)="cancelDelete()"></div>
+    <div class="confirm-modal">
+      <div class="confirm-icon danger">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h3>حذف المتجر نهائياً؟</h3>
+      <p>سيُلغى ترقية التاجر وتُحذف جميع منتجاته من السلات وقوائم الأمنيات. لا يمكن التراجع.</p>
+      <div class="confirm-actions">
+        <button class="btn-confirm-delete"
+                (click)="deleteShop(showDeleteConfirm()!)"
+                [disabled]="isDeletingId() === showDeleteConfirm()">
+          @if (isDeletingId()) {
+            <i class="fas fa-spinner fa-spin"></i>
+          } @else {
+            <i class="fas fa-trash"></i>
+          }
+          حذف نهائي
+        </button>
+        <button class="btn-cancel-confirm" (click)="cancelDelete()">إلغاء</button>
+      </div>
+    </div>
+  }
+
+</div>

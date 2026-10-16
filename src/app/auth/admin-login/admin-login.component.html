@@ -1,0 +1,81 @@
+<div class="auth-page admin-auth">
+
+  <div class="auth-hero admin-hero">
+    <div class="auth-hero-content">
+      <div class="admin-shield">
+        <i class="fas fa-shield-alt"></i>
+      </div>
+      <h2>لوحة تحكم مأب</h2>
+      <p>هذه المنطقة مخصصة لمديري النظام فقط. يرجى التحقق من صلاحياتك قبل الدخول.</p>
+      <div class="admin-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>دخول غير مصرح به يخضع للمساءلة القانونية</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-form-side">
+    <div class="auth-form-container">
+
+      <div class="form-header">
+        <div class="admin-form-icon">
+          <i class="fas fa-user-shield"></i>
+        </div>
+        <h1>دخول المدير</h1>
+        <p>أدخل بيانات حساب الإدارة</p>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="form-alert error">
+          <i class="fas fa-exclamation-circle"></i>
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <div class="form-field">
+        <label for="admin-email">البريد الإلكتروني</label>
+        <div class="input-wrapper">
+          <i class="fas fa-envelope input-icon"></i>
+          <input type="email" id="admin-email"
+                 placeholder="admin@maab.ly" dir="ltr"
+                 [value]="email()"
+                 (input)="email.set($any($event.target).value)"
+                 (keyup.enter)="onSubmit()" />
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="admin-password">كلمة المرور</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock input-icon"></i>
+          <input [type]="showPassword() ? 'text' : 'password'"
+                 id="admin-password" placeholder="••••••••" dir="ltr"
+                 [value]="password()"
+                 (input)="password.set($any($event.target).value)"
+                 (keyup.enter)="onSubmit()" />
+          <button type="button" class="toggle-pw"
+                  (click)="showPassword.update(v => !v)">
+            <i [class]="showPassword() ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+          </button>
+        </div>
+      </div>
+
+      <button class="btn-submit admin-btn"
+              (click)="onSubmit()" [disabled]="isLoading()">
+        @if (isLoading()) {
+          <i class="fas fa-spinner fa-spin"></i> جاري التحقق...
+        } @else {
+          <i class="fas fa-sign-in-alt"></i> دخول لوحة التحكم
+        }
+      </button>
+
+      <div class="form-footer">
+        <a routerLink="/auth/login">
+          <i class="fas fa-arrow-right"></i> العودة للموقع الرئيسي
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+</div>

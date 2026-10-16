@@ -1,87 +1,270 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Component, computed, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
-import { AdminMockService, AdminUser } from '@core/api/mock/admin.mock.service';
+import { AdminService, AdminBuyer, UsersResponse } from '../../core/services/admin.service';
 
 @Component({
-  selector: 'app-admin-users',
-  imports: [CommonModule, FormsModule],
+  selector: 'app-users',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './users.component.html',
   styleUrl: './users.component.scss'
 })
-export class UsersComponent {
-  public adminService = inject(AdminMockService);
+export class UsersComponent implements OnInit {
+  private adminService = inject(AdminService);
   private router = inject(Router);
 
-  activeTab = signal<'all'|'buyers'|'merchants'|'banned'>('all');
+  isLoading = signal(true);
+  error = signal('');
+  activeTab = signal<'all' | 'active' | 'banned'>('all');
+  roleFilter = signal<'all' | 'buyer' | 'seller'>('all');
   searchQuery = signal('');
-  selectedUser = signal<AdminUser | null>(null);
+  allUsers = signal<AdminBuyer[]>([]);
+
+  // Pagination State
+  currentPage = signal(1);
+  lastPage = signal(1);
+  totalUsers = signal(0);
+  perPage = signal(50);
+  rawCounts = signal<UsersResponse['counts'] | null>(null);
+
+  selectedUser = signal<AdminBuyer | null>(null);
   showProfileModal = signal(false);
-  showConfirmModal = signal(false);
+  showDeleteConfirm = signal<string | null>(null);
+  isDeleting = signal(false);
+  isToggling = signal<string | null>(null);
+  isPromotingId = signal<string | null>(null);
 
-  // Quick stats
-  totalUsers = computed(() => this.adminService.users().length);
-  totalBuyers = computed(() => this.adminService.users().filter(u => u.role === 'buyer').length);
-  totalMerchants = computed(() => this.adminService.users().filter(u => u.role === 'merchant').length);
-  totalBanned = computed(() => this.adminService.users().filter(u => u.status === 'banned').length);
+  private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
-  filteredUsers = computed(() => {
-    let users = this.adminService.users();
-    
-    if (this.activeTab() === 'buyers') {
-      users = users.filter(u => u.role === 'buyer');
-    } else if (this.activeTab() === 'merchants') {
-      users = users.filter(u => u.role === 'merchant');
-    } else if (this.activeTab() === 'banned') {
-      users = users.filter(u => u.status === 'banned');
+  filteredUsers = computed(() => this.allUsers());
+
+  pages = computed<number[]>(() => {
+    const total = this.lastPage();
+    const current = this.currentPage();
+    if (total <= 1) return [];
+
+    const start = Math.max(1, current - 2);
+    const end = Math.min(total, current + 2);
+    const list: number[] = [];
+    for (let i = start; i <= end; i++) {
+      list.push(i);
     }
-
-    const q = this.searchQuery().trim().toLowerCase();
-    if (q) {
-      users = users.filter(u =>
-        u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)
-      );
-    }
-    
-    return users;
+    return list;
   });
 
-  openProfile(user: AdminUser) {
+  displayRange = computed(() => {
+    const total = this.totalUsers();
+    if (total === 0) return 'لا يوجد مستخدمون';
+    const page = this.currentPage();
+    const size = this.perPage();
+    const from = (page - 1) * size + 1;
+    const to = Math.min(page * size, total);
+    return `عرض ${from} - ${to} من أصل ${total} مستخدم`;
+  });
+
+  countsSummary = computed(() => {
+    const c = this.rawCounts();
+    if (!c) {
+      return {
+        total: this.totalUsers(),
+        buyers: null as number | null,
+        sellers: null as number | null
+      };
+    }
+    const parseCount = (val: unknown): number | null => {
+      if (typeof val === 'number') return val;
+      if (val && typeof val === 'object' && 'all' in val) {
+        return Number((val as { all?: number }).all ?? 0);
+      }
+      return null;
+    };
+
+    return {
+      total: parseCount(c.total_users) ?? this.totalUsers(),
+      buyers: parseCount(c.buyers),
+      sellers: parseCount(c.sellers)
+    };
+  });
+
+  ngOnInit(): void {
+    this.loadUsers();
+  }
+
+  loadUsers(page: number = this.currentPage()): void {
+    this.isLoading.set(true);
+    this.error.set('');
+    this.currentPage.set(page);
+
+    const searchParam = this.searchQuery().trim() || undefined;
+
+    this.adminService.getUsers(
+      this.roleFilter(),
+      this.activeTab(),
+      searchParam,
+      page,
+      this.perPage()
+    ).subscribe({
+      next: (res) => {
+        const raw = res.data as unknown;
+        let list: AdminBuyer[] = [];
+        let curPage = page;
+        let lastPg = 1;
+        let totalCount = 0;
+
+        if (raw && typeof raw === 'object' && 'data' in raw && Array.isArray((raw as any).data)) {
+          const paginated = raw as { data: AdminBuyer[]; current_page?: number; last_page?: number; total?: number; per_page?: number };
+          list = paginated.data;
+          curPage = paginated.current_page ?? page;
+          lastPg = paginated.last_page ?? 1;
+          totalCount = paginated.total ?? list.length;
+        } else if (Array.isArray(raw)) {
+          list = raw as AdminBuyer[];
+          curPage = 1;
+          lastPg = 1;
+          totalCount = list.length;
+        }
+
+        this.allUsers.set(list);
+        this.currentPage.set(curPage);
+        this.lastPage.set(lastPg);
+        this.totalUsers.set(totalCount);
+
+        if (res.counts) {
+          this.rawCounts.set(res.counts);
+        }
+
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        this.error.set(err?.error?.message || 'فشل تحميل المستخدمين');
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  goToPage(page: number): void {
+    if (page < 1 || page > this.lastPage() || page === this.currentPage()) return;
+    this.loadUsers(page);
+  }
+
+  changePerPage(size: number): void {
+    if (this.perPage() === size) return;
+    this.perPage.set(size);
+    this.loadUsers(1);
+  }
+
+  changeTab(tab: 'all' | 'active' | 'banned'): void {
+    this.activeTab.set(tab);
+    this.loadUsers(1);
+  }
+
+  changeRole(role: 'all' | 'buyer' | 'seller'): void {
+    this.roleFilter.set(role);
+    this.loadUsers(1);
+  }
+
+  updateSearch(v: string): void {
+    this.searchQuery.set(v);
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+    }
+    this.searchDebounceTimer = setTimeout(() => {
+      this.loadUsers(1);
+    }, 350);
+  }
+
+  clearSearch(): void {
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+    }
+    this.searchQuery.set('');
+    this.loadUsers(1);
+  }
+
+  openProfile(user: AdminBuyer): void {
     this.selectedUser.set(user);
     this.showProfileModal.set(true);
   }
 
-  closeProfile() {
+  closeProfile(): void {
     this.showProfileModal.set(false);
   }
 
-  confirmToggle(user: AdminUser) {
-    this.selectedUser.set(user);
-    this.showConfirmModal.set(true);
+  loadBuyers(page: number = this.currentPage()): void {
+    this.loadUsers(page);
   }
 
-  cancelToggle() {
-    this.showConfirmModal.set(false);
-  }
-
-  executeToggle() {
-    const user = this.selectedUser();
-    if (user) {
-      this.adminService.toggleUserStatus(user.id);
-      
-      // Update selectedUser if profile modal is open so it reflects the new status
-      if (this.showProfileModal()) {
-         const updatedUser = this.adminService.users().find(u => u.id === user.id);
-         if (updatedUser) {
-           this.selectedUser.set(updatedUser);
-         }
+  toggleStatus(user: AdminBuyer): void {
+    this.isToggling.set(user.id);
+    const role = (user.role === 'seller') ? 'seller' : 'buyer';
+    this.adminService.toggleUserStatus(user.id, role).subscribe({
+      next: () => {
+        this.isToggling.set(null);
+        // تحديث الـ local state فوراً
+        this.allUsers.update(users =>
+          users.map(u => u.id === user.id
+            ? {
+                ...u,
+                is_active: !u.is_active,
+                status: (u.status === 'banned' || !u.is_active) ? 'active' : 'banned'
+              }
+            : u
+          )
+        );
+        if (this.selectedUser()?.id === user.id) {
+          this.selectedUser.update(u => u ? {
+            ...u,
+            is_active: !u.is_active,
+            status: (u.status === 'banned' || !u.is_active) ? 'active' : 'banned'
+          } : null);
+        }
+        // إعادة جلب البيانات من الـ API
+        this.loadBuyers();
+      },
+      error: (err) => {
+        this.error.set(err?.error?.message || 'فشل تغيير الحالة');
+        this.isToggling.set(null);
       }
-    }
-    this.showConfirmModal.set(false);
+    });
   }
 
-  updateSearch(v: string) {
-    this.searchQuery.set(v);
+  confirmDelete(id: string): void {
+    this.showDeleteConfirm.set(id);
+  }
+
+  cancelDelete(): void {
+    this.showDeleteConfirm.set(null);
+  }
+
+  promoteToAdmin(userId: string): void {
+    if (!confirm('هل أنت متأكد من ترقية هذا المستخدم إلى مدير؟')) return;
+    this.isPromotingId.set(userId);
+    this.adminService.promoteToAdmin(userId).subscribe({
+      next: () => {
+        this.isPromotingId.set(null);
+        this.loadUsers();
+      },
+      error: () => this.isPromotingId.set(null)
+    });
+  }
+
+  deleteUser(id: string): void {
+    this.isDeleting.set(true);
+    this.adminService.deleteUser(id).subscribe({
+      next: () => {
+        this.isDeleting.set(false);
+        this.showDeleteConfirm.set(null);
+        this.loadUsers();
+      },
+      error: (err) => {
+        this.error.set(err?.error?.message || 'فشل الحذف');
+        this.isDeleting.set(false);
+      }
+    });
+  }
+
+  formatDate(date: string | null | undefined): string {
+    if (!date) return '—';
+    const d = new Date(date);
+    return isNaN(d.getTime()) ? '—' : d.toLocaleDateString('ar-LY');
   }
 }

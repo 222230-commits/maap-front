@@ -1,0 +1,281 @@
+<div class="buyer-page">
+
+  <div class="buyer-page-header">
+    <button class="btn-back"
+            (click)="router.navigate(['/'])">
+      <i class="fas fa-arrow-right"></i>
+    </button>
+    <div>
+      <h1>طلباتي</h1>
+      <p>{{ orders().length }} طلب</p>
+    </div>
+  </div>
+
+  <div class="buyer-page-content">
+
+    @if (successMessage()) {
+      <div class="page-toast success">
+        <i class="fas fa-check-circle"></i>
+        {{ successMessage() }}
+      </div>
+    }
+
+    <div class="orders-tabs">
+      <button [class.active]="activeTab() === 'all'"
+              (click)="changeTab('all')">الكل</button>
+      <button [class.active]="activeTab() === 'pending'"
+              (click)="changeTab('pending')">
+        <i class="fas fa-clock"></i> معلقة
+      </button>
+      <button [class.active]="activeTab() === 'preparing'"
+              (click)="changeTab('preparing')">
+        <i class="fas fa-box"></i> قيد التحضير
+      </button>
+      <button [class.active]="activeTab() === 'awaiting'"
+              (click)="changeTab('awaiting')">
+        <i class="fas fa-shipping-fast"></i> بانتظار الاستلام
+      </button>
+      <button [class.active]="activeTab() === 'completed'"
+              (click)="changeTab('completed')">
+        <i class="fas fa-check-circle"></i> مكتملة
+      </button>
+      <button [class.active]="activeTab() === 'cancelled'"
+              (click)="changeTab('cancelled')">
+        <i class="fas fa-times-circle"></i> ملغية
+      </button>
+    </div>
+
+    @if (isLoading()) {
+      <div class="orders-skeleton-list">
+        @for (i of [1, 2, 3]; track i) {
+          <div class="order-skeleton-card">
+            <div class="osc-top">
+              <div class="osc-shop-avatar shimmer"></div>
+              <div class="osc-shop-details">
+                <div class="osc-line-sm shimmer"></div>
+                <div class="osc-line-xs shimmer"></div>
+              </div>
+              <div class="osc-badge shimmer"></div>
+            </div>
+            <div class="osc-body">
+              <div class="osc-item-thumb shimmer"></div>
+              <div class="osc-item-info">
+                <div class="osc-line-md shimmer"></div>
+                <div class="osc-line-xs shimmer"></div>
+              </div>
+            </div>
+            <div class="osc-bottom">
+              <div class="osc-line-xs shimmer"></div>
+              <div class="osc-line-sm shimmer"></div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    @if (!isLoading() && orders().length === 0) {
+      <div class="page-empty">
+        <div class="empty-icon-wrap">
+          <i class="fas fa-shopping-bag"></i>
+        </div>
+        <h3>لا توجد طلبات</h3>
+        <p>لم تقم بأي طلب بعد</p>
+        <button class="btn-browse"
+                (click)="router.navigate(['/products'])">
+          <i class="fas fa-shopping-bag"></i>
+          تصفح المنتجات
+        </button>
+      </div>
+    }
+
+    @if (!isLoading() && orders().length > 0) {
+      <div class="orders-list">
+        @for (order of orders(); track order.id) {
+          <div class="order-card">
+
+            <div class="order-card-top">
+              <div class="order-shop-info">
+                <div class="order-shop-logo">
+                  @if (order.shop.logo_url) {
+                    <img [src]="order.shop.logo_url"
+                         [alt]="order.shop.name" />
+                  } @else {
+                    <i class="fas fa-store"></i>
+                  }
+                </div>
+                <div>
+                  <span class="order-shop-name">
+                    {{ order.shop.name }}
+                  </span>
+                  <span class="order-date">
+                    {{ formatDate(order.created_at) }}
+                  </span>
+                </div>
+              </div>
+              <span class="order-status-badge"
+                    [class]="getStatusClass(order.status)">
+                {{ getStatusLabel(order.status) }}
+              </span>
+            </div>
+
+            @if (order.items.length > 0) {
+              <div class="order-items-preview">
+                @for (item of order.items.slice(0,2); track item.id) {
+                  <div class="order-item-row">
+                    <div class="item-row-img">
+                      @if (item.image_url) {
+                        <img [src]="item.image_url"
+                             [alt]="item.product_title" />
+                      } @else {
+                        <i class="fas fa-box"></i>
+                      }
+                    </div>
+                    <div class="item-row-info">
+                      <p>{{ item.product_title }}</p>
+                      <span>
+                        {{ item.quantity }} قطعة
+                        @if (item.color) { · {{ item.color }} }
+                        @if (item.size) { · {{ item.size }} }
+                      </span>
+                    </div>
+                    <span class="item-row-price">
+                      {{ (item.price * item.quantity) | number }} د.ل
+                    </span>
+                  </div>
+                }
+                @if (order.items.length > 2) {
+                  <p class="more-items-text">
+                    +{{ order.items.length - 2 }} منتجات أخرى
+                  </p>
+                }
+              </div>
+            }
+
+            <div class="order-card-footer">
+              <div class="order-footer-meta">
+                <span>
+                  <i class="fas fa-map-marker-alt"></i>
+                  {{ order.delivery_address }}
+                </span>
+                <span>
+                  <i class="fas fa-wallet"></i>
+                  {{ order.payment_method === 'cash'
+                    ? 'نقدي' : 'بطاقة' }}
+                </span>
+              </div>
+              <div class="order-footer-total">
+                <span class="footer-total-label">الإجمالي</span>
+                <span class="footer-total-price">
+                  {{ formatPrice(order.total_price) }}
+                </span>
+              </div>
+            </div>
+
+            <div class="order-card-actions">
+              <!-- تأكيد الاستلام (يظهر في حالة انتظار استلام الزبون) -->
+              @if (order.status === 'awaiting') {
+                <button class="btn-confirm-receipt"
+                        [disabled]="confirmingId() === order.id"
+                        (click)="promptConfirmReceipt(order.id, $event)">
+                  @if (confirmingId() === order.id) {
+                    <i class="fas fa-spinner fa-spin"></i>
+                  } @else {
+                    <i class="fas fa-check-circle"></i>
+                  }
+                  تأكيد الاستلام
+                </button>
+              }
+
+              <!-- إلغاء الطلب (متاح قبل الاكتمال أو الإلغاء) -->
+              @if (order.status === 'pending' || order.status === 'preparing' || order.status === 'awaiting') {
+                <button class="btn-cancel-order"
+                        [disabled]="cancellingId() === order.id"
+                        (click)="promptCancelOrder(order.id, $event)">
+                  @if (cancellingId() === order.id) {
+                    <i class="fas fa-spinner fa-spin"></i>
+                  } @else {
+                    <i class="fas fa-times"></i>
+                  }
+                  إلغاء الطلب
+                </button>
+              }
+
+              <!-- تفاصيل الطلب والفاتورة -->
+              <button class="btn-view-details"
+                      (click)="goToDetails(order.id, $event)">
+                <i class="fas fa-file-invoice"></i>
+                التفاصيل
+              </button>
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+
+  <!-- Modal تأكيد الاستلام -->
+  @if (confirmModalOrderId()) {
+    <div class="modal-backdrop" (click)="closeConfirmModal()">
+      <div class="confirm-modal" (click)="$event.stopPropagation()">
+        <div class="modal-icon-header success">
+          <i class="fas fa-box-open"></i>
+        </div>
+        <h3>تأكيد استلام الطلب</h3>
+        <p>
+          هل تأكدت من استلام جميع منتجات هذه الشحنة بالفعل؟
+          <br />
+          عند التأكيد، ستكتمل الطلبية نهائياً وتنتقل إلى سجل الطلبات المكتملة.
+        </p>
+        <div class="modal-actions">
+          <button class="btn-modal-confirm"
+                  [disabled]="confirmingId() === confirmModalOrderId()"
+                  (click)="executeConfirmReceipt()">
+            @if (confirmingId() === confirmModalOrderId()) {
+              <i class="fas fa-spinner fa-spin"></i> جاري التأكيد...
+            } @else {
+              <i class="fas fa-check"></i> نعم، تأكيد الاستلام
+            }
+          </button>
+          <button class="btn-modal-cancel"
+                  (click)="closeConfirmModal()">
+            تراجع
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modal إلغاء الطلب -->
+  @if (cancelModalOrderId()) {
+    <div class="modal-backdrop" (click)="closeCancelModal()">
+      <div class="confirm-modal danger" (click)="$event.stopPropagation()">
+        <div class="modal-icon-header danger">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h3>إلغاء الطلب</h3>
+        <p>هل أنت متأكد من رغبتك في إلغاء هذا الطلب؟</p>
+        <textarea placeholder="سبب الإلغاء (اختياري)..."
+                  [value]="cancelReason()"
+                  (input)="cancelReason.set($any($event.target).value)"></textarea>
+        <div class="modal-actions">
+          <button class="btn-modal-danger"
+                  [disabled]="cancellingId() === cancelModalOrderId()"
+                  (click)="executeCancelOrder()">
+            @if (cancellingId() === cancelModalOrderId()) {
+              <i class="fas fa-spinner fa-spin"></i> جاري الإلغاء...
+            } @else {
+              <i class="fas fa-times"></i> تأكيد الإلغاء
+            }
+          </button>
+          <button class="btn-modal-cancel"
+                  (click)="closeCancelModal()">
+            تراجع
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

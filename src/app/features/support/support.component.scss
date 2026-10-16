@@ -1,0 +1,164 @@
+.support-page { direction: rtl; min-height: 100vh; background: var(--bg-soft); }
+
+.support-hero {
+  background: linear-gradient(135deg, #1A0030 0%, #3A004D 50%, #6B2D8B 100%);
+  padding: 60px 24px 80px; text-align: center; color: white;
+  position: relative; overflow: hidden;
+}
+
+.support-hero::before {
+  content: ''; position: absolute;
+  width: 350px; height: 350px; border-radius: 50%;
+  background: rgba(255,255,255,0.04); filter: blur(60px);
+  top: -80px; left: -80px; pointer-events: none;
+}
+
+.support-hero-content { position: relative; }
+
+.support-icon {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  border: 2px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px; margin: 0 auto 20px;
+}
+
+.support-hero h1 { font-family: 'Tajawal', sans-serif; font-size: 2rem; font-weight: 900; margin: 0 0 10px; }
+.support-hero p { font-family: 'Tajawal', sans-serif; font-size: 1rem; opacity: 0.8; margin: 0; }
+
+.support-content {
+  max-width: 900px; margin: -32px auto 0;
+  padding: 0 24px 48px; position: relative; z-index: 1;
+  display: flex; flex-direction: column; gap: 24px;
+}
+
+/* Contact Cards */
+.contact-cards {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+}
+
+@media (max-width: 768px) { .contact-cards { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .contact-cards { grid-template-columns: 1fr 1fr; } }
+
+.contact-card {
+  background: white; border-radius: 18px;
+  border: 1px solid var(--border-light); padding: 22px 18px;
+  text-align: center; box-shadow: 0 2px 10px rgba(58,0,77,0.05);
+  transition: all 0.2s;
+}
+
+.contact-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(58,0,77,0.1); }
+
+.contact-icon {
+  width: 56px; height: 56px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; margin: 0 auto 14px;
+}
+
+.contact-icon.telegram { background: #E8F5FE; color: #0088CC; }
+.contact-icon.whatsapp { background: #E8FFF0; color: #25D366; }
+.contact-icon.email { background: var(--primary-light); color: var(--primary); }
+
+.contact-card h3 { font-family: 'Tajawal', sans-serif; font-size: 1rem; font-weight: 800; color: var(--text-dark); margin: 0 0 7px; }
+.contact-card p { font-family: 'Tajawal', sans-serif; font-size: 0.82rem; color: var(--text-soft); margin: 0 0 14px; line-height: 1.5; }
+
+.contact-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--primary); color: white; text-decoration: none;
+  padding: 9px 18px; border-radius: 10px;
+  font-family: 'Tajawal', sans-serif; font-size: 0.85rem; font-weight: 700;
+  transition: all 0.2s;
+}
+
+.contact-link:hover { background: var(--primary-hover); transform: translateY(-1px); }
+
+/* FAQ */
+.faq-section { background: white; border-radius: 20px; border: 1px solid var(--border-light); overflow: hidden; box-shadow: 0 2px 10px rgba(58,0,77,0.05); }
+
+.faq-header { padding: 20px 24px; border-bottom: 1px solid var(--border-light); }
+.faq-header h2 { font-family: 'Tajawal', sans-serif; font-size: 1.1rem; font-weight: 800; color: var(--text-dark); margin: 0 0 5px; display: flex; align-items: center; gap: 8px; }
+.faq-header h2 i { color: var(--primary); }
+.faq-header p { font-family: 'Tajawal', sans-serif; font-size: 0.82rem; color: var(--text-soft); margin: 0; }
+
+.faq-list { padding: 12px; }
+
+.faq-category-label {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; margin: 6px 0;
+  font-family: 'Tajawal', sans-serif; font-size: 0.78rem; font-weight: 700;
+  color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.08em;
+}
+
+.faq-category-label i { color: var(--primary); }
+.faq-category-label.merchant-label { margin-top: 16px; }
+
+.faq-item {
+  border-radius: 12px; margin-bottom: 4px;
+  border: 1.5px solid transparent; transition: all 0.2s; cursor: pointer;
+  overflow: hidden;
+}
+
+.faq-item.open { border-color: var(--primary-light); background: var(--bg-soft); }
+
+.faq-question {
+  display: flex; justify-content: space-between;
+  align-items: center; gap: 12px; padding: 14px 16px;
+  font-family: 'Tajawal', sans-serif; font-size: 0.9rem; font-weight: 600;
+  color: var(--text-dark);
+}
+
+.faq-question i { color: var(--primary); font-size: 12px; flex-shrink: 0; transition: transform 0.2s; }
+
+.faq-answer { padding: 0 16px 14px; }
+.faq-answer p { font-family: 'Tajawal', sans-serif; font-size: 0.875rem; color: var(--text-mid); line-height: 1.7; margin: 0; }
+
+/* No Answer */
+.no-answer-card {
+  background: linear-gradient(135deg, #1A0030, #3A004D);
+  border-radius: 18px; padding: 20px 24px;
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+
+.no-answer-card > i { font-size: 32px; color: rgba(255,255,255,0.5); flex-shrink: 0; }
+
+.no-answer-card h3 { font-family: 'Tajawal', sans-serif; font-size: 1rem; font-weight: 800; color: white; margin: 0 0 4px; }
+.no-answer-card p { font-family: 'Tajawal', sans-serif; font-size: 0.85rem; color: rgba(255,255,255,0.7); margin: 0; }
+
+.no-answer-card > div { flex: 1; }
+
+.btn-contact-us {
+  display: flex; align-items: center; gap: 8px;
+  background: white; color: var(--primary); text-decoration: none;
+  padding: 11px 22px; border-radius: 12px;
+  font-family: 'Tajawal', sans-serif; font-size: 0.9rem; font-weight: 700;
+  transition: all 0.2s; white-space: nowrap; flex-shrink: 0;
+}
+
+.btn-contact-us:hover { background: #F0E8FF; transform: translateY(-1px); }
+
+.whatsapp-link { background: #25D366 !important; }
+.instagram-link {
+  background: linear-gradient(
+    135deg, #E1306C, #833AB4
+  ) !important;
+}
+.email-link { background: var(--primary) !important; }
+
+.social-row-support {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  justify-content: center; margin-top: -8px;
+}
+
+.social-pill {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 18px; border-radius: 20px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.85rem; font-weight: 600;
+  text-decoration: none; color: white;
+  transition: all 0.2s;
+}
+
+.social-pill:hover { transform: translateY(-2px); opacity: 0.9; }
+.social-pill.facebook { background: #1877F2; }
+.social-pill.tiktok { background: #010101; }
+.social-pill.snapchat { background: #FFFC00; color: #010101; }

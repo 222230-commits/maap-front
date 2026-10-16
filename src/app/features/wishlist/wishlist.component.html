@@ -1,0 +1,136 @@
+<div class="wishlist-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <button class="btn-back" (click)="router.navigate(['/'])">
+      <i class="fas fa-arrow-right"></i>
+    </button>
+    <div>
+      <h1>المفضلة</h1>
+      @if (items().length > 0) {
+        <p>{{ items().length }} منتج محفوظ</p>
+      }
+    </div>
+    @if (items().length > 0) {
+      <button class="btn-clear-all" (click)="askClearAll()" [disabled]="isClearing()">
+        @if (isClearing()) {
+          <i class="fas fa-spinner fa-spin"></i>
+        } @else {
+          <i class="fas fa-trash"></i>
+        }
+        مسح الكل
+      </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="wishlist-skeleton-grid">
+      @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+        <div class="skeleton-card">
+          <div class="skeleton-image shimmer"></div>
+          <div class="skeleton-content">
+            <div class="skeleton-title shimmer"></div>
+            <div class="skeleton-price shimmer"></div>
+            <div class="skeleton-btn shimmer"></div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (!isLoading() && items().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="far fa-heart"></i>
+      </div>
+      <h2>المفضلة فارغة</h2>
+      <p>أضف منتجات تعجبك لتجدها هنا لاحقاً</p>
+      <button class="btn-browse" (click)="router.navigate(['/products'])">
+        <i class="fas fa-shopping-bag"></i>
+        تصفح المنتجات
+      </button>
+    </div>
+  }
+
+  @if (!isLoading() && items().length > 0) {
+    <div class="wishlist-grid">
+      @for (item of items(); track item.id) {
+        <div class="wishlist-card" (click)="router.navigate(['/products', item.slug || item.id], { state: { product: item } })">
+
+          <!-- صورة المنتج -->
+          <div class="card-image">
+            @if (getItemImage(item)) {
+              <img [src]="getItemImage(item)!" [alt]="item.title" />
+            } @else {
+              <div class="no-image">
+                <i class="fas fa-image"></i>
+              </div>
+            }
+
+            <!-- زر حذف -->
+            <button class="btn-remove"
+                    [disabled]="removingId() === item.id"
+                    (click)="removeItem(item.id); $event.stopPropagation()">
+              @if (removingId() === item.id) {
+                <i class="fas fa-spinner fa-spin"></i>
+              } @else {
+                <i class="fas fa-heart"></i>
+              }
+            </button>
+
+            <!-- خصم -->
+            @if (+item.compare_at_price > +item.price) {
+              <div class="discount-badge">
+                خصم {{ ((+item.compare_at_price - +item.price) / +item.compare_at_price * 100) | number:'1.0-0' }}%
+              </div>
+            }
+
+            <!-- نفد المخزون -->
+            @if (item.stock === 0) {
+              <div class="out-badge">نفد</div>
+            }
+          </div>
+
+          <!-- معلومات المنتج -->
+          <div class="card-body">
+            <h3 class="item-title">{{ item.title }}</h3>
+
+            <div class="item-price-row">
+              <span class="item-price">{{ item.price | number }} د.ل</span>
+              @if (+item.compare_at_price > +item.price) {
+                <span class="item-old-price">{{ item.compare_at_price | number }} د.ل</span>
+              }
+            </div>
+
+            <div class="item-stock"
+                 [class.low]="item.stock > 0 && item.stock < 10"
+                 [class.out]="item.stock === 0">
+              @if (item.stock === 0) {
+                <i class="fas fa-times-circle"></i> نفد المخزون
+              } @else if (item.stock < 10) {
+                <i class="fas fa-exclamation-circle"></i> باقي {{ item.stock }} فقط
+              } @else {
+                <i class="fas fa-check-circle"></i> متوفر
+              }
+            </div>
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Confirm Clear Wishlist Dialog -->
+  <app-confirm-dialog
+    [isOpen]="showClearModal()"
+    [isLoading]="isClearing()"
+    title="تفريغ قائمة المفضلة"
+    message="هل أنت متأكد من رغبتك في مسح كافة المنتجات المحفوظة في المفضلة؟"
+    confirmText="نعم، مسح الكل"
+    cancelText="إلغاء"
+    icon="fas fa-trash-alt"
+    (confirmed)="doClearAll()"
+    (cancelled)="showClearModal.set(false)">
+  </app-confirm-dialog>
+
+</div>

@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دليل ربط الفرونت إند — نظام البلاغات (Reports)</title>
+<style>
+:root{
+  --bg:#f6f9fa;
+  --surface:#ffffff;
+  --ink:#1b2430;
+  --muted:#5b6b7a;
+  --teal:#0f766e;
+  --teal-deep:#0b544e;
+  --teal-light:#e6f5f3;
+  --coral:#e2543a;
+  --coral-bg:#fdecea;
+  --amber:#b7791f;
+  --amber-bg:#fdf6e3;
+  --purple:#6d4aff;
+  --purple-bg:#efeaff;
+  --gray-step:#8592a3;
+  --gray-bg:#eef1f4;
+  --border:#e1e7ec;
+  --code-bg:#111827;
+  --code-ink:#e2e8f0;
+  --radius:12px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Segoe UI",Tahoma,Arial,sans-serif;
+  display:flex;min-height:100vh;
+}
+code,pre{font-family:"Consolas","Courier New",monospace;}
+code[dir],.path,.mono{direction:ltr;unicode-bidi:embed;}
+
+/* ===== SIDEBAR ===== */
+nav.side{
+  width:270px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;
+  background:var(--surface);border-left:1px solid var(--border);
+  padding:1.4rem 1rem 3rem;
+}
+.side h3{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin:1.3rem .4rem .5rem;font-weight:700;}
+.side h3:first-child{margin-top:.2rem;}
+.side a{
+  display:flex;align-items:center;gap:8px;padding:.55rem .7rem;border-radius:9px;
+  color:var(--ink);text-decoration:none;font-size:13.5px;font-weight:500;
+  border-right:3px solid transparent;
+}
+.side a:hover{background:var(--teal-light);}
+.side a .n{font-family:monospace;font-size:11px;color:var(--muted);width:16px;}
+.side .brand{font-weight:800;font-size:15px;color:var(--teal-deep);padding:.3rem .7rem 1rem;border-bottom:1px solid var(--border);margin-bottom:.4rem;}
+.side .brand small{display:block;font-weight:400;font-size:11.5px;color:var(--muted);margin-top:2px;}
+
+main{flex:1;padding:2.4rem 3rem 6rem;max-width:1100px;}
+header.top{margin-bottom:2.2rem;}
+.eyebrow{display:inline-block;font-size:11.5px;font-weight:700;color:var(--teal-deep);background:var(--teal-light);padding:.3rem .75rem;border-radius:100px;margin-bottom:.8rem;}
+h1{font-size:28px;font-weight:800;margin:.2rem 0 .5rem;color:var(--teal-deep);}
+.lede{color:var(--muted);font-size:15px;line-height:1.85;max-width:750px;}
+h2{font-size:19px;font-weight:800;color:var(--teal-deep);margin:2.4rem 0 .9rem;padding-bottom:.5rem;border-bottom:2px solid var(--border);}
+h3.sub{font-size:14.5px;font-weight:700;margin:1.2rem 0 .5rem;color:var(--ink);}
+
+/* ===== CARD / TABLE ===== */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem 1.3rem;margin-bottom:1.2rem;}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:.7rem 0 1rem;}
+table th{background:var(--teal-light);color:var(--teal-deep);text-align:right;padding:.55rem .7rem;font-size:11.5px;text-transform:uppercase;letter-spacing:.3px;}
+table td{padding:.6rem .7rem;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.75;}
+table code{background:var(--gray-bg);color:var(--ink);padding:1px 6px;border-radius:5px;font-size:12px;}
+
+/* ===== ENDPOINT ===== */
+.route-line{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:.9rem 0 .4rem;}
+.pill{font-size:11.5px;font-weight:700;padding:.28rem .65rem;border-radius:7px;color:#fff;letter-spacing:.3px;}
+.pill-get{background:#2563eb;}
+.pill-post{background:var(--teal);}
+.path{font-size:14px;font-weight:700;color:var(--ink);}
+.scope-badge{font-size:10.5px;font-weight:700;padding:.2rem .5rem;border-radius:100px;background:var(--gray-bg);color:var(--muted);}
+
+pre{
+  background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:.9rem 1.05rem;
+  overflow-x:auto;font-size:12.5px;line-height:1.7;direction:ltr;text-align:left;margin:.55rem 0;
+}
+.k{color:#7dd3fc;}.s{color:#86efac;}.n{color:#fca5a5;}.b{color:#fcd34d;}.cm{color:#8a94a6;}
+
+.callout{border-radius:10px;padding:.85rem 1.05rem;font-size:13.5px;line-height:1.85;margin:.75rem 0;display:flex;gap:9px;}
+.callout .ic{flex-shrink:0;font-weight:800;}
+.callout.warn{background:var(--amber-bg);color:#7a5313;border:1px solid #f0ddab;}
+.callout.warn .ic{color:var(--amber);}
+.callout.danger{background:var(--coral-bg);color:#8a2c1f;border:1px solid #f3c3ba;}
+.callout.danger .ic{color:var(--coral);}
+.callout.tip{background:var(--teal-light);color:var(--teal-deep);border:1px solid #bfe4df;}
+.callout.tip .ic{color:var(--teal);}
+
+/* ===== FLOW DIAGRAM ===== */
+.flow{display:flex;flex-direction:column;gap:6px;margin:1rem 0 1.6rem;align-items:stretch;}
+.fbox{
+  border-radius:10px;padding:.7rem 1rem;font-size:13px;font-weight:600;text-align:center;
+  border:1.5px solid transparent;
+}
+.fbox.api{background:var(--purple-bg);color:#3d2494;border-color:#d3c6ff;}
+.fbox.step{background:var(--gray-bg);color:var(--ink);border-color:var(--border);}
+.arrow{text-align:center;color:var(--muted);font-size:16px;line-height:1;}
+.branch{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:4px 0;}
+.branch .fbox.ok{background:var(--teal-light);color:var(--teal-deep);border-color:#bfe4df;}
+.branch .fbox.no{background:var(--coral-bg);color:#8a2c1f;border-color:#f3c3ba;}
+.branch-label{font-size:11px;color:var(--muted);text-align:center;margin-bottom:2px;}
+
+/* ===== MOCKUPS ===== */
+.mockup-row{display:flex;gap:1.4rem;flex-wrap:wrap;align-items:flex-start;margin:1rem 0 1.8rem;}
+.phone{width:230px;background:#0d1117;border-radius:26px;padding:8px;box-shadow:0 8px 24px rgba(20,20,30,.12);}
+.screen{background:#fff;border-radius:19px;overflow:hidden;min-height:340px;}
+.screen .bar{background:var(--teal);color:#fff;font-size:12px;font-weight:700;padding:.6rem .8rem;}
+.screen .body{padding:.7rem;}
+.row-item{display:flex;justify-content:space-between;align-items:center;background:#f7f9fa;border-radius:8px;padding:.5rem .6rem;margin-bottom:.5rem;font-size:11px;}
+.status-chip{font-size:9.5px;font-weight:700;padding:.15rem .5rem;border-radius:100px;}
+.status-chip.pending{background:var(--amber-bg);color:var(--amber);}
+.status-chip.resolved{background:var(--teal-light);color:var(--teal-deep);}
+.status-chip.dismissed{background:var(--gray-bg);color:var(--muted);}
+.field-fake{height:26px;background:#f0f2f5;border:1px solid var(--border);border-radius:7px;margin-bottom:8px;}
+.field-fake.tall{height:52px;}
+.btn-fake{text-align:center;padding:.5rem;border-radius:8px;font-size:11.5px;font-weight:700;}
+.btn-fake.primary{background:var(--teal);color:#fff;}
+.btn-fake.ghost{background:var(--gray-bg);color:var(--muted);}
+
+.modal-wrap{background:#eef1f4;border-radius:14px;padding:1.4rem;position:relative;}
+.modal{background:#fff;border-radius:12px;border:1px solid var(--border);padding:1rem 1.1rem;max-width:340px;box-shadow:0 6px 18px rgba(20,30,40,.08);}
+.modal .mtitle{font-weight:800;font-size:13.5px;margin-bottom:6px;}
+.modal .mtext{font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:10px;}
+
+.badge-endpoint{
+  display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;
+  background:var(--ink);color:#fff;padding:.28rem .7rem;border-radius:100px;margin-top:.6rem;direction:ltr;
+}
+
+footer{color:var(--muted);font-size:12px;text-align:center;padding:3rem 0 1rem;border-top:1px solid var(--border);margin-top:3rem;}
+
+@media(max-width:900px){
+  body{flex-direction:column;}
+  nav.side{position:relative;height:auto;width:100%;}
+  main{padding:1.5rem;}
+  .branch{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<nav class="side">
+  <div class="brand">📋 نظام البلاغات (Reports)<small>دليل ربط الفرونت إند الكامل</small></div>
+
+  <h3>نظرة عامة</h3>
+  <a href="#overview"><span class="n">00</span> اختيار الأداة لكل واجهة</a>
+
+  <h3>مسارات الأدمن (Angular)</h3>
+  <a href="#admin-index"><span class="n">01</span> عرض كل البلاغات</a>
+  <a href="#admin-show"><span class="n">02</span> تفاصيل بلاغ</a>
+  <a href="#admin-resolve"><span class="n">03</span> إغلاق / اتخاذ إجراء</a>
+
+  <h3>مسارات المشتري (Flutter)</h3>
+  <a href="#buyer-index"><span class="n">04</span> بلاغاتي</a>
+  <a href="#buyer-show"><span class="n">05</span> تفاصيل بلاغي</a>
+  <a href="#buyer-store"><span class="n">06</span> تقديم بلاغ جديد</a>
+
+  <h3>مسارات التاجر (Flutter)</h3>
+  <a href="#seller-index"><span class="n">07</span> بلاغاتي (تاجر)</a>
+  <a href="#seller-show"><span class="n">08</span> تفاصيل بلاغي (تاجر)</a>
+  <a href="#seller-store"><span class="n">09</span> تقديم بلاغ تجاري</a>
+
+  <h3>مرجع سريع</h3>
+  <a href="#errors">جدول الأخطاء الشامل</a>
+  <a href="#tips">نصائح لتفادي الاحتكاك</a>
+  <a href="#backend-note">ملاحظة لفريق الباك إند</a>
+</nav>
+
+<main>
+
+<header class="top" id="overview">
+  <span class="eyebrow">Reports Module · v1</span>
+  <h1>دليل ربط الفرونت إند — نظام البلاغات</h1>
+  <p class="lede">يوجد 3 Controllers منفصلة تماماً تتشارك نفس جدول <code class="mono">reports</code> لكنها معزولة بالكامل من ناحية النطاق (Scope) والصلاحيات: الأدمن يرى كل شيء، بينما المشتري والتاجر كل منهما يرى <b>فقط البلاغات التي قدّمها هو بنفسه</b> — وليس البلاغات المُقدَّمة ضده. هذا الفرق الجوهري يجب أن ينعكس في تصميم الواجهة قبل أي شيء آخر.</p>
+</header>
+
+<div class="callout danger">
+  <span class="ic">⚠</span>
+  <div><b>فخّ مفاهيمي مهم:</b> مسار <code class="mono">/store/reports</code> و <code class="mono">/Buyer/reports</code> ليسا "صندوق وارد بلاغات عن حسابي/متجري" — بل "سجل البلاغات التي أرسلتُها أنا كمُبلِّغ". لا يوجد حالياً في الكود المرفق أي Endpoint يعرض للتاجر البلاغات المُقدَّمة ضد متجره أو منتجاته؛ تلك تُدار حصراً من طرف الأدمن.</div>
+</div>
+
+<h2>00 · نظرة عامة واختيار الأداة</h2>
+<table>
+  <tr><th>الواجهة</th><th>الأداة المناسبة</th><th>السبب</th></tr>
+  <tr>
+    <td>لوحة تحكم الأدمن (مراجعة/إغلاق البلاغات)</td>
+    <td><b>Angular</b></td>
+    <td>جدول كبير بفلاتر متعددة (type/status)، Pagination من السيرفر، ومودال قرار معقّد (اختيار حالة + ملاحظة + Checkbox إجراء) — نمط لوحة تحكم كلاسيكي.</td>
+  </tr>
+  <tr>
+    <td>"بلاغاتي" لدى المشتري والتاجر + نموذج الإبلاغ</td>
+    <td><b>Flutter</b></td>
+    <td>تدفّق قصير ومتسلسل داخل تجربة تصفّح تفاعلية (الإبلاغ عن منتج/متجر/مستخدم/تعليق أثناء التصفح)، مع حاجة لمعالجة أخطاء متعددة الطبقات (Throttle + Business Rules) بشكل سلس للمستخدم النهائي على الموبايل.</td>
+  </tr>
+</table>
+
+<!-- ======================================================= -->
+<!-- ADMIN SECTION -->
+<!-- ======================================================= -->
+<h2 id="admin-index" style="margin-top:3rem">01 · GET /admin/reports — عرض كل البلاغات (Angular)</h2>
+<div class="route-line"><span class="pill pill-get">GET</span><span class="path">/admin/reports</span><span class="scope-badge">نطاق: كل النظام</span></div>
+
+<table>
+  <tr><th>Query</th><th>القيم</th><th>ملاحظة</th></tr>
+  <tr><td><code>type</code></td><td>all, product, shop, user, review</td><td>يُصفّي حسب <code>target_type</code></td></tr>
+  <tr><td><code>status</code></td><td>all, pending, investigating, resolved, dismissed...</td><td>⚠ لا يوجد تحقق (Validation) على القيمة — قيمة غير معروفة تُرجع نتائج فارغة بصمت بدل خطأ</td></tr>
+</table>
+
+<pre>{
+  <span class="k">"success"</span>: <span class="b">true</span>,
+  <span class="k">"stats"</span>: {
+    <span class="k">"total"</span>: <span class="n">340</span>, <span class="k">"pending"</span>: <span class="n">28</span>, <span class="k">"investigating"</span>: <span class="n">6</span>, <span class="k">"resolved"</span>: <span class="n">260</span>, <span class="k">"dismissed"</span>: <span class="n">40</span>,
+    <span class="k">"by_type"</span>: { <span class="k">"product"</span>: <span class="n">150</span>, <span class="k">"shop"</span>: <span class="n">40</span>, <span class="k">"user"</span>: <span class="n">90</span>, <span class="k">"review"</span>: <span class="n">60</span> }
+  },
+  <span class="k">"data"</span>: {
+    <span class="cm">/* Laravel Paginator — 15 عنصر/صفحة */</span>
+    <span class="k">"data"</span>: [
+      {
+        <span class="k">"id"</span>: <span class="s">"uuid"</span>, <span class="k">"target_type"</span>: <span class="s">"product"</span>, <span class="k">"status"</span>: <span class="s">"pending"</span>, <span class="k">"reason"</span>: <span class="s">"..."</span>,
+        <span class="k">"reporter"</span>: { <span class="k">"id"</span>: <span class="s">"uuid"</span>, <span class="k">"full_name"</span>: <span class="s">"..."</span>, <span class="k">"email"</span>: <span class="s">"..."</span> },
+        <span class="k">"target_data"</span>: { <span class="cm">// كائن المنتج/المتجر/المستخدم/التعليق — حسب target_type</span> }
+      }
+    ]
+  }
+}</pre>
+
+<div class="callout warn">
+  <span class="ic">⚠</span>
+  <div><b>فخّ #1 — الإحصائيات دائماً عالمية:</b> حقل <code>stats</code> يُحسب على <b>كامل جدول البلاغات</b> بغض النظر عن فلاتر <code>type</code>/<code>status</code> المُرسلة في نفس الطلب. استخدمه لبناء أرقام التبويبات العلوية الثابتة (الكل/معلّقة/محلولة...) وليس كـ "نتيجة الفلترة الحالية".</div>
+</div>
+<div class="callout warn">
+  <span class="ic">⚠</span>
+  <div><b>فخّ #2 — حقل <code>target_data</code> هو المصدر الوحيد الموثوق:</b> رغم أن الاستجابة تحمّل أيضاً علاقات <code>product</code>/<code>shop</code>/<code>user</code>/<code>review</code> مباشرة، لا تعتمد عليها لعرض "العنصر المُبلَّغ عنه" لأن واحدة فقط منها ستكون ذات معنى فعلي حسب <code>target_type</code> والبقية غالباً <code>null</code>. اقرأ دائماً من <code>target_data</code> بشكل موحّد بغض النظر عن النوع.</div>
+</div>
+<div class="callout tip">
+  <span class="ic">✓</span>
+  <div><b>تم إصلاحه بالباك إند:</b> <code>stats</code> أصبحت الآن تتضمّن مفتاح <code>investigating</code> بشكل صريح إلى جانب pending/resolved/dismissed، أي أن <code>total = pending + investigating + resolved + dismissed</code> تماماً. حدّث بطاقات KPI في لوحة الأدمن لإضافة عمود/شارة خامسة "قيد التحقيق" بدل تجاهلها.</div>
+</div>
+
+<h3 class="sub">الربط في Angular</h3>
+<pre><span class="cm">// admin-reports.service.ts</span>
+list(params: { type?: <span class="b">string</span>; status?: <span class="b">string</span>; page?: <span class="b">number</span> }) {
+  <span class="k">return</span> this.http.get&lt;ApiResponse&lt;LaravelPaginated&lt;Report&gt;&gt;&gt;(<span class="s">'/admin/reports'</span>, { params });
+}
+<span class="cm">// ملاحظة: اعرض stats بشكل منفصل تماماً عن data.data — لا تُعيد حسابها محلياً من عناصر الصفحة الحالية</span></pre>
+
+<div class="mockup-row">
+  <div style="flex:1;min-width:280px">
+    <div class="modal-wrap">
+      <div class="modal" style="max-width:100%">
+        <div class="mtitle">📋 قائمة البلاغات — لوحة الأدمن</div>
+        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+          <span class="status-chip pending">الكل 340</span>
+          <span class="status-chip pending">معلّقة 28</span>
+          <span class="status-chip resolved">محلولة 260</span>
+          <span class="status-chip dismissed">مرفوضة 40</span>
+        </div>
+        <div class="row-item"><span>منتج · فستان صيفي</span><span class="status-chip pending">معلّق</span></div>
+        <div class="row-item"><span>متجر · بوتيك لمسات</span><span class="status-chip resolved">تم الحل</span></div>
+        <div class="row-item"><span>مستخدم · @user213</span><span class="status-chip pending">معلّق</span></div>
+      </div>
+    </div>
+    <span class="badge-endpoint">GET /admin/reports</span>
+  </div>
+</div>
+
+<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0">
+
+<h2 id="admin-show">02 · GET /admin/reports/{id} — تفاصيل بلاغ</h2>
+<div class="route-line"><span class="pill pill-get">GET</span><span class="path">/admin/reports/{id}</span><span class="scope-badge">نطاق: كل النظام</span></div>
+<p style="color:var(--muted);font-size:13.5px">نفس شكل عنصر القائمة أعلاه لكن بحقول موسّعة (هاتف المُبلِّغ، صور المنتج، صورة المستخدم...). <code>404</code> إن لم يوجد.</p>
+<pre><span class="cm">// 404</span>
+{ <span class="k">"success"</span>: <span class="b">false</span>, <span class="k">"message"</span>: <span class="s">"البلاغ المطلوب غير موجود."</span> }</pre>
+
+<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0">
+
+<h2 id="admin-resolve">03 · POST /admin/reports/{id}/resolve — إغلاق البلاغ واتخاذ إجراء</h2>
+<div class="route-line"><span class="pill pill-post">POST</span><span class="path">/admin/reports/{id}/resolve</span></div>
+
+<table>
+  <tr><th>الحقل</th><th>القاعدة</th></tr>
+  <tr><td><code>status</code></td><td>مطلوب، ∈ {pending, resolved, investigating, dismissed}</td></tr>
+  <tr><td><code>admin_notes</code></td><td>اختياري، حد أقصى 1500 حرف</td></tr>
+  <tr><td><code>take_action</code></td><td>اختياري، Boolean</td></tr>
+</table>
+
+<h3 class="sub">مخطط تدفّق القرار الفعلي داخل الكود</h3>
+<div class="flow">
+  <div class="fbox api">POST /admin/reports/{id}/resolve</div>
+  <div class="arrow">↓</div>
+  <div class="branch">
+    <div><div class="branch-label">status === "resolved" AND take_action === true</div><div class="fbox ok">تنفيذ إجراء تلقائي حسب target_type</div></div>
+    <div><div class="branch-label">أي حالة أخرى، أو take_action غير مُفعّل</div><div class="fbox no">لا يُتَّخذ أي إجراء على الكيان المستهدف إطلاقاً</div></div>
+  </div>
+  <div class="arrow">↓ (في كلتا الحالتين)</div>
+  <div class="fbox step">تحديث report.status + admin_notes + resolved_by</div>
+  <div class="arrow">↓</div>
+  <div class="branch">
+    <div><div class="branch-label">actionTaken = true</div><div class="fbox ok">200 — "تم توثيق المراجعة الإدارية واتخاذ الإجراء العقابي بنجاح"</div></div>
+    <div><div class="branch-label">actionTaken = false</div><div class="fbox step">200 — "تم تحديث حالة البلاغ والملاحظات بنجاح دون اتخاذ إجراء تلقائي"</div></div>
+  </div>
+</div>
+
+<table>
+  <tr><th>target_type</th><th>الإجراء الفعلي المُنفَّذ (فقط عند الشرطين أعلاه)</th></tr>
+  <tr><td><code>product</code></td><td>تحديث <code>status</code> إلى <code>unpublished</code> — <b>لا يمسّ</b> <code>is_active</code></td></tr>
+  <tr><td><code>shop</code></td><td>تحديث <code>is_active = false</code> فقط (بدون حذف أو تخفيض رتبة التاجر)</td></tr>
+  <tr><td><code>user</code></td><td>تحديث <code>is_active = false</code> (حظر الحساب)</td></tr>
+  <tr><td><code>review</code></td><td>حذف التقييم (<code>delete()</code>)</td></tr>
+</table>
+
+<div class="callout tip">
+  <span class="ic">✓</span>
+  <div><b>تم إصلاحه بالباك إند:</b> أصبح الكونترولر يتتبّع متغيّراً داخلياً <code>actionTaken</code> ويبني رسالة ديناميكية دقيقة بناءً عليه — رسالة مختلفة فعلياً إن نُفِّذ إجراء عقابي حقيقي مقابل مجرّد تحديث حالة البلاغ بدون إجراء. <b>يمكنك الآن الاعتماد مباشرة على نص <code>message</code> القادم من السيرفر</b> لعرضه كما هو في Toast النجاح، دون الحاجة لبنائه يدوياً من <code>status</code>/<code>take_action</code> بالفرونت كما كان سابقاً.</div>
+</div>
+<div class="callout warn">
+  <span class="ic">⚠</span>
+  <div>عطّل بصرياً خيار "اتخاذ إجراء" (Checkbox) في الفورم إلا إذا كانت القيمة المختارة في حقل الحالة هي <code>resolved</code> تحديداً — اختياره مع حالة أخرى لن يفعل شيئاً فعلياً بالخلفية رغم ظهوره مفعّلاً بالواجهة.</div>
+</div>
+
+<h3 class="sub">الربط في Angular</h3>
+<pre>resolve(id: <span class="b">string</span>, body: { status: <span class="b">string</span>; admin_notes?: <span class="b">string</span>; take_action?: <span class="b">boolean</span> }) {
+  <span class="k">return</span> this.http.post&lt;ApiResponse&lt;Report&gt;&gt;(<span class="s">`/admin/reports/${id}/resolve`</span>, body);
+}
+<span class="cm">// في الفورم:</span>
+<span class="k">this</span>.takeActionControl.disable(); <span class="cm">// افتراضياً</span>
+<span class="k">this</span>.statusControl.valueChanges.subscribe(v =&gt;
+  v === <span class="s">'resolved'</span> ? <span class="k">this</span>.takeActionControl.enable() : <span class="k">this</span>.takeActionControl.disable()
+);</pre>
+
+<div class="mockup-row">
+  <div style="flex:1;min-width:300px">
+    <div class="modal-wrap">
+      <div class="modal" style="max-width:100%">
+        <div class="mtitle">إغلاق البلاغ — منتج "فستان صيفي"</div>
+        <div class="mtext">اختر الحالة النهائية للبلاغ:</div>
+        <div class="field-fake"></div>
+        <div class="mtext" style="margin:6px 0 4px">☑ اتخاذ إجراء تلقائي (إخفاء المنتج) — <i>مفعّل فقط عند اختيار "محلول"</i></div>
+        <div class="field-fake tall"></div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <div class="btn-fake ghost" style="flex:1">إلغاء</div>
+          <div class="btn-fake primary" style="flex:1">حفظ القرار</div>
+        </div>
+      </div>
+    </div>
+    <span class="badge-endpoint">POST /admin/reports/{id}/resolve</span>
+  </div>
+</div>
+
+<!-- ======================================================= -->
+<!-- BUYER SECTION -->
+<!-- ======================================================= -->
+<h2 id="buyer-index" style="margin-top:3.5rem">04 · GET /Buyer/reports — بلاغاتي (مشتري)</h2>
+<div class="route-line"><span class="pill pill-get">GET</span><span class="path">/Buyer/reports</span><span class="scope-badge">نطاق: بلاغاتي فقط</span></div>
+<p style="color:var(--muted);font-size:13.5px">لاحظ حرف <code>B</code> الكبير في <code>/Buyer/reports</code> — المسار حسّاس لحالة الأحرف تماماً كما هو مسجَّل في الراوتس.</p>
+<table>
+  <tr><th>Query</th><th>القيم</th></tr>
+  <tr><td><code>type</code></td><td>all, product, shop, user, review</td></tr>
+</table>
+<pre>{
+  <span class="k">"success"</span>: <span class="b">true</span>,
+  <span class="k">"stats"</span>: { <span class="cm">// محسوبة فقط على بلاغات هذا المستخدم — وليست عالمية كما في نسخة الأدمن</span>
+    <span class="k">"total"</span>: <span class="n">4</span>, <span class="k">"pending"</span>: <span class="n">1</span>, <span class="k">"resolved"</span>: <span class="n">3</span>, <span class="k">"dismissed"</span>: <span class="n">0</span>,
+    <span class="k">"by_type"</span>: { <span class="k">"product"</span>: <span class="n">2</span>, <span class="k">"shop"</span>: <span class="n">1</span>, <span class="k">"user"</span>: <span class="n">0</span>, <span class="k">"review"</span>: <span class="n">1</span> }
+  },
+  <span class="k">"data"</span>: { <span class="cm">/* Laravel Paginator — 10 عناصر/صفحة (وليس 15 كما عند الأدمن) */</span> }
+}</pre>
+
+<h3 class="sub">الربط في Flutter</h3>
+<pre><span class="cm">// reports_api.dart</span>
+<span class="k">Future</span>&lt;ReportListResponse&gt; myReports({<span class="b">String</span> type = <span class="s">'all'</span>, <span class="b">int</span> page = <span class="n">1</span>}) <span class="k">async</span> {
+  <span class="k">final</span> res = <span class="k">await</span> _dio.get(<span class="s">'/Buyer/reports'</span>, queryParameters: {<span class="s">'type'</span>: type, <span class="s">'page'</span>: page});
+  <span class="k">return</span> ReportListResponse.fromJson(res.data);
+}</pre>
+
+<div class="mockup-row">
+  <div class="phone">
+    <div class="screen">
+      <div class="bar">📋 بلاغاتي</div>
+      <div class="body">
+        <div class="row-item"><span>منتج · حقيبة جلدية</span><span class="status-chip pending">معلّق</span></div>
+        <div class="row-item"><span>متجر · محل الفخامة</span><span class="status-chip resolved">تم الحل</span></div>
+        <div class="row-item"><span>تعليق · مستخدم مجهول</span><span class="status-chip resolved">تم الحل</span></div>
+      </div>
+    </div>
+  </div>
+  <div style="align-self:flex-end;padding-bottom:6px"><span class="badge-endpoint">GET /Buyer/reports</span></div>
+</div>
+
+<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0">
+
+<h2 id="buyer-show">05 · GET /Buyer/reports/{id} — تفاصيل بلاغي</h2>
+<div class="route-line"><span class="pill pill-get">GET</span><span class="path">/Buyer/reports/{id}</span><span class="scope-badge">نطاق: بلاغاتي فقط</span></div>
+<pre><span class="cm">// إن كان البلاغ لمستخدم آخر أو غير موجود — نفس الرسالة تماماً لكلا الحالتين (لا يكشف عن وجوده لغيرك)</span>
+{ <span class="k">"success"</span>: <span class="b">false</span>, <span class="k">"message"</span>: <span class="s">"البلاغ غير موجود أو لا تملك صلاحية للوصول إليه."</span> }</pre>
+<div class="callout tip">
+  <span class="ic">✓</span>
+  <div>تصميم أمني جيد يستحق المحافظة عليه بالفرونت: لا تحاول أبداً التمييز بين "غير موجود" و"غير مصرَّح" في رسالة العرض للمستخدم — استخدم نفس شاشة الخطأ العامة (404) لكليهما.</div>
+</div>
+
+<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0">
+
+<h2 id="buyer-store">06 · POST /Buyer/reports/store — تقديم بلاغ جديد</h2>
+<div class="route-line"><span class="pill pill-post">POST</span><span class="path">/Buyer/reports/store</span><span class="scope-badge">throttle: 3 / دقيقة</span></div>
+
+<table>
+  <tr><th>الحقل</th><th>القاعدة</th></tr>
+  <tr><td><code>target_type</code></td><td>مطلوب ∈ {product, shop, user, review}</td></tr>
+  <tr><td><code>target_id</code></td><td>مطلوب، UUID صالح وموجود فعلياً في جدول النوع المطابق</td></tr>
+  <tr><td><code>reason</code></td><td>مطلوب، 10–1000 حرف</td></tr>
+</table>
+
+<h3 class="sub">مخطط تدفّق منطق العمل الكامل (بالترتيب الفعلي في الكود)</h3>
+<div class="flow">
+  <div class="fbox api">POST /Buyer/reports/store</div>
+  <div class="arrow">↓</div>
+  <div class="fbox step">Middleware: throttle:3,1 — 3 طلبات كحد أقصى بالدقيقة الواحدة (كل الحسابات)</div>
+  <div class="arrow">↓</div>
+  <div class="fbox step">هل بلاغاتي خلال آخر 24 ساعة ≥ 3؟</div>
+  <div class="branch">
+    <div><div class="branch-label">نعم</div><div class="fbox no">429 — "وصلت للحد الأقصى 3 بلاغات يومياً"</div></div>
+    <div><div class="branch-label">لا</div><div class="fbox ok">استمرار</div></div>
+  </div>
+  <div class="arrow">↓</div>
+  <div class="fbox step">هل بلاغاتي "المعلّقة" حالياً ≥ 3؟</div>
+  <div class="branch">
+    <div><div class="branch-label">نعم</div><div class="fbox no">422 — "لديك ثلاثة قيد المراجعة حالياً"</div></div>
+    <div><div class="branch-label">لا</div><div class="fbox ok">استمرار</div></div>
+  </div>
+  <div class="arrow">↓</div>
+  <div class="fbox step">هل العنصر الهدف (target_id) موجود فعلاً؟</div>
+  <div class="branch">
+    <div><div class="branch-label">لا</div><div class="fbox no">404 — "العنصر غير موجود أو تم حذفه"</div></div>
+    <div><div class="branch-label">نعم</div><div class="fbox ok">استمرار</div></div>
+  </div>
+  <div class="arrow">↓</div>
+  <div class="fbox step">هل يوجد لي بلاغ "معلّق" مسبقاً لنفس العنصر بالضبط؟</div>
+  <div class="branch">
+    <div><div class="branch-label">نعم</div><div class="fbox no">422 — "أبلغت عن هذا العنصر مسبقاً وهو قيد المراجعة"</div></div>
+    <div><div class="branch-label">لا</div><div class="fbox ok">201 — إنشاء البلاغ بنجاح</div></div>
+  </div>
+</div>
+
+<div class="callout danger">
+  <span class="ic">⚠</span>
+  <div><b>فخّ #5 — طبقتان مختلفتان تماماً من 429:</b> الأولى من <code>throttle:3,1</code> (ميدل وير Laravel القياسي) وتُطلَق <b>قبل</b> وصول الطلب للكونترولر أصلاً — شكل استجابتها <b>لا يطابق</b> غلاف <code>{success, message}</code> المعتاد (عادة <code>{"message":"Too Many Attempts."}</code> بدون <code>success</code>)، وتحمل هيدر <code>Retry-After</code>. أما 429 الثانية فمن منطق الكونترولر نفسه (حد الـ 3 يومياً) وتتبع الغلاف الموحّد. <b>يجب على الفرونت التحقق من وجود مفتاح <code>success</code> في جسم الاستجابة</b> لتحديد أي رسالة يعرضها للمستخدم، بدل افتراض شكل واحد لكل 429.</div>
+</div>
+<div class="callout warn">
+  <span class="ic">⚠</span>
+  <div>حظر "البلاغ المكرر" (آخر خطوة) يتحقق فقط من الحالة <code>pending</code>. إذا سبق أن أُغلق بلاغ سابق لنفس العنصر (محلول/مرفوض)، <b>يُسمح</b> للمستخدم بإعادة الإبلاغ عنه من جديد — لا تُبنِ منطق "زر الإبلاغ" على افتراض أنه يُعطَّل نهائياً بعد أول بلاغ.</div>
+</div>
+
+<h3 class="sub">الربط في Flutter — مع معالجة الطبقتين من 429</h3>
+<pre><span class="k">Future</span>&lt;Report&gt; submitReport({
+  <span class="k">required</span> <span class="b">String</span> targetType, <span class="k">required</span> <span class="b">String</span> targetId, <span class="k">required</span> <span class="b">String</span> reason,
+}) <span class="k">async</span> {
+  <span class="k">try</span> {
+    <span class="k">final</span> res = <span class="k">await</span> _dio.post(<span class="s">'/Buyer/reports/store'</span>, data: {
+      <span class="s">'target_type'</span>: targetType, <span class="s">'target_id'</span>: targetId, <span class="s">'reason'</span>: reason,
+    });
+    <span class="k">return</span> Report.fromJson(res.data[<span class="s">'data'</span>]);
+  } <span class="k">on</span> DioException <span class="k">catch</span> (e) {
+    <span class="k">final</span> body = e.response?.data;
+    <span class="k">final</span> hasEnvelope = body <span class="k">is</span> Map &amp;&amp; body.containsKey(<span class="s">'success'</span>);
+    <span class="k">if</span> (e.response?.statusCode == <span class="n">429</span>) {
+      <span class="k">throw</span> ReportException(hasEnvelope
+        ? body[<span class="s">'message'</span>]
+        : <span class="s">'محاولات كثيرة خلال دقيقة واحدة، أعد المحاولة بعد قليل.'</span>);
+    }
+    <span class="k">if</span> ([<span class="n">422</span>, <span class="n">404</span>].contains(e.response?.statusCode)) {
+      <span class="k">throw</span> ReportException(body[<span class="s">'message'</span>]);
+    }
+    <span class="k">rethrow</span>;
+  }
+}</pre>
+
+<div class="mockup-row">
+  <div class="phone">
+    <div class="screen">
+      <div class="bar">🚩 الإبلاغ عن منتج</div>
+      <div class="body">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px">سبب البلاغ (10 أحرف على الأقل)</div>
+        <div class="field-fake tall"></div>
+        <div class="btn-fake primary" style="margin-top:8px">إرسال البلاغ</div>
+      </div>
+    </div>
+  </div>
+  <div style="flex:1;min-width:230px">
+    <div class="modal-wrap">
+      <div class="modal">
+        <div class="mtitle">⚠ لا يمكن الإرسال</div>
+        <div class="mtext">لديك ثلاثة قيد المراجعة حالياً، يرجى انتظار رد الإدارة قبل إرسال بلاغ جديد.</div>
+        <div class="btn-fake primary">فهمت</div>
+      </div>
+    </div>
+  </div>
+  <div style="width:100%"><span class="badge-endpoint">POST /Buyer/reports/store</span></div>
+</div>
+
+<!-- ======================================================= -->
+<!-- SELLER SECTION -->
+<!-- ======================================================= -->
+<h2 id="seller-index" style="margin-top:3.5rem">07 · GET /store/reports — بلاغاتي (تاجر)</h2>
+<div class="route-line"><span class="pill pill-get">GET</span><span class="path">/store/reports</span><span class="scope-badge">نطاق: بلاغاتي فقط</span></div>
+<div class="callout warn">
+  <span class="ic">⚠</span>
+  <div>البادئة هنا <code>/store/reports</code> (مو <code>/seller/reports</code>) لأنها متداخلة تحت نفس مجموعة راوتس بروفايل المتجر. تأكد من هذا الاسم بالضبط عند بناء الـ Base URL في تطبيق التاجر.</div>
+</div>
+<table>
+  <tr><th>Query</th><th>القيم</th></tr>
+  <tr><td><code>type</code></td><td>all, review, user, product <b>(لا يوجد "shop")</b></td></tr>
+</table>
+<div class="callout danger">
+  <span class="ic">⚠</span>
+  <div><b>فخّ #6:</b> أنواع البلاغات المتاحة للتاجر (<code>review, user, product</code>) مختلفة عن المتاحة للمشتري (<code>product, shop, user, review</code>) — التاجر <b>لا يمكنه</b> الإبلاغ عن متجر آخر عبر هذا المسار. لا تُظهر خيار "الإبلاغ عن متجر" في تطبيق التاجر إطلاقاً.</div>
+</div>
+<pre>{ <span class="cm">/* نفس شكل استجابة المشتري تماماً، لكن Pagination = 10 و by_type بلا مفتاح shop */</span> }</pre>
+
+<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0">
+
+<h2 id="seller-show">08 · GET /store/reports/{id} — تفاصيل بلاغي (تاجر)</h2>
+<div class="route-line"><span class="pill pill-get">GET</span><span class="path">/store/reports/{id}</span><span class="scope-badge">نطاق: بلاغاتي فقط</span></div>
+<p style="color:var(--muted);font-size:13.5px">نفس منطق العزل الأمني الموجود لدى المشتري (404 موحّدة لغير الموجود/غير المملوك).</p>
+
+<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0">
+
+<h2 id="seller-store">09 · POST /store/reports/store — تقديم بلاغ تجاري</h2>
+<div class="route-line"><span class="pill pill-post">POST</span><span class="path">/store/reports/store</span><span class="scope-badge">throttle: 3 / دقيقة</span></div>
+<table>
+  <tr><th>الحقل</th><th>القاعدة</th></tr>
+  <tr><td><code>target_type</code></td><td>مطلوب ∈ {review, user, product}</td></tr>
+  <tr><td><code>target_id</code></td><td>مطلوب، UUID موجود فعلياً</td></tr>
+  <tr><td><code>reason</code></td><td>مطلوب، 10–1000 حرف</td></tr>
+</table>
+
+<div class="callout tip">
+  <span class="ic">✓</span>
+  <div>
+    <b>تم إصلاحه بالباك إند:</b> عتبة البلاغات المعلّقة أصبحت الآن <b>موحّدة (3) بين المشتري والتاجر</b> — كانت سابقاً 2 للمشتري و3 للتاجر بنفس نص الرسالة، وهو ما تم تصحيحه. رسالة الخطأ الآن <i>"لديك ثلاثة قيد المراجعة حالياً"</i> تطابق تماماً الشرط الفعلي (<code>pendingCount ≥ 3</code>) في كلا الكونترولرين. يمكنك الآن استخدام نفس منطق تعطيل الزر استباقياً (بعد 3 بلاغات معلّقة) في تطبيقَي المشتري والتاجر دون تمييز.
+  </div>
+</div>
+
+<h3 class="sub">الربط في Flutter</h3>
+<pre><span class="cm">// نفس دالة submitReport تماماً، فقط غيّر الـ Base Path:</span>
+<span class="k">await</span> _dio.post(<span class="s">'/store/reports/store'</span>, data: {...});
+<span class="cm">// وقيّد Dropdown نوع البلاغ في تطبيق التاجر بثلاث قيم فقط (بدون shop)</span></pre>
+
+<div class="mockup-row">
+  <div class="phone">
+    <div class="screen">
+      <div class="bar">🚩 إبلاغ تجاري</div>
+      <div class="body">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px">نوع البلاغ</div>
+        <div class="row-item"><span>تعليق / مستخدم / منتج</span><span style="color:var(--teal)">▾</span></div>
+        <div class="field-fake tall" style="margin-top:8px"></div>
+        <div class="btn-fake primary" style="margin-top:8px">إرسال</div>
+      </div>
+    </div>
+  </div>
+  <div style="width:100%"><span class="badge-endpoint">POST /store/reports/store</span></div>
+</div>
+
+<!-- ======================================================= -->
+<h2 id="errors">جدول الأخطاء الشامل</h2>
+<table>
+  <tr><th>الكود</th><th>يظهر في</th><th>المعنى</th><th>ماذا تفعل الواجهة</th></tr>
+  <tr><td>200</td><td>كل GET وresolve</td><td>نجاح</td><td>اعرض البيانات</td></tr>
+  <tr><td>201</td><td>store (مشتري/تاجر)</td><td>تم إنشاء البلاغ</td><td>Toast نجاح + إغلاق الفورم</td></tr>
+  <tr><td>404</td><td>show, resolve, target غير موجود في store</td><td>غير موجود / غير مملوك / محذوف</td><td>رسالة السيرفر مباشرة، دون تمييز السبب للمستخدم</td></tr>
+  <tr><td>422</td><td>store فقط</td><td>حد البلاغات المعلّقة (3 لكلا الحسابين الآن)، أو تكرار بلاغ لنفس العنصر</td><td>رسالة عامة — العتبة موحّدة 3 لدى المشتري والتاجر</td></tr>
+  <tr><td>429 (كونترولر)</td><td>store فقط</td><td>تجاوز حد 3 بلاغات/يوم</td><td>يحمل <code>success:false</code> — اعرض <code>message</code> كما هي</td></tr>
+  <tr><td>429 (Laravel Throttle)</td><td>store فقط</td><td>تجاوز 3 طلبات/دقيقة</td><td><b>لا يحمل</b> <code>success</code> — اعرض رسالة عامة ثابتة من الفرونت</td></tr>
+  <tr><td>500</td><td>الكل</td><td>خطأ خادم غير متوقع</td><td>رسالة عامة + سجل داخلي فقط</td></tr>
+</table>
+
+<h2 id="tips">نصائح عملية لتفادي الاحتكاك مع الباك إند</h2>
+<div class="card">
+  <ol style="margin:0;padding-right:1.2rem;font-size:13.5px;line-height:2">
+    <li>ابنِ Interceptor واحد (Dio في Flutter / HttpInterceptor في Angular) يفحص وجود مفتاح <code>success</code> في كل خطأ 4xx/5xx قبل قراءة <code>message</code> — لتفادي كسر التطبيق عند 429 من Laravel نفسه.</li>
+    <li>لا تبني عدّاد "بلاغات متبقية اليوم" أو "بلاغات معلّقة متبقية" من نص رسالة الخطأ — احسبه من <code>stats.pending</code> في استجابة <code>index</code> الخاصة بالمستخدم نفسه قبل فتح فورم الإبلاغ، وعطّل الزر استباقياً.</li>
+    <li>لا تشارك أي Cache/State واحد بين شاشة "بلاغاتي كمشتري" و"بلاغاتي كتاجر" حتى لو كان المستخدم نفسه يملك الحسابين — الـ Endpoints منفصلة تماماً بالخلفية ولا تتشارك نفس النطاق.</li>
+    <li>في نموذج الإبلاغ، قيّد Dropdown نوع البلاغ (Enum) حسب سياق التطبيق (4 خيارات للمشتري، 3 فقط للتاجر بدون "متجر") بدل عرض قائمة موحّدة يرفضها السيرفر لاحقاً.</li>
+    <li>حالة <code>investigating</code> (لدى الأدمن) أصبحت الآن مُعادة صراحة ضمن <code>stats</code> — اعرضها كشارة/عمود مستقل عن pending/resolved/dismissed في أي رسم بياني أو عدّاد، ولا تُدرجها ضمن "معلّقة" افتراضياً رغم تشابه المعنى الظاهري.</li>
+  </ol>
+</div>
+
+<h2 id="backend-note">تحديثات الباك إند المطبَّقة (v1.1)</h2>
+<div class="callout tip">
+  <span class="ic">✓</span>
+  <div>
+    <b>تم تأكيد 3 إصلاحات في هذا الإصدار — التوثيق أعلاه محدّث بالكامل بناءً عليها:</b>
+    <ol style="margin:.5rem 0 0;padding-right:1.2rem;line-height:1.9">
+      <li><code>Admin\ReportController::index</code> — أصبحت <code>stats</code> تتضمّن <code>investigating</code> صراحة.</li>
+      <li><code>Admin\ReportController::resolve</code> — الرسالة أصبحت ديناميكية حسب متغيّر <code>actionTaken</code> الفعلي بدل نص ثابت مضلِّل.</li>
+      <li><code>Buyer\ReportController::store</code> و <code>Seller\SellerReportController::store</code> — عتبة البلاغات المعلّقة ونص الرسالة أصبحا موحّدين ومتطابقين (3) بين الحسابين.</li>
+    </ol>
+  </div>
+</div>
+<div class="callout warn">
+  <span class="ic">⚠</span>
+  <div>لا يزال قائماً بدون تغيير: Query <code>status</code> في <code>GET /admin/reports</code> بلا Validation (راجع جدول الـ Query بالقسم 01)، وازدواجية طبقتَي 429 (throttle مقابل حد يومي — فخّ #5). هذه سلوكيات على الفرونت التعامل معها كما هي، وليست أخطاءً تم إصلاحها بعد.</div>
+</div>
+
+<footer>دليل داخلي — نظام البلاغات (Reports Module) · لأغراض التطوير فقط · ملف مستقل بدون اتصال إنترنت</footer>
+
+</main>
+</body>
+</html>

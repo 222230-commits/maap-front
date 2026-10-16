@@ -1,0 +1,255 @@
+<div class="order-details-page">
+
+  <div class="page-header">
+    <button class="btn-back" (click)="router.navigate(['/orders'])">
+      <i class="fas fa-arrow-right"></i>
+    </button>
+    <h1><i class="fas fa-file-invoice"></i> تفاصيل الطلب</h1>
+  </div>
+
+  @if (successMessage()) {
+    <div class="alert-success">
+      <i class="fas fa-check-circle"></i> {{ successMessage() }}
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert-error">
+      <i class="fas fa-exclamation-circle"></i> {{ error() }}
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <i class="fas fa-circle-notch fa-spin"></i>
+      <p>جاري تحميل الفاتورة...</p>
+    </div>
+  }
+
+  @if (!isLoading() && invoice()) {
+    <div class="invoice-card">
+
+      <!-- Header الفاتورة -->
+      <div class="invoice-top">
+        <div>
+          <p class="invoice-label">رقم الطلب</p>
+          <p class="invoice-value">{{ invoice().order_number }}</p>
+        </div>
+        <div>
+          <p class="invoice-label">التاريخ</p>
+          <p class="invoice-value">{{ invoice().order_date }}</p>
+        </div>
+      </div>
+
+      <!-- الحالة وطريقة الدفع -->
+      <div class="invoice-status">
+        <span class="badge badge-status">{{ invoice().status }}</span>
+        <span class="payment-tag">
+          <i class="fas fa-wallet"></i> {{ invoice().payment_method }}
+        </span>
+      </div>
+
+      <!-- منتجات الطلب -->
+      <div class="invoice-items">
+        @for (item of invoice().items; track $index) {
+          <div class="invoice-item">
+            @if (item.image) {
+              <img [src]="item.image" [alt]="item.product_title" class="item-img" />
+            } @else {
+              <div class="item-img-placeholder">
+                <i class="fas fa-box"></i>
+              </div>
+            }
+            <div class="item-info">
+              <p class="item-title">{{ item.product_title }}</p>
+              <p class="item-meta">
+                {{ item.quantity }} قطعة
+                @if (item.color) { · {{ item.color }} }
+                @if (item.shade) { · درجة: {{ item.shade }} }
+                @if (item.size) { · مقاس {{ item.size }} }
+              </p>
+              <!-- availability لا تُعرض إلا بعد مرحلة preparing -->
+              @if (item.availability !== 'pending') {
+                <span class="availability-badge"
+                      [class.unavailable]="item.availability !== 'available'">
+                  {{ item.availability === 'available' ? 'متوفر' : 'غير متوفر' }}
+                </span>
+              }
+              <!-- زر التقييم — يظهر فقط بعد اكتمال الطلب وتأكيد الاستلام وليس صاحب المنتج -->
+              @if (invoice().status === 'completed'
+                   && !ratedProductIds().has(item.product_id)
+                   && !hiddenRatingProductIds().has(item.product_id)) {
+                <button class="btn-rate" (click)="openRatingModal(item.product_id)">
+                  <i class="fas fa-star"></i> قيّم المنتج
+                </button>
+              }
+              @if (ratedProductIds().has(item.product_id)) {
+                <span class="rated-label">
+                  <i class="fas fa-check-circle"></i> تم التقييم
+                </span>
+              }
+            </div>
+            <span class="item-total">{{ formatPrice(item.total_item_price) }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- عنوان الشحن -->
+      <div class="invoice-address">
+        <i class="fas fa-map-marker-alt"></i>
+        <span>{{ invoice().shipping_address }}</span>
+      </div>
+
+      <!-- الإجمالي -->
+      <div class="invoice-total-row">
+        <span>الإجمالي الكلي</span>
+        <span class="total-amount">{{ formatPrice(invoice().total_price) }}</span>
+      </div>
+
+      <!-- رد على مراجعة جزئية (waiting_buyer) -->
+      @if (invoice().status === 'waiting_buyer') {
+        <div class="action-block">
+          <p class="action-hint">
+            التاجر راجع طلبك ووجد بعض المنتجات غير متوفرة.
+            هل توافق على المتابعة بالمنتجات المتوفرة فقط؟
+          </p>
+          <div class="action-row">
+            <button class="btn-accept"
+                    [disabled]="isRespondingAccept()"
+                    (click)="respondToReview(true)">
+              @if (isRespondingAccept()) {
+                <i class="fas fa-spinner fa-spin"></i>
+              } @else {
+                <i class="fas fa-check"></i> موافقة
+              }
+            </button>
+            <button class="btn-reject"
+                    [disabled]="isRespondingReject()"
+                    (click)="respondToReview(false)">
+              @if (isRespondingReject()) {
+                <i class="fas fa-spinner fa-spin"></i>
+              } @else {
+                <i class="fas fa-times"></i> رفض
+              }
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- تأكيد الاستلام (awaiting فقط) -->
+      @if (invoice().status === 'awaiting') {
+        <button class="btn-confirm-full"
+                [disabled]="isConfirming()"
+                (click)="confirmReceipt()">
+          @if (isConfirming()) {
+            <i class="fas fa-spinner fa-spin"></i> جاري التأكيد...
+          } @else {
+            <i class="fas fa-check-circle"></i> تأكيد استلام الطلب
+          }
+        </button>
+      }
+
+      <!-- إلغاء (لا تظهر إذا مكتمل أو ملغي) -->
+      @if (invoice().status !== 'completed' && invoice().status !== 'cancelled') {
+        <button class="btn-cancel-full" (click)="openCancelModal()">
+          <i class="fas fa-times-circle"></i> إلغاء الطلب
+        </button>
+      }
+
+    </div>
+  }
+
+  <!-- Modal الإلغاء -->
+  @if (showCancelModal()) {
+    <div class="modal-backdrop" (click)="closeCancelModal()"></div>
+    <div class="modal">
+      <div class="modal-header">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h3>إلغاء الطلب</h3>
+      </div>
+      <div class="modal-body">
+        <p>هذا الإجراء لا يمكن التراجع عنه. اذكر سبب الإلغاء (اختياري):</p>
+        <textarea rows="3"
+                  [value]="cancelReason()"
+                  (input)="cancelReason.set($any($event.target).value)"
+                  placeholder="سبب الإلغاء...">
+        </textarea>
+        <div class="modal-actions">
+          <button class="btn-secondary" (click)="closeCancelModal()">تراجع</button>
+          <button class="btn-danger"
+                  [disabled]="isCancelling()"
+                  (click)="confirmCancel()">
+            @if (isCancelling()) {
+              <i class="fas fa-spinner fa-spin"></i>
+            } @else {
+              تأكيد الإلغاء
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modal التقييم -->
+  @if (ratingModalProductId()) {
+    <div class="modal-backdrop" (click)="closeRatingModal()"></div>
+    <div class="modal rating-modal">
+      <div class="modal-header">
+        <i class="fas fa-star"></i>
+        <h3>قيّم هذا المنتج</h3>
+      </div>
+      <div class="modal-body">
+        <div class="stars-row">
+          @for (star of [1,2,3,4,5]; track star) {
+            <i class="fas fa-star"
+               [class.active]="star <= ratingValue()"
+               (click)="setRating(star)"></i>
+          }
+        </div>
+        <textarea rows="3"
+                  placeholder="اكتب رأيك في المنتج (اختياري)..."
+                  [value]="ratingComment()"
+                  (input)="ratingComment.set($any($event.target).value)">
+        </textarea>
+
+        @if (isCheckingComment()) {
+          <div class="comment-checking">
+            <i class="fas fa-shield-alt fa-spin"></i>
+            <span>جاري مراجعة محتوى التعليق...</span>
+          </div>
+        }
+
+        @if (commentWarning()) {
+          <div class="comment-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+              <p>{{ commentWarning() }}</p>
+              <button type="button" (click)="doSubmitRating()">
+                إرسال رغم ذلك
+              </button>
+            </div>
+          </div>
+        }
+
+        @if (ratingError()) {
+          <p class="rating-error">
+            <i class="fas fa-exclamation-circle"></i> {{ ratingError() }}
+          </p>
+        }
+        <div class="modal-actions">
+          <button class="btn-secondary" (click)="closeRatingModal()">إلغاء</button>
+          <button class="btn-primary"
+                  [disabled]="ratingValue() === 0 || isSubmittingRating()"
+                  (click)="submitRating()">
+            @if (isSubmittingRating()) {
+              <i class="fas fa-spinner fa-spin"></i>
+            } @else {
+              إرسال التقييم
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

@@ -3,92 +3,144 @@
   <!-- badges -->
   <div class="badges">
     @if (product().isNew) {
-      <span class="badge-new">
-        <i class="fas fa-sparkles"></i> جديد
-      </span>
+      <span class="badge-new"><i class="fas fa-sparkles"></i> جديد</span>
     }
     @if (product().isTrending) {
-      <span class="badge-trending">
-        <i class="fas fa-fire"></i> رائج
-      </span>
+      <span class="badge-trending"><i class="fas fa-fire"></i> رائج</span>
     }
   </div>
 
-  <!-- صورة المنتج أو placeholder -->
+  <!-- صورة المنتج -->
   <div class="product-image">
-    @if (product().image) {
-      <img [src]="product().image" [alt]="product().name" />
+    @if (displayImage) {
+      <img [src]="displayImage" [alt]="displayName" loading="lazy" />
     } @else {
       <div class="placeholder">
-        <i class="fas fa-image text-4xl"></i>
+        <i class="fas fa-image"></i>
       </div>
     }
 
     <!-- زر القلب -->
-    <button class="wishlist-btn"
-            (click)="onWishlistClick($event)"
-            [class.active]="product().inWishlist">
-      <i [class]="product().inWishlist ? 'fas fa-heart' : 'far fa-heart'"></i>
-    </button>
+    @if (!isAdmin()) {
+      <button class="wishlist-btn"
+              (click)="onWishlistClick($event)"
+              [class.active]="inWishlist"
+              aria-label="إضافة للمفضلة">
+        <i [class]="inWishlist ? 'fas fa-heart' : 'far fa-heart'"></i>
+      </button>
+    }
   </div>
 
   <!-- معلومات المنتج -->
   <div class="product-info">
-
-    <!-- اسم المتجر -->
-    <div class="shop-name">
-      <i class="fas fa-store"></i>
-      {{ product().shopName }}
-    </div>
-
-    <!-- اسم المنتج -->
-    <h3 class="product-name">{{ product().name }}</h3>
-
-    <!-- التصنيف -->
-    <div class="category">
-      {{ getCategoryName(product().categoryId) }}
-    </div>
-
-    <!-- السعر -->
+    @if (shopName) {
+      <div class="shop-name">
+        <i class="fas fa-store"></i> {{ shopName }}
+      </div>
+    }
+    <h3 class="product-name">{{ displayName }}</h3>
     <div class="price-section">
-      @if (product().discountPrice) {
-        <span class="price-new">{{ product().discountPrice }} د.ل</span>
-        <span class="price-old">{{ product().price }} د.ل</span>
-        <span class="discount-badge">
-          {{ ((product().price - product().discountPrice!) / product().price * 100) | number:'1.0-0' }}%-
-        </span>
+      @if (hasDiscount) {
+        <span class="price-new">{{ displayPrice }} د.ل</span>
+        <span class="price-old">{{ originalPrice }} د.ل</span>
+        <span class="discount-badge">-{{ discountPercent }}%</span>
       } @else {
-        <span class="price-new">{{ product().price }} د.ل</span>
+        <span class="price-new">{{ originalPrice }} د.ل</span>
       }
     </div>
-
-    <!-- التقييم -->
-    <div class="rating">
-      @for (star of getStars(); track star) {
-        <i class="fas fa-star"
-           [class.filled]="star <= product().rating">
-        </i>
-      }
-      <span>({{ product().rating }})</span>
-    </div>
-
-    <!-- الإحصائيات -->
-    <div class="stats">
-      <span>
-        <i class="fas fa-shopping-bag"></i>
-        {{ product().ordersCount }} طلب
-      </span>
-    </div>
-
-    <!-- زر إضافة للسلة -->
-    <button class="add-to-cart-btn"
-            (click)="addToCart($event)"
-            [class.in-cart]="isInCart()">
-      @if (isInCart()) {
-        <i class="fas fa-check"></i> في السلة
-      } @else {
-        <i class="fas fa-cart-plus"></i> أضف للسلة
-      }
-    </button>
+    @if (displayRating > 0) {
+      <div class="rating">
+        @for (star of getStars(); track star) {
+          <i class="fas fa-star" [class.filled]="star <= displayRating"></i>
+        }
+        <span>({{ displayRating }})</span>
+      </div>
+    }
+    @if (!isAdmin()) {
+      <button class="add-to-cart-btn"
+              (click)="addToCart($event)"
+              [class.in-cart]="isInCart()">
+        @if (isInCart()) {
+          <i class="fas fa-check"></i> في السلة
+        } @else {
+          <i class="fas fa-cart-plus"></i> أضف للسلة
+        }
+      </button>
+    }
   </div>
 </div>
+
+<!-- Quick Add Dialog -->
+@if (showQuickAdd()) {
+  <div class="quick-add-overlay" (click)="closeQuickAdd()">
+    <div class="quick-add-box" (click)="$event.stopPropagation()">
+
+      <button class="qa-close" (click)="closeQuickAdd()">
+        <i class="fas fa-times"></i>
+      </button>
+
+      <div class="qa-product-info">
+        @if (displayImage) {
+          <img [src]="displayImage" [alt]="displayName" class="qa-img" />
+        }
+        <div>
+          <h4>{{ displayName }}</h4>
+          <p class="qa-price">{{ originalPrice }} د.ل</p>
+        </div>
+      </div>
+
+      @if (addSuccess()) {
+        <div class="qa-success">
+          <i class="fas fa-check-circle"></i> تمت الإضافة للسلة!
+        </div>
+      } @else {
+
+        <!-- الألوان -->
+        @if (productColors.length > 0) {
+          <div class="qa-section">
+            <label>اللون:</label>
+            <div class="qa-color-row">
+              @for (color of productColors; track color.id) {
+                <button class="qa-color-chip"
+                        [class.selected]="selectedColor() == color.id"
+                        (click)="selectColor(color.id)">
+                  @if (color.hex_code) {
+                    <span class="color-dot" [style.background]="color.hex_code"></span>
+                  }
+                  {{ color.color_name }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- المقاسات -->
+        @if (selectedColorSizes.length > 0) {
+          <div class="qa-section">
+            <label>المقاس:</label>
+            <div class="qa-size-row">
+              @for (size of selectedColorSizes; track size) {
+                <button class="qa-size-chip"
+                        [class.selected]="selectedSize() === size"
+                        (click)="selectSize(size)">
+                  {{ size }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <button class="qa-confirm"
+                (click)="confirmAddToCart()"
+                [disabled]="addingToCart()">
+          @if (addingToCart()) {
+            <i class="fas fa-spinner fa-spin"></i> جاري الإضافة...
+          } @else {
+            <i class="fas fa-cart-plus"></i> أضف للسلة
+          }
+        </button>
+
+      }
+    </div>
+  </div>
+}

@@ -1,11 +1,35 @@
-@if (showSplash()) {
-  <div class="splash-screen">
-    <div class="text-white text-6xl mb-4">
-      <i class="fas fa-store"></i>
+@if (isVisible()) {
+  <div class="splash-screen"
+       [class.hiding]="progress() >= 100">
+
+    <div class="splash-bg">
+      <div class="splash-orb orb-1"></div>
+      <div class="splash-orb orb-2"></div>
     </div>
-    <h1 class="text-white text-3xl font-bold mb-8">السوق الليبي</h1>
-    <div class="loading-bar">
-      <div class="loading-bar-fill"></div>
+
+    <div class="splash-content">
+
+      <!-- اللوغو -->
+      <div class="splash-logo">
+        <img src="assets/logo.png"
+             alt="مأب"
+             class="logo-img-splash" />
+      </div>
+
+      <!-- اسم المنصة -->
+      <h1 class="splash-title">مآب</h1>
+      <p class="splash-subtitle">منصة ذكية للتجارة الإلكترونية</p>
+
+      <!-- Progress Bar -->
+      <div class="splash-progress-wrapper">
+        <div class="splash-progress-track">
+          <div class="splash-progress-fill"
+               [style.width.%]="progress()">
+          </div>
+        </div>
+      </div>
+
     </div>
+
   </div>
 }

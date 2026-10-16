@@ -1,78 +1,96 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { AdminMockService } from '@core/api/mock/admin.mock.service';
+import { AdminService, Application } from '../../core/services/admin.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './admin-dashboard.component.html',
-  styleUrl: './admin-dashboard.component.scss',
-  providers: [DatePipe]
+  styleUrl: './admin-dashboard.component.scss'
 })
 export class AdminDashboardComponent implements OnInit {
-  adminService = inject(AdminMockService);
-  private router = inject(Router);
+  private adminService = inject(AdminService);
+  public router = inject(Router);
+  public authService = inject(AuthService);
 
-  stats = this.adminService.stats;
-  recentActivity = this.adminService.recentActivity;
-  pendingApplications = this.adminService.pendingApplications;
-  pendingReports = this.adminService.pendingReports;
+  sidebarCollapsed = signal(false);
 
-  animatedStats = signal({ buyers: 0, merchants: 0, products: 0, orders: 0 });
+  isLoading = signal(true);
+  error = signal('');
 
-  currentDate = new Date();
+  stats = signal({
+    buyers_count: 0,
+    sellers_count: 0,
+    products_count: 0,
+    orders_count: 0,
+    pending_applications_count: 0,
+    new_reports_count: 0
+  });
 
-  // نسب الـ Chart
-  buyersPercent = computed(() => 
-    Math.round(this.stats().totalBuyers / 
-    (this.stats().totalBuyers + this.stats().totalMerchants) * 100)
-  );
+  recentApplications = signal<Application[]>([]);
+  recentActivities = signal<any[]>([]);
+  footerCounters = signal<any>(null);
+  applicationsChart = signal<any>(null);
+  
+  animatedStats = signal({
+    buyers: 0, sellers: 0,
+    products: 0, orders: 0
+  });
 
-  merchantsPercent = computed(() => 
-    Math.round(this.stats().totalMerchants / 
-    (this.stats().totalBuyers + this.stats().totalMerchants) * 100)
-  );
+  ngOnInit(): void {
+    this.adminService.getDashboard().subscribe({
+      next: (res) => {
+        const cards = res.data.top_cards;
+        this.stats.set(cards);
+        
+        this.recentActivities.set(res.data.recent_activities ?? []);
+        this.footerCounters.set(res.data.footer_counters ?? null);
+        this.applicationsChart.set(res.data.seller_applications_chart ?? null);
+        this.recentApplications.set(res.data.pending_applications_list?.slice(0, 3) ?? []);
 
-  // نسب الطلبات
-  pendingPercent = computed(() =>
-    Math.round(this.adminService.applications().filter(a => a.status === 'pending').length /
-    (this.adminService.applications().length || 1) * 100)
-  );
-
-  approvedPercent = computed(() =>
-    Math.round(this.adminService.applications().filter(a => a.status === 'approved').length /
-    (this.adminService.applications().length || 1) * 100)
-  );
-
-  rejectedPercent = computed(() =>
-    Math.round(this.adminService.applications().filter(a => a.status === 'rejected').length /
-    (this.adminService.applications().length || 1) * 100)
-  );
-
-  approvedApplicationsCount = computed(() => this.adminService.applications().filter(a => a.status === 'approved').length);
-  rejectedApplicationsCount = computed(() => this.adminService.applications().filter(a => a.status === 'rejected').length);
-
-  ngOnInit() {
-    this.animateNumber(this.stats().totalBuyers, 'buyers');
-    this.animateNumber(this.stats().totalMerchants, 'merchants');
-    this.animateNumber(this.stats().totalProducts, 'products');
-    this.animateNumber(this.stats().totalOrders, 'orders');
-  }
-
-  animateNumber(target: number, key: keyof ReturnType<typeof this.animatedStats>) {
-    let current = 0;
-    const step = Math.max(1, Math.ceil(target / 30));
-    const interval = setInterval(() => {
-      current = Math.min(current + step, target);
-      this.animatedStats.update(s => ({ ...s, [key]: current }));
-      if (current >= target) {
-        clearInterval(interval);
+        this.isLoading.set(false);
+        this.animateNumbers(cards);
+      },
+      error: (err) => {
+        this.error.set('فشل تحميل البيانات');
+        this.isLoading.set(false);
       }
-    }, 50);
+    });
+    
+    this.adminService.getApplications('pending').subscribe({
+      next: (res) => {
+        this.recentApplications.set(res.data.data.slice(0, 3));
+      }
+    });
   }
 
-  goTo(path: string) {
+  animateNumbers(cards: any): void {
+    const keys = ['buyers', 'sellers', 'products', 'orders'];
+    const targets = [
+      cards.buyers_count,
+      cards.sellers_count,
+      cards.products_count,
+      cards.orders_count
+    ];
+    
+    keys.forEach((key, i) => {
+      let current = 0;
+      const target = targets[i];
+      const step = Math.ceil(target / 30) || 1;
+      const interval = setInterval(() => {
+        current = Math.min(current + step, target);
+        this.animatedStats.update(s => ({...s, [key]: current}));
+        if (current >= target) clearInterval(interval);
+      }, 50);
+    });
+  }
+
+  goTo(path: string): void {
     this.router.navigate([path]);
+  }
+
+  formatDate(date: string): string {
+    return new Date(date).toLocaleDateString('ar-LY');
   }
 }

@@ -1,0 +1,289 @@
+<div class="create-product">
+
+  <!-- Header -->
+  <div class="page-header">
+    <button class="btn-back"
+            (click)="router.navigate(['/merchant/products'])">
+      <i class="fas fa-arrow-right"></i>
+    </button>
+    <div>
+      <h1>إضافة منتج جديد</h1>
+      <p>اتبع الخطوات لإضافة منتجك</p>
+    </div>
+  </div>
+
+  <!-- Steps Indicator -->
+  <div class="steps-indicator">
+    <div class="step" [class.active]="currentStep() === 'info'"
+         [class.done]="createdProductId()">
+      <div class="step-circle">
+        @if (createdProductId()) {
+          <i class="fas fa-check"></i>
+        } @else {
+          <span>1</span>
+        }
+      </div>
+      <span class="step-label">المعلومات</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" [class.active]="currentStep() === 'images'">
+      <div class="step-circle"><span>2</span></div>
+      <span class="step-label">الصور</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" [class.active]="currentStep() === 'publish'">
+      <div class="step-circle"><span>3</span></div>
+      <span class="step-label">النشر</span>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="alert-error">
+      <i class="fas fa-exclamation-circle"></i>
+      {{ error() }}
+    </div>
+  }
+
+  @if (successMessage()) {
+    <div class="alert-success">
+      <i class="fas fa-check-circle"></i>
+      {{ successMessage() }}
+    </div>
+  }
+
+  <!-- Step 1: المعلومات الأساسية -->
+  @if (currentStep() === 'info') {
+    <div class="step-card">
+      <h2><i class="fas fa-info-circle"></i> المعلومات الأساسية</h2>
+
+      <div class="form-group">
+        <label>عنوان المنتج *</label>
+        <input type="text" placeholder="مثال: قميص قطني كاجوال"
+               [value]="title()"
+               (input)="title.set($any($event.target).value)" />
+      </div>
+
+      <div class="form-group">
+        <label>الوصف</label>
+        <textarea rows="3" placeholder="اكتب وصفاً مفصلاً..."
+                  [value]="description()"
+                  (input)="description.set($any($event.target).value)">
+        </textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>السعر (د.ل) *</label>
+          <input type="number" min="0" placeholder="0"
+                 [value]="price()"
+                 (input)="price.set(+$any($event.target).value)" />
+        </div>
+        <div class="form-group">
+          <label>السعر قبل الخصم (د.ل)</label>
+          <input type="number" min="0" placeholder="0"
+                 [value]="compare_at_price()"
+                 (input)="compare_at_price.set(+$any($event.target).value)" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>الكمية في المخزون</label>
+        <input type="number" min="0" placeholder="0"
+               [value]="stock()"
+               (input)="stock.set(+$any($event.target).value)" />
+      </div>
+
+      <!-- التصنيف الرئيسي -->
+      <div class="form-group">
+        <label>التصنيف الرئيسي *</label>
+        <select [value]="selectedRootCategoryId()"
+                (change)="onRootCategoryChange($any($event.target).value)">
+          <option value="">اختر التصنيف الرئيسي</option>
+          @for (cat of rootCategories(); track cat.id) {
+            <option [value]="cat.id">{{ cat.name }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- التصنيف الفرعي (إلزامي للمنتج) -->
+      @if (selectedRootCategoryId()) {
+        <div class="form-group subcategory-group">
+          <label class="label-with-hint">
+            <span>التصنيف الفرعي * <span class="required-tag">مطلوب للمنتج</span></span>
+            @if (isLoadingSubCategories()) {
+              <span class="loading-sub"><i class="fas fa-circle-notch fa-spin"></i> جاري التحميل...</span>
+            }
+          </label>
+          
+          @if (!isLoadingSubCategories() && subCategories().length === 0) {
+            <div class="sub-alert-box">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>لا توجد تصنيفات فرعية مسجلة تحت هذا التصنيف الرئيسي. يرجى اختيار تصنيف رئيسي آخر.</span>
+            </div>
+          } @else {
+            <select [value]="selectedSubCategoryId()"
+                    [disabled]="isLoadingSubCategories()"
+                    (change)="onSubCategoryChange($any($event.target).value)">
+              <option value="">اختر التصنيف الفرعي</option>
+              @for (sub of subCategories(); track sub.id) {
+                <option [value]="sub.id">{{ sub.name }}</option>
+              }
+            </select>
+            <p class="field-sub-note">
+              <i class="fas fa-check-circle"></i>
+              يجب اختيار تصنيف فرعي يمتلك تصنيفاً أباً ليتم قبول المنتج في المتجر.
+            </p>
+          }
+        </div>
+      }
+
+      <!-- التصنيف التفصيلي الإضافي (إن وجد) -->
+      @if (selectedSubCategoryId() && (isLoadingChildCategories() || childCategories().length > 0)) {
+        <div class="form-group">
+          <label class="label-with-hint">
+            <span>تصنيف إضافي أكثر تفصيلاً (اختياري)</span>
+            @if (isLoadingChildCategories()) {
+              <span class="loading-sub"><i class="fas fa-circle-notch fa-spin"></i> جاري الفحص...</span>
+            }
+          </label>
+          @if (childCategories().length > 0) {
+            <select [value]="selectedChildCategoryId()"
+                    (change)="onChildCategoryChange($any($event.target).value)">
+              <option value="">(اختياري) يمكنك تحديد تفريع أدق</option>
+              @for (child of childCategories(); track child.id) {
+                <option [value]="child.id">{{ child.name }}</option>
+              }
+            </select>
+          }
+        </div>
+      }
+
+      <div class="form-group">
+        <label>الألوان المتاحة</label>
+        <div class="colors-grid">
+          @for (color of colors(); track color.id) {
+            <div class="color-chip"
+                 [class.selected]="selectedColorIds().includes(color.id)"
+                 (click)="toggleColor(color.id)">
+              <span class="color-dot"
+                    [style.background]="color.hex_code"
+                    [style.border]="color.hex_code === '#FFFFFF'
+                      ? '1px solid #e5e7eb' : 'none'">
+              </span>
+              {{ color.name }}
+              @if (selectedColorIds().includes(color.id)) {
+                <i class="fas fa-check"></i>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>المقاسات المتاحة</label>
+        <div class="sizes-grid">
+          @for (size of sizes(); track size.id) {
+            <div class="size-chip"
+                 [class.selected]="selectedSizeIds().includes(size.id)"
+                 (click)="toggleSize(size.id)">
+              {{ size.name }}
+            </div>
+          }
+        </div>
+      </div>
+
+      <button class="btn-primary" (click)="saveBasicInfo()"
+              [disabled]="isSaving()">
+        @if (isSaving()) {
+          <i class="fas fa-spinner fa-spin"></i>
+          جاري الحفظ...
+        } @else {
+          التالي — رفع الصور
+          <i class="fas fa-arrow-left"></i>
+        }
+      </button>
+    </div>
+  }
+
+  <!-- Step 2: الصور -->
+  @if (currentStep() === 'images') {
+    <div class="step-card">
+      <h2><i class="fas fa-images"></i> صور المنتج</h2>
+      <p class="step-desc">
+        ارفع صور المنتج — الصورة الأولى ستكون الغلاف الرئيسي
+      </p>
+
+      <div class="upload-area">
+        <input type="file" accept="image/*" multiple hidden
+               id="images-input"
+               (change)="onGeneralFilesChange($event)" />
+        <label for="images-input" class="upload-label">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <span>اضغط لاختيار الصور</span>
+          <span class="upload-hint">PNG, JPG — متعددة</span>
+        </label>
+      </div>
+
+      @if (generalPreviews().length > 0) {
+        <div class="images-preview">
+          @for (preview of generalPreviews(); track $index) {
+            <div class="preview-item">
+              <img [src]="preview" alt="صورة المنتج" />
+              @if ($index === 0) {
+                <span class="primary-badge">
+                  <i class="fas fa-star"></i> غلاف
+                </span>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <div class="step-actions">
+        <button class="btn-primary"
+                (click)="uploadImages()"
+                [disabled]="isUploadingImages()">
+          @if (isUploadingImages()) {
+            <i class="fas fa-spinner fa-spin"></i>
+            جاري الرفع...
+          } @else {
+            <i class="fas fa-upload"></i>
+            رفع الصور والمتابعة
+          }
+        </button>
+        <button class="btn-secondary" (click)="skipImages()">
+          تخطي — بدون صور
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Step 3: النشر -->
+  @if (currentStep() === 'publish') {
+    <div class="step-card publish-step">
+      <div class="publish-icon">
+        <i class="fas fa-rocket"></i>
+      </div>
+      <h2>المنتج جاهز!</h2>
+      <p>يمكنك نشره الآن أو حفظه كمسودة ونشره لاحقاً</p>
+
+      <div class="publish-actions">
+        <button class="btn-publish" (click)="publishProduct()"
+                [disabled]="isSaving()">
+          @if (isSaving()) {
+            <i class="fas fa-spinner fa-spin"></i>
+            جاري النشر...
+          } @else {
+            <i class="fas fa-globe"></i>
+            نشر المنتج الآن
+          }
+        </button>
+        <button class="btn-draft" (click)="saveDraft()">
+          <i class="fas fa-save"></i>
+          حفظ كمسودة
+        </button>
+      </div>
+    </div>
+  }
+
+</div>

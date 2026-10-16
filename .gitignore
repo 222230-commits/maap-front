@@ -42,3 +42,11 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Scratch and analysis files
+*.txt
+*methods.json
+lastVerApi.json
+test.html
+test.png
+

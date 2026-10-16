@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>دليل تكامل الفرونت إند - نظام الإشعارات</title>
+<style>
+  :root{
+    --bg:#f6f7f5; --card:#ffffff; --border:#dedcd3; --border-strong:#c7c4b8;
+    --text:#26251f; --text-muted:#6b6a62;
+    --teal:#0f6e56; --teal-light:#e1f5ee; --teal-mid:#5dcaa5;
+    --coral:#993c1d; --coral-light:#faece7; --coral-mid:#f0997b;
+    --purple:#3c3489; --purple-light:#eeedfe; --purple-mid:#7f77dd;
+    --gray:#5f5e5a; --gray-light:#f1efe8;
+    --red:#791f1f; --red-light:#fcebeb;
+    --code-bg:#1e2320; --code-text:#e7f3ee;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;}
+  code,.mono{font-family:"Consolas","Courier New",monospace;direction:ltr;unicode-bidi:embed;display:inline-block;}
+  a{color:var(--teal);}
+  .layout{display:flex;max-width:1400px;margin:0 auto;}
+  nav.side{position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;width:260px;flex:0 0 260px;background:var(--card);border-left:1px solid var(--border);padding:24px 18px;}
+  nav.side h4{font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin:22px 0 8px;}
+  nav.side h4:first-child{margin-top:0;}
+  nav.side a{display:block;padding:6px 8px;border-radius:6px;color:var(--text);text-decoration:none;font-size:14px;}
+  nav.side a:hover{background:var(--teal-light);color:var(--teal);}
+  main{flex:1;padding:32px 40px 80px;min-width:0;}
+  .eyebrow{color:var(--teal);font-weight:600;font-size:13px;letter-spacing:.5px;text-transform:uppercase;}
+  h1{font-size:30px;margin:6px 0 10px;}
+  .lead{color:var(--text-muted);font-size:16px;max-width:820px;}
+  h2{font-size:22px;margin:46px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--teal-light);}
+  h3{font-size:17px;margin:26px 0 8px;color:var(--teal);}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin:16px 0;}
+  table{width:100%;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden;margin:14px 0;}
+  th,td{border:1px solid var(--border);padding:10px 12px;font-size:14px;text-align:right;vertical-align:top;}
+  th{background:var(--teal-light);color:var(--teal);font-weight:600;}
+  tr:nth-child(even) td{background:#fafaf7;}
+  pre{background:var(--code-bg);color:var(--code-text);padding:14px 16px;border-radius:10px;overflow-x:auto;direction:ltr;text-align:left;font-size:13px;margin:10px 0;}
+  pre code{display:block;}
+  .pill{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;direction:ltr;}
+  .pill-get{background:#e6f1fb;color:#0c447c;}
+  .pill-post{background:var(--teal-light);color:var(--teal);}
+  .pill-patch{background:#faeeda;color:#633806;}
+  .pill-delete{background:var(--red-light);color:var(--red);}
+  .endpoint-line{display:flex;align-items:center;gap:10px;margin:14px 0 6px;flex-wrap:wrap;}
+  .endpoint-line code{font-size:14px;background:var(--gray-light);padding:4px 10px;border-radius:6px;}
+  .callout{border-radius:10px;padding:12px 16px;margin:12px 0;font-size:14px;border:1px solid;}
+  .callout.warn{background:var(--coral-light);border-color:var(--coral-mid);color:var(--coral);}
+  .callout.tip{background:var(--teal-light);border-color:var(--teal-mid);color:var(--teal);}
+  .callout b{display:block;margin-bottom:4px;}
+  /* flow diagram */
+  .flow{display:flex;flex-direction:column;align-items:center;gap:0;margin:24px 0;}
+  .fbox{background:var(--card);border:1.5px solid var(--border-strong);border-radius:10px;padding:12px 18px;text-align:center;min-width:260px;font-size:14px;position:relative;}
+  .fbox.api{border-color:var(--purple-mid);background:var(--purple-light);color:var(--purple);}
+  .fbox.notif{border-color:var(--teal-mid);background:var(--teal-light);color:var(--teal);}
+  .fbox.warn{border-color:var(--coral-mid);background:var(--coral-light);color:var(--coral);}
+  .fbox.manual{border-color:var(--border-strong);background:var(--gray-light);color:var(--gray);}
+  .fbox small{display:block;font-size:12px;font-weight:400;margin-top:3px;opacity:.85;}
+  .arrow-down{width:2px;height:26px;background:var(--border-strong);position:relative;}
+  .arrow-down::after{content:"";position:absolute;bottom:-1px;right:-4px;border:5px solid transparent;border-top-color:var(--border-strong);}
+  .branch{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;}
+  /* mockups */
+  .phone{width:300px;background:var(--card);border:8px solid #222;border-radius:34px;padding:10px;margin:16px auto;box-shadow:0 6px 18px rgba(0,0,0,.15);}
+  .screen{background:#fff;border-radius:20px;overflow:hidden;min-height:480px;display:flex;flex-direction:column;}
+  .screen .topbar{background:var(--teal);color:#fff;padding:14px 16px;font-weight:600;font-size:15px;}
+  .tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto;}
+  .tabs span{padding:8px 12px;font-size:12px;white-space:nowrap;color:var(--text-muted);border-bottom:2px solid transparent;}
+  .tabs span.active{color:var(--teal);border-color:var(--teal);font-weight:600;}
+  .row{display:flex;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);align-items:flex-start;}
+  .row .dot{width:9px;height:9px;border-radius:50%;margin-top:6px;flex:0 0 9px;}
+  .dot.c-teal{background:var(--teal-mid);} .dot.c-coral{background:var(--coral-mid);} .dot.c-purple{background:var(--purple-mid);} .dot.c-gray{background:#b4b2a9;}
+  .row .rtext{flex:1;}
+  .row .rtext .t1{font-size:13px;font-weight:600;}
+  .row .rtext .t2{font-size:12px;color:var(--text-muted);margin-top:2px;}
+  .row.unread{background:#fbfdf6;}
+  .badge-endpoint{display:inline-block;margin-top:10px;font-size:12px;background:var(--gray-light);color:var(--gray);padding:4px 10px;border-radius:6px;direction:ltr;}
+  .modal-wrap{min-height:340px;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;border-radius:14px;padding:10px;}
+  .modal{background:#fff;border-radius:16px 16px 0 0;width:100%;max-width:320px;padding:18px;}
+  .modal h4{margin:0 0 6px;font-size:15px;}
+  .modal p{font-size:13px;color:var(--text-muted);margin:4px 0 14px;}
+  .modal button{width:100%;padding:10px;border:none;border-radius:8px;background:var(--teal);color:#fff;font-size:14px;margin-bottom:8px;cursor:pointer;}
+  .modal button.secondary{background:var(--gray-light);color:var(--gray);}
+  footer{margin-top:60px;padding:20px 0;border-top:1px solid var(--border);color:var(--text-muted);font-size:13px;text-align:center;}
+  ul.tips li{margin:8px 0;}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="side">
+  <h4>تصفح المستخدم</h4>
+  <a href="#overview">نظرة عامة واختيار الأداة</a>
+  <a href="#types">خريطة أنواع الإشعارات</a>
+  <a href="#flow">تدفق البلاغ ← إشعار</a>
+  <a href="#user-endpoints">مسارات المشتري/التاجر</a>
+  <a href="#mockup-list">موك-أب: شاشة القائمة</a>
+  <a href="#mockup-detail">موك-أب: عند الضغط على إشعار</a>
+
+  <h4>إدارة الأدمن (Angular)</h4>
+  <a href="#admin-endpoints">مسارات لوحة الأدمن</a>
+
+  <h4>مرجع سريع</h4>
+  <a href="#errors">جدول الأخطاء المتوقعة</a>
+  <a href="#tips">نصائح عملية</a>
+  <a href="#backend-note">ملاحظة لفريق الباك إند</a>
+</nav>
+
+<main>
+  <div class="eyebrow">دليل تكامل الفرونت إند</div>
+  <h1>نظام الإشعارات — من الباك إند إلى الواجهة</h1>
+  <p class="lead">هذا الدليل يغطي فقط مسارات الإشعارات الجديدة (app.notifications) وتأثيرها على تصميم الواجهة، بناءً على قراءة فعلية لأكواد NotificationController وAdminNotificationController وNotificationService والمسارات المرتبطة.</p>
+
+  <div class="callout tip">
+    <b>مهم قبل أي شيء</b>
+    لا يوجد أي تغيير في شكل أو مسار أي Endpoint اشتغلتم عليه سابقاً (التقييمات، السلة، الطلبات، متابعة المتاجر، البلاغات...). كل هذه المسارات كما هي تماماً. الجديد فقط هو مجموعة مسارات <code>/notifications</code> للمشتري/التاجر، ومجموعة موازية <code>/admin/notifications</code> للأدمن. لا داعي للقلق من كسر أي شاشة موجودة.
+  </div>
+
+  <h2 id="overview">نظرة عامة واختيار الأداة</h2>
+  <table>
+    <tr><th>الميزة</th><th>الأداة المقترحة</th><th>السبب</th></tr>
+    <tr><td>شاشة قائمة الإشعارات (مشتري/تاجر)</td><td>Flutter</td><td>تصفح عمودي متسلسل، سحب للتحديث، Badge على أيقونة الجرس — تجربة موبايل نمطية.</td></tr>
+    <tr><td>لوحة إشعارات المشتري/التاجر — نسخة الويب إن وجدت</td><td>Angular</td><td>يمكن عرضها كـ Dropdown من الهيدر بنفس الـ Endpoint، فقط قائمة مختصرة بدون تبويبات كاملة.</td></tr>
+    <tr><td>معالجة الضغط على إشعار (Bottom Sheet)</td><td>Flutter</td><td>سلوك مشروط بنوع الإشعار ووجود order_id — يحتاج منطق شرطي بسيط داخل الواجهة، لا تعقيد جدولي.</td></tr>
+    <tr><td>لوحة إشعارات الأدمن</td><td>Angular فقط</td><td>الأدمن لوحة تحكم بجدول قابل للفرز والتصفية، وهذا خارج نطاق تطبيق الموبايل أصلاً.</td></tr>
+  </table>
+
+  <h2 id="types">خريطة أنواع الإشعارات (enum قابل للتوسع)</h2>
+  <p>حقل <code>type</code> في الجدول هو enum فعلي في قاعدة البيانات (<code>app.notification_type</code>). الأنواع المستخدمة فعلياً حالياً في الكود:</p>
+  <table>
+    <tr><th>type</th><th>مصدره في الكود</th><th>لون مقترح</th><th>شكل data حالياً</th></tr>
+    <tr><td><code>report_submitted</code></td><td>ReportController@store (مشتري/تاجر)</td><td>تيل</td><td>title/body فقط (عبر sendToUser)</td></tr>
+    <tr><td><code>new_report_received</code></td><td>ReportController@store → لكل الأدمن</td><td>كورال</td><td>title/body فقط (عبر sendToAdmins → sendToUser)</td></tr>
+    <tr><td><code>report_status_changed</code></td><td>Admin ReportController@resolve</td><td>بنفسجي</td><td>title/body فقط (عبر sendToUser)</td></tr>
+    <tr><td><code>new_follower</code></td><td>ShopFollowerController@follow</td><td>تيل</td><td>title/body فقط حالياً (عبر sendToUser) — أفضل مرشّح ليُحوَّل لاحقاً إلى sendTargetedNotification مع target_type=shop</td></tr>
+    <tr><td><code>seller_status_changed</code></td><td>Admin SellerController@toggleStatus</td><td>كورال</td><td>title/body فقط (عبر sendToUser)</td></tr>
+  </table>
+  <div class="callout warn">
+    <b>لا يوجد اليوم أي نوع فعلي يستخدم target_type/target_id</b>
+    رغم إضافة sendTargetedNotification إلى الخدمة، كل الأكواد المرفقة حتى الآن (البلاغات، المتابعة، حظر التاجر) ما زالت تستدعي sendToUser/sendToAdmins القديمتين. يعني هذا أن الميزة جاهزة في الباك إند لكن غير مفعّلة على أي مسار حالياً — لا تبنِ منطق تنقّل تلقائي (Deep Link) يفترض وجود target_id لأي من الأنواع الخمسة أعلاه إلى أن يؤكد فريق الباك إند تفعيلها فعلياً على مسار معيّن.
+  </div>
+  <div class="callout warn">
+    <b>الفخ: لا تبني switch-case مغلق</b>
+    بما أن <code>type</code> عمود enum في قاعدة البيانات، إضافة نوع جديد مستقبلاً (مثلاً عند طلبات الشراء أو ترقية تاجر) لن يكسر الـ API — لكنه سيكسر الواجهة لو كانت مبنية على switch يعرض حالة "خطأ" لأي نوع غير معروف. صمّم خريطة config: <code>{type → {icon, color, label}}</code> مع سجل افتراضي (fallback) بأيقونة/لون محايد وعنوان عام، بدل رمي استثناء أو شاشة فارغة.
+  </div>
+  <div class="callout tip">
+    <b>تحديث: أضيفت دالة sendTargetedNotification</b>
+    NotificationService الآن فيها دالة ثانية منفصلة عن sendToUser، اسمها <code>sendTargetedNotification(user, type, title, body, targetType, targetId)</code>. أي إشعار يُنشأ عبرها يخزّن داخل <code>data</code> حقلين إضافيين: <code>target_type</code> و<code>target_id</code>، ويرسلهما أيضاً ضمن payload الفايربيس. هذا يفتح إمكانية التنقل المباشر من الإشعار لصفحته (مثلاً فتح متجر معيّن عند new_follower).
+  </div>
+  <div class="callout warn">
+    <b>الفخ الجديد: شكل data لم يعد موحّداً بين كل الإشعارات</b>
+    وجود الدالتين معاً (sendToUser القديمة وsendTargetedNotification الجديدة) يعني أن حقل <code>data</code> لنفس الجدول أصبح له شكلان مختلفان حسب أي دالة استخدمها الباك إند عند الإرسال:
+    <br>• عبر sendToUser: <code>{ title, body }</code> فقط — بدون أي معرّف.
+    <br>• عبر sendTargetedNotification: <code>{ title, body, target_type, target_id }</code>.
+    <br>لا تفترض في الفرونت أن type معيّن يضمن وجود target_id بشكل دائم — تحقق دائماً بأمان (<code>data['target_id'] ?? null</code>) قبل محاولة بناء رابط تنقل، وإلا ستحصل على استثناء أو تنقل فارغ لأي إشعار لا يزال يُرسل بالطريقة القديمة. اطلب من فريق الباك إند قائمة محدّثة بأي الأنواع الخمسة الحالية (إن وُجدت) انتقلت فعلياً لاستخدام sendTargetedNotification، لأن الأكواد المرفقة سابقاً لبلاغات/متابعة المتاجر ما زالت تستدعي sendToUser وsendToAdmins القديمتين.
+  </div>
+
+  <h2 id="flow">تدفق: إرسال بلاغ ← مراجعة أدمن ← إشعار</h2>
+  <div class="flow">
+    <div class="fbox api">POST /reports/store<small>مشتري أو تاجر يرسل بلاغ</small></div>
+    <div class="arrow-down"></div>
+    <div class="fbox manual">فحوصات: 3/يوم، 3 معلقة، عدم تكرار<small>أي فشل → 422 فوراً، لا يصل لأي إشعار</small></div>
+    <div class="arrow-down"></div>
+    <div class="fbox api">إنشاء Report status=pending<small>201</small></div>
+    <div class="arrow-down"></div>
+    <div class="branch">
+      <div class="fbox notif">إشعار للمُبلِّغ<small>report_submitted</small></div>
+      <div class="fbox notif">إشعار لكل الأدمن<small>new_report_received (broadcast)</small></div>
+    </div>
+    <div class="arrow-down"></div>
+    <div class="fbox api">Admin: POST /admin/reports/{id}/resolve<small>status + admin_notes + take_action</small></div>
+    <div class="arrow-down"></div>
+    <div class="fbox warn">إن take_action=true<small>product→unpublished (رجعي) / shop,user→is_active=false (رجعي) / review→حذف نهائي (غير رجعي)</small></div>
+    <div class="arrow-down"></div>
+    <div class="fbox notif">إشعار للمُبلِّغ<small>report_status_changed</small></div>
+  </div>
+  <div class="callout warn">
+    <b>عملية غير قابلة للتراجع</b>
+    عندما يكون <code>target_type=review</code> ويفعّل الأدمن <code>take_action</code>، السلوك في الكود هو <code>$report->review?->delete()</code> — حذف نهائي من القاعدة، وليس تعليق أو إخفاء مثل باقي الأنواع. إن كانت واجهة الأدمن تعرض هذا الخيار كـ toggle بسيط بجانب باقي الخيارات، يُفضّل تمييزه بتأكيد إضافي (نص أحمر أو Dialog تأكيد منفصل) لأنه الوحيد بلا رجعة بين الأربعة.
+  </div>
+
+  <h2 id="user-endpoints">مسارات المشتري/التاجر (مشتركة تحت /notifications)</h2>
+  <p>ملاحظة: هذه المسارات <b>لا تُفرّق</b> بين المشتري والتاجر — كلاهما نفس Controller ونفس الجدول، لأن notifiable_type دائماً 'user' بغض النظر عن role.</p>
+
+  <h3 id="ep-index">جلب الإشعارات</h3>
+  <div class="endpoint-line"><span class="pill pill-get">GET</span><code>/notifications?per_page=15</code></div>
+  <pre><code>// Response 200
+{
+  "success": true,
+  "pagination": { "total": 42, "current_page": 1, "last_page": 3 },
+  "data": [
+    {
+      "id": "uuid",
+      "type": "report_status_changed",
+      "notifiable_type": "user",
+      "notifiable_id": "uuid",
+      "data": { "title": "تحديث بشأن بلاغك 📢", "body": "تم تحديث حالة البلاغ..." },
+      "read_at": null,
+      "order_id": null,
+      "created_at": "2026-08-05T10:00:00Z"
+    },
+    {
+      "id": "uuid-2",
+      "type": "new_follower",
+      "data": {
+        "title": "متابع جديد! 🎉",
+        "body": "قام أحمد بمتابعة متجرك للتو.",
+        "target_type": "shop",
+        "target_id": "uuid-shop"
+      },
+      "read_at": null,
+      "order_id": null,
+      "created_at": "2026-08-05T10:02:00Z"
+    }
+  ]
+}</code></pre>
+  <div class="callout tip"><b>ملاحظة تصميم</b> per_page محدود بحد أقصى 50 في الباك إند (أي رقم أكبر يُقصّ تلقائياً إلى 50) — لا حاجة للتحقق منه في الفرونت. لاحظ أن العنصر الثاني هنا مثال توضيحي فقط لشكل sendTargetedNotification المستقبلي — لا يوجد اليوم نوع فعلي يُرجعه (راجع التحذير أعلى الجدول).</div>
+
+  <h3 id="ep-unread">عدد غير المقروء</h3>
+  <div class="endpoint-line"><span class="pill pill-get">GET</span><code>/notifications/unread-count</code></div>
+  <pre><code>// Response 200
+{ "success": true, "unread_count": 5 }</code></pre>
+
+  <h3>تحديد إشعار كمقروء</h3>
+  <div class="endpoint-line"><span class="pill pill-patch">PATCH</span><code>/notifications/{id}/read</code></div>
+  <pre><code>// Response 200
+{ "success": true, "message": "تم تحديد الإشعار كمقروء." }
+// Response 404 إن لم يكن الإشعار موجوداً أو لا يخص هذا المستخدم
+{ "success": false, "message": "الإشعار غير موجود." }</code></pre>
+
+  <h3>تحديد الكل كمقروء</h3>
+  <div class="endpoint-line"><span class="pill pill-post">POST</span><code>/notifications/mark-all-read</code></div>
+  <pre><code>// Response 200
+{ "success": true, "message": "تم تحديد جميع الإشعارات كمقروءة." }</code></pre>
+
+  <h3>حذف إشعار / مسح الكل</h3>
+  <div class="endpoint-line"><span class="pill pill-delete">DELETE</span><code>/notifications/{id}/delete</code></div>
+  <div class="endpoint-line"><span class="pill pill-delete">DELETE</span><code>/notifications/clear-all</code></div>
+  <pre><code>// كلاهما 200 عند النجاح، حذف {id} يرجع 404 إن لم يكن موجوداً/غير مملوك</code></pre>
+
+  <div class="callout tip">
+    <b>تم إصلاحه في آخر تعديل بالباك إند</b>
+    كل دوال NotificationController (index, unreadCount, markAsRead, markAllAsRead, destroy, clearAll) أصبحت الآن تتحقق من notifiable_type = 'user' بالإضافة إلى notifiable_id بشكل موحّد. لا حاجة لأي احتراز إضافي بخصوص هذه النقطة على مستوى الفرونت — العدّاد وقائمة العناصر مضمونان أن يتطابقا من هذه الجهة.
+  </div>
+
+  <h2 id="mockup-list">موك-أب: شاشة قائمة الإشعارات (Flutter)</h2>
+  <div class="phone"><div class="screen">
+    <div class="topbar">الإشعارات</div>
+    <div class="tabs">
+      <span class="active">الكل</span><span>البلاغات</span><span>المتاجر</span><span>حسابي</span>
+    </div>
+    <div class="row unread"><span class="dot c-purple"></span><div class="rtext"><div class="t1">تحديث بشأن بلاغك 📢</div><div class="t2">تم تحديث حالة البلاغ إلى: مكتمل ✅</div></div></div>
+    <div class="row unread"><span class="dot c-teal"></span><div class="rtext"><div class="t1">متابع جديد! 🎉</div><div class="t2">قام أحمد بمتابعة متجرك للتو.</div></div></div>
+    <div class="row"><span class="dot c-teal"></span><div class="rtext"><div class="t1">تم استلام بلاغك 📝</div><div class="t2">سنقوم بمراجعته في أقرب وقت ممكن.</div></div></div>
+    <div class="row"><span class="dot c-gray"></span><div class="rtext"><div class="t1">نوع جديد غير معروف بعد</div><div class="t2">يُعرض بأيقونة/لون افتراضي بدل كسر الشاشة</div></div></div>
+  </div></div>
+  <div style="text-align:center"><span class="badge-endpoint">GET /notifications · GET /notifications/unread-count</span></div>
+  <p>التبويبات في الأعلى ليست حقلاً من الباك إند — هي تصنيف تبنيه الواجهة محلياً من <code>type</code> حسب خريطة الألوان (مثال: report_* ضمن تبويب "البلاغات"). النقطة الرمادية في آخر صف تمثل حالة fallback لنوع غير موجود بالجدول أعلاه — هكذا لا تنكسر الشاشة عند إضافة type جديد بالباك إند دون تحديث الفرونت فوراً.</p>
+
+  <h2 id="mockup-detail">موك-أب: عند الضغط على إشعار</h2>
+  <div class="modal-wrap"><div class="modal">
+    <h4>تحديث بشأن بلاغك 📢</h4>
+    <p>تم تحديث حالة البلاغ الذي قدمته إلى: مكتمل ✅</p>
+    <button>عرض كل بلاغاتي</button>
+    <button class="secondary">إغلاق</button>
+  </div></div>
+  <div style="text-align:center"><span class="badge-endpoint">PATCH /notifications/{id}/read</span></div>
+  <p>السلوك المقترح عند الضغط: (1) استدعاء PATCH لتحديد الإشعار كمقروء فوراً، (2) عرض النص الكامل في Bottom Sheet، (3) فحص دفاعي لوجود <code>data.target_id</code> و<code>data.target_type</code> — إن وُجدا (إشعار أُرسل عبر sendTargetedNotification) افتح الشاشة المرتبطة مباشرة، وإن لم يوجدا (الحالة الافتراضية اليوم لكل الأنواع الخمسة) اعرض زر توجيه عام حسب نوع الإشعار فقط — "عرض بلاغاتي" لأنواع report_*، "متابعيّ" لـ new_follower. لا تفترض توفر target_id لأي نوع بثقة كاملة قبل تأكيد الباك إند تفعيله فعلياً.</p>
+
+  <h2 id="admin-endpoints">مسارات لوحة إشعارات الأدمن (Angular فقط)</h2>
+  <p>نفس البنية العامة تحت <code>/admin/notifications</code> عبر AdminNotificationController، لكن مع فروقات مهمة عن نسخة المشتري/التاجر:</p>
+  <table>
+    <tr><th>Endpoint</th><th>الفرق عن نسخة المشتري/التاجر</th></tr>
+    <tr><td>كل الدوال</td><td>فلترة notifiable_type موحّدة الآن بين النسختين — لا فرق في هذه النقطة بعد التحديث الأخير.</td></tr>
+    <tr><td>كل الدوال</td><td>مُغلّفة بـ try/catch مستقل داخل كل دالة (على عكس نسخة المشتري/التاجر التي لا تغلّف استعلاماتها بـ try/catch)، فأي خطأ غير متوقع في نسخة الأدمن يرجع دائماً بصيغة <code>{success:false,message}</code> بينما نسخة المشتري/التاجر قد ترجع صيغة استثناء Laravel الافتراضية عند خطأ غير متوقع.</td></tr>
+  </table>
+  <div class="callout tip"><b>تصميم مقترح للوحة</b> Dropdown من الهيدر العلوي بعدد غير مقروء + قائمة مختصرة (5-10 عناصر) تفتح صفحة كاملة بجدول عند "عرض الكل"، بنفس منطق التبويب حسب type الموجود في القسم أعلاه.</div>
+
+  <h2 id="errors">جدول ملخص الأخطاء المتوقعة</h2>
+  <table>
+    <tr><th>الكود</th><th>يظهر في</th><th>المعنى</th><th>ماذا يفعل الفرونت</th></tr>
+    <tr><td>404</td><td>markAsRead / destroy (مشتري وأدمن)</td><td>الإشعار غير موجود أو لا يخص المستخدم الحالي</td><td>احذفه محلياً من القائمة إن كان معروضاً مسبقاً (Optimistic UI مع Fallback)</td></tr>
+    <tr><td>422</td><td>POST /reports/store</td><td>تجاوز الحد اليومي، أو 3 بلاغات معلقة، أو تكرار</td><td>اعرض رسالة الباك إند حرفياً (تختلف الرسالة حسب السبب الثلاثة)</td></tr>
+    <tr><td>500</td><td>أي مسار</td><td>خطأ غير متوقع بالخادم</td><td>رسالة عامة "حدث خطأ، حاول لاحقاً" + إعادة محاولة يدوية</td></tr>
+    <tr><td>400</td><td>Admin toggle-status للتاجر</td><td>معرّف UUID غير صالح</td><td>لا ينطبق على شاشات الإشعارات مباشرة، مذكور للسياق فقط</td></tr>
+  </table>
+
+  <h2 id="tips">نصائح عملية لتفادي الاحتكاك مع الباك إند</h2>
+  <div class="card">
+    <ul class="tips">
+      <li>ابنِ خريطة <code>type → {icon, color, label, tab}</code> في ملف config منفصل قابل للتعديل من دون رفع نسخة تطبيق جديدة إن أمكن (remote config)، لأن الـ enum سيتوسّع لاحقاً.</li>
+      <li>لا تعتمد على unread_count كمصدر وحيد للـ Badge إن كنت تعرض أيضاً قائمة مفلترة — اجلبهما بشكل مستقل حسب الفخ المذكور أعلاه.</li>
+      <li>عند حذف إشعار محلياً بعد نجاح DELETE، لا تعتمد على استرجاعه — العملية لا رجعة فيها من جهة الباك إند أيضاً (Hard delete فعلي في الجدول).</li>
+      <li>خزّن نص data.title وdata.body كما هما دون افتراض بنية إضافية داخل data — أي حقل غير موجود في الأمثلة أعلاه غير مضمون الوجود مستقبلاً بدون تنسيق مسبق مع الباك إند.</li>
+      <li>فرّق بصرياً بين إشعارات المشتري والتاجر لو كان نفس المستخدم له الدوران (نادر لكن ممكن) عبر النص فقط، فلا فرق تقني في الاستجابة بينهما.</li>
+      <li>اقرأ <code>data.target_id</code> و<code>data.target_type</code> دائماً بصيغة اختيارية (nullable) بغض النظر عن type، لأن شكل data يعتمد على أي دالة استدعاها الباك إند وليس على النوع نفسه فقط.</li>
+    </ul>
+  </div>
+
+  <h2 id="backend-note">ملاحظة مقترحة لفريق الباك إند</h2>
+  <div class="callout tip">
+    <b>تحديث الحالة</b>
+    ✅ توحيد notifiable_type عبر كل الدوال — تم تنفيذه.
+    ✅ إضافة آلية target_id/target_type — تم تجهيزها كدالة جاهزة (sendTargetedNotification) في NotificationService.
+    <br><br><b>المتبقي</b>: تفعيل استدعاء sendTargetedNotification فعلياً بدل sendToUser في نقاط الإرسال المرشّحة (خصوصاً new_follower وreport_status_changed)، وتوثيق أي نوع أصبح يحمل target_id بشكل رسمي حتى يبني الفرونت منطق التنقّل عليه بثقة بدل التحقق الدفاعي فقط.
+  </div>
+
+  <footer>دليل داخلي — تم إعداده بالاعتماد على قراءة مباشرة للأكواد الفعلية المرفقة (NotificationController، AdminNotificationController، NotificationService، ReportController، ShopFollowerController، SellerController، ومسارات admin.php وBuyer.php وSeller.php وnotification.php).</footer>
+</main>
+</div>
+</body>
+</html>

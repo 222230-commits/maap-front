@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>دليل ربط الفرونت إند - نظام البحث والتوصيات</title>
+<style>
+:root{
+  --bg:#F7F8F7; --card:#FFFFFF; --border:#DFE3DF;
+  --teal:#0F6E56; --teal-light:#E1F5EE; --teal-dark:#04342C;
+  --coral:#993C1D; --coral-light:#FAECE7;
+  --purple:#534AB7; --purple-light:#EEEDFE;
+  --gray:#5F5E5A; --gray-light:#F1EFE8;
+  --text:#26221C; --text-sub:#5F5E5A;
+  --code-bg:#1E2422; --code-text:#DDEFE8;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI",Tahoma,Arial,sans-serif;line-height:1.7}
+code,.mono{font-family:Consolas,"Courier New",monospace}
+a{color:var(--teal);text-decoration:none}
+.layout{display:flex;min-height:100vh}
+nav.side{width:250px;flex:0 0 250px;background:var(--card);border-left:1px solid var(--border);
+  position:sticky;top:0;height:100vh;overflow-y:auto;padding:20px 16px}
+nav.side h4{font-size:12px;color:var(--gray);text-transform:uppercase;margin:18px 0 8px}
+nav.side ul{list-style:none;margin:0;padding:0}
+nav.side li{margin:2px 0}
+nav.side a{display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:var(--text)}
+nav.side a:hover{background:var(--teal-light);color:var(--teal-dark)}
+main{flex:1;padding:32px 48px;max-width:920px}
+.eyebrow{color:var(--teal);font-size:13px;font-weight:bold;letter-spacing:.5px}
+h1{font-size:30px;margin:6px 0 6px}
+.lead{color:var(--text-sub);font-size:16px;max-width:700px}
+h2{margin-top:48px;padding-top:12px;border-top:1px solid var(--border);font-size:22px}
+h3{font-size:17px}
+table{width:100%;border-collapse:collapse;margin:14px 0;background:var(--card);font-size:14px}
+th,td{border:1px solid var(--border);padding:8px 10px;text-align:right;vertical-align:top}
+th{background:var(--teal-light);color:var(--teal-dark)}
+.pill{display:inline-block;font-family:Consolas,monospace;font-size:12px;font-weight:bold;
+  padding:3px 10px;border-radius:14px;color:#fff}
+.pill-get{background:#1D6FB8}
+.pill-post{background:var(--teal)}
+.pill-delete{background:var(--coral)}
+.route-line{display:flex;align-items:center;gap:10px;margin:10px 0}
+.route-line code{direction:ltr;font-size:14px}
+pre{background:var(--code-bg);color:var(--code-text);padding:14px 16px;border-radius:10px;
+  overflow-x:auto;font-size:13px;direction:ltr;text-align:left}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin:14px 0}
+.callout{border-radius:10px;padding:12px 16px;margin:12px 0;font-size:14px}
+.callout.warn{background:var(--coral-light);border-right:4px solid var(--coral)}
+.callout.tip{background:var(--teal-light);border-right:4px solid var(--teal)}
+.flow{display:flex;flex-direction:column;gap:10px;margin:16px 0}
+.frow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.fbox{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;min-width:160px}
+.fbox.api{border-color:var(--purple);background:var(--purple-light)}
+.fbox.manual{border-color:var(--gray);background:var(--gray-light)}
+.branch{font-size:12px;color:var(--text-sub);margin-inline-start:6px}
+.badge-endpoint{display:block;text-align:center;font-family:Consolas,monospace;font-size:12px;
+  background:var(--gray-light);color:var(--text-sub);padding:6px;border-radius:8px;margin-top:8px;direction:ltr}
+.phone{width:280px;background:#111;border-radius:28px;padding:10px;margin:14px auto}
+.screen{background:var(--card);border-radius:20px;padding:14px;min-height:380px}
+.row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.row .thumb{width:40px;height:40px;border-radius:8px;background:var(--gray-light)}
+footer{color:var(--text-sub);font-size:13px;text-align:center;padding:40px 0 24px}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="side">
+  <h4>تصفح المستخدم</h4>
+  <ul>
+    <li><a href="#overview">نظرة عامة</a></li>
+    <li><a href="#search">بحث المنتجات</a></li>
+    <li><a href="#recommendations">التوصيات</a></li>
+  </ul>
+  <h4>إدارة الطرف الآخر</h4>
+  <ul>
+    <li><a href="#embedding">توليد متجه منتج (تاجر)</a></li>
+    <li><a href="#sync">مزامنة شاملة (أدمن)</a></li>
+    <li><a href="#remove">حذف من الفهرس</a></li>
+  </ul>
+  <h4>فلترة التعليقات</h4>
+  <ul>
+    <li><a href="#comment-filter">التحقق من التعليق</a></li>
+  </ul>
+  <h4>مرجع سريع</h4>
+  <ul>
+    <li><a href="#errors">جدول الأخطاء</a></li>
+    <li><a href="#tips">نصائح عملية</a></li>
+    <li><a href="#backend-note">ملاحظة للباك إند</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="eyebrow">دليل تكامل الفرونت إند</div>
+  <h1>نظام البحث والتوصيات</h1>
+  <p class="lead">شرح كامل لكيفية ربط الواجهة (Angular / Flutter) بمسارات البحث الهجين وتوصيات الصفحة الرئيسية، مع كل الفخاخ المكتشفة فعلياً في الكود.</p>
+
+  <h2 id="overview">نظرة عامة واختيار الأداة</h2>
+  <table>
+    <tr><th>الميزة</th><th>الأداة المناسبة</th><th>السبب</th></tr>
+    <tr><td>شاشة بحث وفلاتر (Buyer)</td><td>Flutter</td><td>تصفح متسلسل وتفاعل لحظي مع الفلاتر على الموبايل، مع debounce بسيط</td></tr>
+    <tr><td>الصفحة الرئيسية (أقسام متعددة)</td><td>Flutter</td><td>قوائم أفقية/عمودية قابلة للتمرير حسب حالة المستخدم (زائر/مسجّل/له اهتمامات)</td></tr>
+    <tr><td>لوحة مزامنة محرك البحث (أدمن)</td><td>Angular</td><td>عملية طويلة بخطوات ودفعات، تحتاج شريط تقدم وجدول حالة وليس تصفحاً بسيطاً</td></tr>
+    <tr><td>زر "إعادة توليد متجه المنتج" (تاجر)</td><td>Angular</td><td>إجراء إداري ضمن لوحة تحكم موجودة أصلاً، لا يحتاج تجربة موبايل مستقلة</td></tr>
+  </table>
+
+  <h2 id="search">بحث المنتجات</h2>
+  <div class="route-line"><span class="pill pill-get">GET</span><code>/Buyer/products/search</code></div>
+  <p>بدون Middleware مصادقة — متاح للزوار. جميع الفلاتر تُقرأ عبر <code dir="ltr">$request-&gt;all()</code>.</p>
+
+  <h3>مثال الطلب</h3>
+  <pre>GET /Buyer/products/search?q=قميص&category[]=رجالي&color[]=أزرق&min_price=50&max_price=300</pre>
+
+  <table>
+    <tr><th>الحقل</th><th>النوع</th><th>ملاحظة</th></tr>
+    <tr><td><code>q</code></td><td>نص</td><td>اختياري — بحث نصي + دلالي هجين</td></tr>
+    <tr><td><code>category[]</code>, <code>color[]</code>, <code>size[]</code></td><td>مصفوفة</td><td>يجب إرسالها بصيغة <code dir="ltr">key[]=value</code> وليس مفصولة بفواصل</td></tr>
+    <tr><td><code>min_price</code>, <code>max_price</code></td><td>رقم</td><td>اختياري، بدون تحقق صارم على النوع في الكود</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <b>فخ 1 — الرد الفارغ الصامت:</b> إذا كانت كل الفلاتر فارغة معاً (لا q ولا تصنيف ولا سعر ولا لون ولا مقاس)، الباك إند يرجع <code dir="ltr">{success:true, data:[]}</code> فوراً دون أي استعلام فعلي. الفرونت يجب أن يميّز هذه الحالة (اعرض "ابدأ البحث") عن حالة "لا توجد نتائج مطابقة" الحقيقية — لأن شكل الاستجابة متطابق تماماً بين الحالتين.
+  </div>
+
+  <div class="callout warn">
+    <b>فخ 2 — فلترة على فهرس، جلب من مصدر آخر:</b> الترتيب والفلترة يتمّان على Materialized View (<code dir="ltr">product_search_index</code>)، لكن البيانات النهائية المُعادة تُجلب من جدول <code dir="ltr">Product</code> الحقيقي بشرط <code dir="ltr">status=published</code> و <code dir="ltr">is_active=true</code>. منتج قد يظهر في الفهرس لكنه يُستبعد من النتيجة النهائية إذا تغيّرت حالته قبل تحديث الفهرس. لا يوجد <code dir="ltr">total_count</code> منفصل — عدد عناصر <code dir="ltr">data</code> هو العدد الحقيقي النهائي فقط.
+  </div>
+
+  <table>
+    <tr><th>الحالة</th><th>Status</th><th>الشكل</th></tr>
+    <tr><td>نجاح (فيه أو بدون نتائج)</td><td>200</td><td><code dir="ltr">{success:true, data:[Product,...]}</code></td></tr>
+    <tr><td>فشل خدمة الذكاء الاصطناعي (Embedding/Re-rank)</td><td>500</td><td><code dir="ltr">{success:false, message:"نص عربي جاهز للعرض", data:[]}</code></td></tr>
+  </table>
+
+  <div class="callout tip">تحقق من <code dir="ltr">success</code> أولاً وليس فقط status code — كلا الحالتين (فارغة/خطأ) تُرجعان <code dir="ltr">data:[]</code>، والفارق الوحيد هو <code dir="ltr">success</code> ورسالة الخطأ.</div>
+
+  <div class="flow">
+    <div class="frow"><div class="fbox">استقبال الفلاتر</div></div>
+    <div class="frow"><div class="fbox">فحص: كل الفلاتر فارغة؟ <span class="branch">→ نعم: رد فوري data:[]</span></div></div>
+    <div class="frow"><div class="fbox api">بحث هجين (نص + متجه) على الفهرس</div></div>
+    <div class="frow"><div class="fbox api">Re-rank عبر خدمة بايثون <span class="branch">→ فشل: خطأ 500</span></div></div>
+    <div class="frow"><div class="fbox">جلب المنتجات الكاملة (published + active فقط)</div></div>
+    <div class="frow"><div class="fbox">إعادة ترتيب حسب دقة المحرك → رد نهائي 200</div></div>
+  </div>
+
+  <h2 id="recommendations">التوصيات</h2>
+
+  <h3>الصفحة الرئيسية</h3>
+  <div class="route-line"><span class="pill pill-get">GET</span><code>/recommendations/home</code></div>
+  <p>لا تتطلب مصادقة، لكنها تستفيد من المستخدم المسجّل إن وُجد (<code dir="ltr">auth:sanctum</code> اختياري عبر <code dir="ltr">$request-&gt;user('sanctum')</code>).</p>
+
+  <div class="callout warn">
+    <b>فخ 3 — أقسام متغيّرة الشكل حسب المستخدم:</b> الاستجابة دائماً تحتوي <code dir="ltr">most_popular</code>, <code dir="ltr">top_rated</code>, <code dir="ltr">top_stores</code>. لكن قسم رابع يظهر أو لا يظهر حسب حالة المستخدم:
+    <ul>
+      <li>زائر / مستخدم بلا تفاعلات ولا اهتمامات → لا يوجد قسم رابع إطلاقاً</li>
+      <li>مستخدم له طلبات أو تقييمات سابقة → مفتاح <code dir="ltr">recommended_for_you</code></li>
+      <li>مستخدم جديد حدّد اهتماماته فقط → مفتاح <code dir="ltr">because_you_like</code></li>
+    </ul>
+    الفرونت يجب أن يتعامل مع الاستجابة ديناميكياً (<code dir="ltr">Object.keys</code>) وليس بافتراض مفاتيح ثابتة، وإلا فقد قسم كامل بصمت.
+  </div>
+
+  <div class="callout warn">
+    <b>فخ 4 — كاش لمدة ساعة:</b> <code dir="ltr">most_popular</code>, <code dir="ltr">top_rated</code>, <code dir="ltr">top_stores</code>, وحتى نتيجة "هل للمستخدم تفاعلات" (لكل مستخدم على حدة) مخزّنة في كاش لمدة 3600 ثانية. تغييرات حديثة في الشحن/التقييم قد لا تنعكس فوراً — لا تعتمد على هذه الأقسام لعرض بيانات "لحظية".
+  </div>
+
+  <h3>منتجات مشابهة</h3>
+  <div class="route-line"><span class="pill pill-get">GET</span><code>/recommendations/products/{id}/similar</code></div>
+
+  <div class="callout warn">
+    <b>فخ 5 — الأخطاء تُخفى داخل <code dir="ltr">data</code> نفسها:</b> عند أي فشل داخلي (منتج غير مرتبط بمجموعة الذكاء الاصطناعي، فشل اتصال بخدمة بايثون، نتائج فارغة...) الباك إند لا يرجع <code dir="ltr">status</code> خطأ ولا <code dir="ltr">success:false</code> — بل يرجع <b>200 دائماً</b> مع <code dir="ltr">data</code> تحتوي على عنصر واحد بصيغة <code dir="ltr">{debug_error: "نص تشخيصي"}</code>. هذا شكل مختلف تماماً عن شكل المنتج العادي. الفرونت <b>يجب</b> أن يفحص كل عنصر في <code dir="ltr">data</code> بحثاً عن مفتاح <code dir="ltr">debug_error</code> قبل عرضه كمنتج، وإلا سيحاول رسم بطاقة منتج من كائن تشخيصي فارغ من الحقول المطلوبة (لا صورة، لا سعر، لا اسم).
+  </div>
+
+  <h3>توصيات حسب التصنيف</h3>
+  <div class="route-line"><span class="pill pill-get">GET</span><code>/recommendations/category/{categoryId}</code></div>
+  <p>مخزّنة في كاش لمدة ساعة لكل <code dir="ltr">categoryId</code>. ترجع دائماً <code dir="ltr">{status:"success", data:[Product,...]}</code> — لا يوجد شكل خطأ منفصل موثّق في الكود لهذا المسار تحديداً.</p>
+
+  <h2 id="embedding">توليد متجه منتج (تاجر)</h2>
+  <div class="route-line"><span class="pill pill-post">POST</span><code>/store/products/{id}/generate-embedding</code></div>
+  <div class="callout warn">
+    <b>فخ 6 — رد فوري لا يعني اكتمال العملية:</b> الباك إند يرجع <code dir="ltr">{success:true, message:"..."}</code> خلال ميلي ثوانٍ، لكن التوليد الفعلي للمتجه وتحديث الفهرس يحدثان في الخلفية بعد إرسال الرد (<code dir="ltr">afterResponse()</code>). لا يوجد مسار للاستعلام عن حالة الاكتمال. الواجهة يجب أن تعرض رسالة "قيد المعالجة" وليس "تم التحديث بنجاح" بشكل قاطع.
+  </div>
+
+  <h2 id="sync">مزامنة شاملة لمحرك البحث (أدمن)</h2>
+  <div class="route-line"><span class="pill pill-post">POST</span><code>/admin/products/sync-search-engine</code></div>
+  <table>
+    <tr><th>الحالة</th><th>Status</th><th>الشكل</th></tr>
+    <tr><td>لا توجد منتجات منشورة</td><td>200</td><td><code dir="ltr">{success:true, message:"..."}</code></td></tr>
+    <tr><td>بدء المزامنة بنجاح</td><td>202</td><td><code dir="ltr">{success:true, message:"...", batch_id:"..."}</code></td></tr>
+    <tr><td>فشل التهيئة</td><td>500</td><td><code dir="ltr">{success:false, message:"...", error_detail:"..."}</code></td></tr>
+  </table>
+  <div class="callout warn">
+    <b>فخ 7 — <code dir="ltr">batch_id</code> بلا مسار متابعة:</b> الرد يذكر أن <code dir="ltr">batch_id</code> "يمكن استخدامه لعمل شريط تقدم"، لكن لا يوجد أي Endpoint في الكود المرفوع لجلب حالة الدفعة (Batch) بهذا المعرّف. لا تبني شريط تقدم حقيقي دون التأكد من وجود مسار Backend فعلي لذلك — حالياً غير موجود.
+  </div>
+  <div class="callout warn">
+    <b>فخ 8 — الفهرسة تتم بعد كل الدفعات:</b> تحديث الفهرس (Materialized View) لا يحدث تدريجياً، بل فقط بعد اكتمال جميع الدفعات (<code dir="ltr">finally</code> على الـ Batch). خلال المزامنة، نتائج البحث تبقى بالبيانات القديمة بالكامل حتى النهاية.
+  </div>
+
+  <div class="flow">
+    <div class="frow"><div class="fbox">تقسيم المنتجات إلى دفعات (100 لكل دفعة)</div></div>
+    <div class="frow"><div class="fbox api">تنفيذ الدفعات بالتوازي في الخلفية</div></div>
+    <div class="frow"><div class="fbox manual">انتظار اكتمال كل الدفعات <span class="branch">→ فشل دفعة: تُسجَّل في اللوج، الباقي يكمل</span></div></div>
+    <div class="frow"><div class="fbox api">تحديث الفهرس مرة واحدة بعد الاكتمال</div></div>
+  </div>
+
+  <h2 id="remove">حذف منتج من الفهرس</h2>
+  <div class="route-line"><span class="pill pill-delete">DELETE</span><code>/store/products/search/products/{id}/remove</code></div>
+  <div class="callout warn">
+    <b>فخ 9 — عملية غير قابلة للتراجع:</b> حذف متجه المنتج نهائي من جدول <code dir="ltr">product_embeddings</code>. إذا رجع <code dir="ltr">success:false</code> بحالة 404 فهذا يعني المنتج لم يكن موجوداً أصلاً في الفهرس (وليس خطأ فعلي) — لا تعرضها كـ "فشل الحذف" بل كحالة طبيعية.
+  </div>
+
+  <h3>موك-أب: شاشة بحث المشتري (Flutter)</h3>
+  <div class="phone">
+    <div class="screen">
+      <div style="border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:10px;font-size:13px;color:var(--text-sub)">🔍 بحث... (q)</div>
+      <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+        <span style="font-size:11px;background:var(--teal-light);color:var(--teal-dark);padding:4px 8px;border-radius:12px">تصنيف</span>
+        <span style="font-size:11px;background:var(--gray-light);padding:4px 8px;border-radius:12px">لون</span>
+        <span style="font-size:11px;background:var(--gray-light);padding:4px 8px;border-radius:12px">مقاس</span>
+      </div>
+      <div class="row"><div class="thumb"></div><div>منتج ١</div></div>
+      <div class="row"><div class="thumb"></div><div>منتج ٢</div></div>
+      <div class="row"><div class="thumb"></div><div>منتج ٣</div></div>
+    </div>
+  </div>
+  <div class="badge-endpoint">GET /Buyer/products/search</div>
+  <p style="font-size:14px;color:var(--text-sub)">حقل البحث مرتبط بـ debounce (400ms) قبل إرسال الطلب، وكل فلتر إضافي (تصنيف/لون/مقاس) يُرسل كمصفوفة منفصلة على نفس المفتاح.</p>
+
+  <h2 id="comment-filter">التحقق من التعليق (خدمة comment_filter)</h2>
+  <div class="route-line"><span class="pill pill-post">POST</span><code>/Buyer/review/products/check-comment</code></div>
+  <p>يتطلب مصادقة (<code dir="ltr">auth:sanctum</code>). يرسل نص التعليق إلى خدمة بايثون خارجية (<code dir="ltr">{comment_filter_url}/predict</code>) لفحصه قبل النشر.</p>
+
+  <h3>مثال الطلب</h3>
+  <pre>POST /Buyer/review/products/check-comment
+{
+  "comment": "نص التعليق المراد فحصه"
+}</pre>
+
+  <h3>مثال الاستجابة</h3>
+  <pre>{
+  "is_allowed": true,
+  "message": "التعليق مقبول ويمكنك نشره."
+}</pre>
+
+  <div class="callout warn">
+    <b>فخ 10 — سلوك متضارب بين "خطأ في الرد" و"تعذّر الاتصال" (الأخطر في الملف كله):</b>
+    الدالة الداخلية <code dir="ltr">isCommentAllowed()</code> لا تتعامل بشكل موحّد مع فشل الخدمة الخارجية:
+    <ul>
+      <li>إذا ردّت الخدمة برمز خطأ (404/500) أو رفضت الطلب بشكل عادي → الكود <b>يسمح</b> بالتعليق ضمنياً (<code dir="ltr">return true</code>) "لتجنب إيقاف التطبيق".</li>
+      <li>إذا فشل الاتصال بالكامل (Timeout بعد 3 ثوانٍ، أو الخدمة غير متاحة أصلاً) → الكود <b>يرفض</b> التعليق (<code dir="ltr">return false</code>) عبر الـ catch.</li>
+    </ul>
+    هذا معكوس لما يتوقعه أي فرونت إند منطقياً: عطل جزئي في الخدمة (خطأ HTTP) أكثر تساهلاً من عطل كامل (Exception). يعني لو الخدمة متوقفة تماماً، كل التعليقات تُرفض بصمت برسالة "يحتوي على محتوى مخالف" رغم أن السبب الحقيقي هو عطل تقني وليس محتوى المستخدم — لا تعرض هذه الرسالة حرفياً للمستخدم دون تمييز؛ من الأفضل عرض رسالة عامة عند تكرار الرفض بسرعة غير طبيعية (مؤشر على عطل الخدمة لا محتوى فعلي).
+  </div>
+
+  <div class="callout warn">
+    <b>فخ 11 — الفحص استشاري فقط، لا يوجد إنفاذ فعلي عند النشر:</b> مسار <code dir="ltr">check-comment</code> منفصل تماماً عن مسار النشر الفعلي <code dir="ltr">POST /review/products/{product}/comment</code>. عند فحص كود دالة <code dir="ltr">comment()</code> مباشرة، هي <b>لا تستدعي</b> <code dir="ltr">isCommentAllowed()</code> إطلاقاً — أي أن المستخدم يستطيع تجاوز الفحص تماماً وإرسال أي نص مباشرة إلى مسار النشر دون المرور بـ <code dir="ltr">check-comment</code> على الإطلاق. الفحص حالياً UX فقط (تحذير استباقي في الواجهة) وليس حماية فعلية من الخادم.
+  </div>
+
+  <div class="callout tip">في الفرونت: استخدم <code dir="ltr">check-comment</code> فقط لتحسين تجربة المستخدم (تحذير فوري قبل الإرسال)، ولا تعتمد عليه كضمان أمني — إذا كانت الفلترة مطلوبة فعلياً كحماية، يجب أن يُطلب من الباك إند استدعاء نفس الفحص داخل <code dir="ltr">comment()</code> نفسها.</div>
+
+  <h2 id="errors">جدول ملخص الأخطاء المتوقعة</h2>
+  <table>
+    <tr><th>الكود</th><th>يظهر في</th><th>المعنى</th><th>ماذا يفعل الفرونت</th></tr>
+    <tr><td>200 + success:true + data:[]</td><td>البحث</td><td>فلاتر فارغة أو لا نتائج مطابقة</td><td>ميّز الحالتين حسب ما إذا كان المستخدم قد أدخل أي فلتر</td></tr>
+    <tr><td>500 + success:false</td><td>البحث، المزامنة</td><td>فشل خدمة الذكاء الاصطناعي أو تهيئة المزامنة</td><td>اعرض حقل <code>message</code> مباشرة (نص عربي جاهز)</td></tr>
+    <tr><td>200 + data يحوي debug_error</td><td>المنتجات المشابهة</td><td>فشل داخلي مُموَّه كنتيجة ناجحة</td><td>افحص كل عنصر بحثاً عن <code dir="ltr">debug_error</code> قبل عرضه كمنتج</td></tr>
+    <tr><td>404</td><td>حذف من الفهرس</td><td>المنتج لم يكن مفهرساً أصلاً</td><td>لا تعرضها كخطأ فادح، بل كحالة طبيعية</td></tr>
+    <tr><td>202</td><td>المزامنة الشاملة</td><td>تم قبول الطلب، المعالجة جارية بالخلفية</td><td>اعرض حالة "بدأت المزامنة" دون شريط تقدم حقيقي (لا مسار متابعة متاح)</td></tr>
+    <tr><td>200 + is_allowed:false</td><td>فحص التعليق</td><td>قد يكون رفضاً حقيقياً للمحتوى، أو رفضاً بسبب عطل كامل في الخدمة</td><td>لا تعرض دائماً "محتوى مخالف" — راقب تكرار الرفض المفاجئ كمؤشر عطل خدمة</td></tr>
+  </table>
+
+  <h2 id="tips">نصائح عملية لتفادي الاحتكاك مع الباك إند</h2>
+  <div class="card">
+    <ol>
+      <li>أرسل فلاتر <code dir="ltr">category</code>/<code dir="ltr">color</code>/<code dir="ltr">size</code> دائماً بصيغة <code dir="ltr">key[]=value</code>.</li>
+      <li>لا تعتمد على <code dir="ltr">status code</code> وحده — تحقق من <code dir="ltr">success</code> داخل الـ body أولاً.</li>
+      <li>افحص كل عنصر في نتائج "المنتجات المشابهة" بحثاً عن مفتاح <code dir="ltr">debug_error</code> قبل الرسم.</li>
+      <li>لا تبني شريط تقدم لعملية المزامنة الشاملة بدون تأكيد وجود مسار Backend لجلب حالة الدفعة.</li>
+      <li>تعامل مع أقسام الصفحة الرئيسية ديناميكياً — القسم الرابع قد لا يظهر إطلاقاً.</li>
+      <li>تذكّر أن الكاش لمدة ساعة يعني تأخّراً محتملاً في ظهور بيانات جديدة على الصفحة الرئيسية.</li>
+    </ol>
+  </div>
+
+  <h2 id="backend-note">ملاحظة مقترحة لفريق الباك إند</h2>
+  <div class="callout tip">
+    مسار المزامنة الشاملة (<code dir="ltr">sync-search-engine</code>) يرجع <code dir="ltr">batch_id</code> ويذكر تعليق في الكود نفسه أنه "يمكن استخدامه لعمل شريط تقدم" — لكن لا يوجد Endpoint فعلي لجلب حالة الدفعة بهذا المعرّف. إضافة مسار <code dir="ltr">GET /admin/products/sync-status/{batch_id}</code> يعتمد على <code dir="ltr">Bus::findBatch()</code> الجاهزة أصلاً في لارافيل سيمكّن الفرونت من بناء شريط تقدم حقيقي بدل رسالة نصية ثابتة.
+  </div>
+  <div class="callout tip" style="margin-top:10px">
+    دالة <code dir="ltr">isCommentAllowed()</code> تسمح بالتعليق ضمنياً عند خطأ HTTP من خدمة الفلترة، لكن ترفضه عند فشل الاتصال بالكامل — وهذا معكوس منطقياً. كما أن مسار النشر الفعلي <code dir="ltr">comment()</code> لا يستدعي هذا الفحص إطلاقاً، فالفلترة غير مُنفَّذة فعلياً على الخادم. يُنصح بتوحيد سلوك الفشل (fail-open أو fail-closed بشكل ثابت) واستدعاء الفحص داخل <code dir="ltr">comment()</code> نفسها إذا كان الهدف حماية فعلية لا مجرد تحذير واجهة.
+  </div>
+
+  <footer>دليل داخلي للفريق — يُفتح مباشرة من أي متصفح بدون إنترنت</footer>
+</main>
+</div>
+</body>
+</html>

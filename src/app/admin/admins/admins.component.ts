@@ -3,9 +3,7 @@ import { CommonModule } from '@angular/common';
 import { AdminMockService } from '@core/api/mock/admin.mock.service';
 
 @Component({
-  selector: 'app-admins',
-  standalone: true,
-  imports: [CommonModule],
+  selector: 'app-admins',  imports: [CommonModule],
   templateUrl: './admins.component.html',
   styleUrl: './admins.component.scss'
 })

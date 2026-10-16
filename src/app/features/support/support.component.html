@@ -1,0 +1,158 @@
+<div class="support-page">
+
+  <!-- Hero -->
+  <div class="support-hero">
+    <div class="support-hero-content">
+      <div class="support-icon">
+        <i class="fas fa-headset"></i>
+      </div>
+      <h1>الدعم الفني</h1>
+      <p>نحن هنا لمساعدتك — تواصل معنا أو ابحث عن إجابتك</p>
+    </div>
+  </div>
+
+  <div class="support-content">
+
+    <!-- طرق التواصل -->
+    <div class="contact-cards">
+
+      <div class="contact-card">
+        <div class="contact-icon whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </div>
+        <h3>واتساب</h3>
+        <p>راسلنا مباشرة للدعم الفوري</p>
+        <a href="https://wa.me/218900000000"
+           target="_blank" class="contact-link whatsapp-link">
+          <i class="fab fa-whatsapp"></i>
+          +218 90 000 0000
+        </a>
+      </div>
+
+      <div class="contact-card">
+        <div class="contact-icon instagram">
+          <i class="fab fa-instagram"></i>
+        </div>
+        <h3>انستغرام</h3>
+        <p>تابعنا للعروض والأخبار</p>
+        <a href="https://instagram.com/maab.ly"
+           target="_blank" class="contact-link instagram-link">
+          <i class="fab fa-instagram"></i>
+          maab.ly@
+        </a>
+      </div>
+
+      <div class="contact-card">
+        <div class="contact-icon email">
+          <i class="fas fa-envelope"></i>
+        </div>
+        <h3>البريد الإلكتروني</h3>
+        <p>نرد خلال 24 ساعة</p>
+        <a href="mailto:support@maab.ly"
+           class="contact-link email-link">
+          <i class="fas fa-envelope"></i>
+          support@maab.ly
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Social Links Row -->
+    <div class="social-row-support">
+      <a href="https://www.facebook.com/MaabPlatform"
+         target="_blank" class="social-pill facebook">
+        <i class="fab fa-facebook-f"></i>
+        Maab Platform
+      </a>
+      <a href="https://www.tiktok.com/@maab_tiktok"
+         target="_blank" class="social-pill tiktok">
+        <i class="fab fa-tiktok"></i>
+        maab_tiktok@
+      </a>
+      <a href="https://snapchat.com/add/maab_snap"
+         target="_blank" class="social-pill snapchat">
+        <i class="fab fa-snapchat"></i>
+        maab_snap@
+      </a>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="faq-section">
+      <div class="faq-header">
+        <h2>
+          <i class="fas fa-question-circle"></i>
+          الأسئلة الشائعة
+        </h2>
+        <p>أجوبة لأكثر الأسئلة شيوعاً</p>
+      </div>
+
+      <div class="faq-list">
+
+        <!-- للمشترين -->
+        <div class="faq-category-label">
+          <i class="fas fa-shopping-bag"></i>
+          للمشترين
+        </div>
+
+        @for (faq of buyerFaqs; track $index) {
+          <div class="faq-item"
+               [class.open]="openFaq() === $index"
+               (click)="toggleFaq($index)">
+            <div class="faq-question">
+              <span>{{ faq.q }}</span>
+              <i [class]="openFaq() === $index
+                ? 'fas fa-chevron-up'
+                : 'fas fa-chevron-down'"></i>
+            </div>
+            @if (openFaq() === $index) {
+              <div class="faq-answer">
+                <p>{{ faq.a }}</p>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- للتجار -->
+        <div class="faq-category-label merchant-label">
+          <i class="fas fa-store"></i>
+          للتجار
+        </div>
+
+        @for (faq of merchantFaqs; track $index + 100) {
+          <div class="faq-item"
+               [class.open]="openFaq() === $index + 100"
+               (click)="toggleFaq($index + 100)">
+            <div class="faq-question">
+              <span>{{ faq.q }}</span>
+              <i [class]="openFaq() === $index + 100
+                ? 'fas fa-chevron-up'
+                : 'fas fa-chevron-down'"></i>
+            </div>
+            @if (openFaq() === $index + 100) {
+              <div class="faq-answer">
+                <p>{{ faq.a }}</p>
+              </div>
+            }
+          </div>
+        }
+
+      </div>
+    </div>
+
+    <!-- لم تجد إجابتك؟ -->
+    <div class="no-answer-card">
+      <i class="fas fa-comments"></i>
+      <div>
+        <h3>لم تجد إجابتك؟</h3>
+        <p>تواصل معنا مباشرة وسنساعدك في أقرب وقت</p>
+      </div>
+      <a href="https://t.me/maab_ly"
+         target="_blank" class="btn-contact-us">
+        <i class="fab fa-telegram"></i>
+        تواصل معنا
+      </a>
+    </div>
+
+  </div>
+
+</div>

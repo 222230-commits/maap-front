@@ -1,100 +1,462 @@
-<div class="flex flex-col gap-6">
-  <!-- Header -->
-  <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex justify-between items-center">
-    <div>
-      <h2 class="text-2xl font-bold mb-1">الطلبات</h2>
-      <p class="text-gray-600 font-medium">إجمالي الطلبات في هذا القسم: <span class="text-primary font-bold">{{ currentOrders().length }}</span></p>
-    </div>
-  </div>
+<div class="merchant-page">
 
-  <!-- Tabs -->
-  <div class="flex flex-col md:flex-row bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden font-bold">
-    <button (click)="activeTab.set('pending')"
-            class="flex-1 py-4 text-center transition-colors relative border-b-2 md:border-b-0 md:border-l-2"
-            [ngClass]="activeTab() === 'pending' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-gray-500 hover:bg-gray-50'">
-      معلقة
-      <span class="mr-2 inline-flex items-center justify-center bg-yellow-100 text-yellow-800 text-xs px-2.5 py-0.5 rounded-full">{{ pendingOrders().length }}</span>
-    </button>
-    <button (click)="activeTab.set('completed')"
-            class="flex-1 py-4 text-center transition-colors relative border-b-2 md:border-b-0 md:border-l-2"
-            [ngClass]="activeTab() === 'completed' ? 'border-green-600 text-green-600 bg-green-50' : 'border-transparent text-gray-500 hover:bg-gray-50'">
-      مكتملة
-      <span class="mr-2 inline-flex items-center justify-center bg-green-100 text-green-800 text-xs px-2.5 py-0.5 rounded-full">{{ completedOrders().length }}</span>
-    </button>
-    <button (click)="activeTab.set('cancelled')"
-            class="flex-1 py-4 text-center transition-colors relative"
-            [ngClass]="activeTab() === 'cancelled' ? 'border-red-600 text-red-600 bg-red-50' : 'border-transparent text-gray-500 hover:bg-gray-50'">
-      ملغاة
-      <span class="mr-2 inline-flex items-center justify-center bg-red-100 text-red-800 text-xs px-2.5 py-0.5 rounded-full">{{ cancelledOrders().length }}</span>
-    </button>
-  </div>
+  <div class="merchant-page-content">
 
-  <!-- Orders Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    @for (order of currentOrders(); track order.id) {
-      <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 flex flex-col hover:shadow-md transition-shadow relative">
-        
-        <!-- Status Badge -->
-        <div class="absolute top-5 left-5">
-          @if (order.status === 'pending') {
-            <span class="bg-yellow-100 text-yellow-800 text-xs px-3 py-1 rounded-full font-bold border border-yellow-200">معلق</span>
-          } @else if (order.status === 'completed') {
-            <span class="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full font-bold border border-green-200">مكتمل</span>
-          } @else {
-            <span class="bg-red-100 text-red-800 text-xs px-3 py-1 rounded-full font-bold border border-red-200">ملغي</span>
-          }
-        </div>
-
-        <h3 class="font-bold text-lg text-gray-900 mb-4 border-b border-gray-100 pb-3 pr-1">طلب #{{ order.id }}</h3>
-        
-        <div class="flex flex-col gap-3 text-sm text-gray-700 mb-6">
-          <div class="flex items-center gap-3">
-            <span class="text-gray-400 w-5 text-center"><i class="fas fa-user"></i></span>
-            <span class="font-medium">{{ order.buyerName }}</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <span class="text-gray-400 w-5 text-center"><i class="fas fa-box"></i></span>
-            <span class="font-medium">{{ order.productName }}</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <span class="text-gray-400 w-5 text-center"><i class="fas fa-tag"></i></span>
-            <span class="font-bold text-green-600">{{ order.price }} د.ل</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <span class="text-gray-400 w-5 text-center"><i class="fas fa-calendar"></i></span>
-            <span>{{ order.date }}</span>
-          </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="mt-auto pt-4 border-t border-gray-100">
-          @if (order.status === 'pending') {
-            <div class="flex gap-3">
-              <button (click)="updateStatus(order.id, 'completed')" class="flex-1 bg-green-500 text-white py-2.5 rounded-lg font-bold hover:bg-green-600 transition-colors shadow-sm text-sm">
-                تأكيد <i class="fas fa-check mr-1"></i>
-              </button>
-              <button (click)="updateStatus(order.id, 'cancelled')" class="flex-1 bg-red-50 text-red-600 py-2.5 rounded-lg font-bold hover:bg-red-100 transition-colors border border-red-100 text-sm">
-                إلغاء <i class="fas fa-times mr-1"></i>
-              </button>
-            </div>
-          } @else if (order.status === 'completed') {
-            <div class="text-center text-green-600 font-bold bg-green-50 py-2.5 rounded-lg border border-green-100">
-              تم التسليم <i class="fas fa-check-circle mr-1"></i>
-            </div>
-          } @else {
-            <div class="text-center text-red-500 font-bold bg-red-50 py-2.5 rounded-lg border border-red-100">
-              ملغي <i class="fas fa-ban mr-1"></i>
-            </div>
-          }
-        </div>
-
-      </div>
-    } @empty {
-      <div class="col-span-1 md:col-span-2 lg:col-span-3 py-24 px-4 flex flex-col items-center justify-center text-center text-gray-500 bg-white rounded-lg shadow-sm border border-gray-100 border-dashed">
-        <span class="text-6xl mb-5 text-gray-300"><i class="fas fa-inbox"></i></span>
-        <h3 class="text-xl font-bold text-gray-700">لا توجد طلبات في هذا القسم</h3>
-        <p class="text-sm text-gray-400 mt-2">عندما تتلقى طلبات جديدة ستظهر هنا مباشرة.</p>
+    @if (statusSuccess()) {
+      <div class="page-toast success">
+        <i class="fas fa-check-circle"></i>
+        <span>{{ statusSuccess() }}</span>
       </div>
     }
+
+    @if (statusError()) {
+      <div class="page-toast error">
+        <i class="fas fa-exclamation-circle"></i>
+        <span>{{ statusError() }}</span>
+      </div>
+    }
+
+    <!-- ── بطاقات الإحصائيات وتقسيم الطلبات ── -->
+    <div class="order-stats-grid">
+
+      <!-- 1. المعلقة -->
+      <div class="stat-card pending"
+           [class.active]="activeOrderTab() === 'pending'"
+           (click)="changeOrderTab('pending')">
+        <div class="stat-card-icon">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-card-info">
+          <span class="stat-count">{{ tabsCount().pending }}</span>
+          <span class="stat-title">طلبات معلقة</span>
+          <span class="stat-desc">بانتظار المراجعة والتأكيد</span>
+        </div>
+        <span class="stat-indicator"></span>
+      </div>
+
+      <!-- 2. قيد التجهيز (إن وجدت) -->
+      @if (tabsCount().preparing > 0 || activeOrderTab() === 'preparing') {
+        <div class="stat-card preparing"
+             [class.active]="activeOrderTab() === 'preparing'"
+             (click)="changeOrderTab('preparing')">
+          <div class="stat-card-icon">
+            <i class="fas fa-boxes-packing"></i>
+          </div>
+          <div class="stat-card-info">
+            <span class="stat-count">{{ tabsCount().preparing }}</span>
+            <span class="stat-title">قيد التجهيز</span>
+            <span class="stat-desc">بانتظار الاستلام والتسليم</span>
+          </div>
+          <span class="stat-indicator"></span>
+        </div>
+      }
+
+      <!-- 3. المكتملة -->
+      <div class="stat-card completed"
+           [class.active]="activeOrderTab() === 'completed'"
+           (click)="changeOrderTab('completed')">
+        <div class="stat-card-icon">
+          <i class="fas fa-circle-check"></i>
+        </div>
+        <div class="stat-card-info">
+          <span class="stat-count">{{ tabsCount().completed }}</span>
+          <span class="stat-title">طلبات مكتملة</span>
+          <span class="stat-desc">تم تسليمها واستلامها</span>
+        </div>
+        <span class="stat-indicator"></span>
+      </div>
+
+      <!-- 4. الملغية -->
+      <div class="stat-card cancelled"
+           [class.active]="activeOrderTab() === 'cancelled'"
+           (click)="changeOrderTab('cancelled')">
+        <div class="stat-card-icon">
+          <i class="fas fa-circle-xmark"></i>
+        </div>
+        <div class="stat-card-info">
+          <span class="stat-count">{{ tabsCount().cancelled }}</span>
+          <span class="stat-title">طلبات ملغية</span>
+          <span class="stat-desc">ملغية أو معتذر عنها</span>
+        </div>
+        <span class="stat-indicator"></span>
+      </div>
+
+    </div>
+
+    <!-- ── أشرطة التبويب والبحث ── -->
+    <div class="toolbar-section">
+      <div class="orders-tabs">
+        <button [class.active]="activeOrderTab() === 'all'"
+                (click)="changeOrderTab('all')">
+          <i class="fas fa-list-ul"></i>
+          <span>الكل</span>
+          <span class="tab-pill">{{ tabsCount().all }}</span>
+        </button>
+
+        <button [class.active]="activeOrderTab() === 'pending'"
+                (click)="changeOrderTab('pending')">
+          <i class="fas fa-clock"></i>
+          <span>المعلقة</span>
+          @if (tabsCount().pending > 0) {
+            <span class="tab-pill alert">{{ tabsCount().pending }}</span>
+          } @else {
+            <span class="tab-pill">{{ tabsCount().pending }}</span>
+          }
+        </button>
+
+        @if (tabsCount().preparing > 0 || activeOrderTab() === 'preparing') {
+          <button [class.active]="activeOrderTab() === 'preparing'"
+                  (click)="changeOrderTab('preparing')">
+            <i class="fas fa-boxes-packing"></i>
+            <span>قيد التجهيز</span>
+            <span class="tab-pill">{{ tabsCount().preparing }}</span>
+          </button>
+        }
+
+        <button [class.active]="activeOrderTab() === 'completed'"
+                (click)="changeOrderTab('completed')">
+          <i class="fas fa-check-double"></i>
+          <span>المكتملة</span>
+          <span class="tab-pill success">{{ tabsCount().completed }}</span>
+        </button>
+
+        <button [class.active]="activeOrderTab() === 'cancelled'"
+                (click)="changeOrderTab('cancelled')">
+          <i class="fas fa-times-circle"></i>
+          <span>الملغية</span>
+          <span class="tab-pill danger">{{ tabsCount().cancelled }}</span>
+        </button>
+      </div>
+
+      <div class="orders-search-box">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text"
+               placeholder="ابحث برقم الطلب، اسم المشتري، المنتج..."
+               [value]="searchQuery()"
+               (input)="onSearchChange($event)" />
+        @if (searchQuery()) {
+          <button class="clear-search" (click)="searchQuery.set('')">
+            <i class="fas fa-times"></i>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- ── حالة التحميل ── -->
+    @if (isLoading()) {
+      <div class="page-loading">
+        <i class="fas fa-circle-notch fa-spin"></i>
+        <p>جاري تحديث الطلبات...</p>
+      </div>
+    }
+
+    <!-- ── حالة لا توجد طلبات ── -->
+    @if (!isLoading() && orders().length === 0) {
+      <div class="page-empty">
+        <div class="empty-icon-wrap">
+          @if (activeOrderTab() === 'pending') {
+            <i class="fas fa-clock"></i>
+          } @else if (activeOrderTab() === 'completed') {
+            <i class="fas fa-check-circle"></i>
+          } @else if (activeOrderTab() === 'cancelled') {
+            <i class="fas fa-ban"></i>
+          } @else {
+            <i class="fas fa-shopping-bag"></i>
+          }
+        </div>
+        @if (searchQuery()) {
+          <h3>لا توجد نتائج مطابقة</h3>
+          <p>لم يتم العثور على أي طلب يطابق كلمة البحث "{{ searchQuery() }}"</p>
+        } @else {
+          @if (activeOrderTab() === 'pending') {
+            <h3>لا توجد طلبات معلقة</h3>
+            <p>رائع! لا توجد طلبات معلقة بانتظار اتخاذ إجراء حالياً.</p>
+          } @else if (activeOrderTab() === 'completed') {
+            <h3>لا توجد طلبات مكتملة</h3>
+            <p>ستظهر هنا الطلبات التي تم تسليمها وإكمالها بنجاح.</p>
+          } @else if (activeOrderTab() === 'cancelled') {
+            <h3>لا توجد طلبات ملغية</h3>
+            <p>لا يوجد أي طلب تم إلغاؤه في سجلك.</p>
+          } @else {
+            <h3>لا توجد طلبات</h3>
+            <p>لم يتلق متجرك أي طلبات بعد.</p>
+          }
+        }
+      </div>
+    }
+
+    <!-- ── قائمة بطاقات الطلبات ── -->
+    @if (!isLoading() && orders().length > 0) {
+      <div class="orders-list">
+        @for (order of orders(); track order.id) {
+          <div class="order-card-m" [class]="'border-' + order.status">
+
+            <!-- ترويسة البطاقة -->
+            <div class="order-card-header">
+              <div class="header-main-meta">
+                <span class="order-id">
+                  <i class="fas fa-hashtag"></i>
+                  {{ order.orderCode }}
+                </span>
+                <span class="order-status-badge" [class]="getOrderStatusClass(order.status)">
+                  {{ getOrderStatusLabel(order.status) }}
+                </span>
+              </div>
+              <span class="order-date">
+                <i class="far fa-calendar-alt"></i>
+                {{ formatDate(order.date) }}
+              </span>
+            </div>
+
+            <!-- جسم البطاقة -->
+            <div class="order-card-body">
+              <div class="order-info-grid">
+
+                <!-- المشتري -->
+                <div class="buyer-block">
+                  <div class="buyer-av">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div class="buyer-details">
+                    <span class="buyer-label">الزبون:</span>
+                    <strong class="buyer-name">{{ order.buyerName }}</strong>
+                    @if (order.buyerPhone) {
+                      <span class="buyer-phone">
+                        <i class="fas fa-phone-alt"></i>
+                        {{ order.buyerPhone }}
+                      </span>
+                    }
+                  </div>
+                </div>
+
+                <!-- المنتج / المحتوى -->
+                <div class="product-block">
+                  <div class="product-icon-wrap">
+                    <i class="fas fa-box-open"></i>
+                  </div>
+                  <div class="product-details">
+                    <span class="product-label">المنتج / المحتوى:</span>
+                    <strong class="product-name">{{ order.productName }}</strong>
+                    @if (order.itemsCount > 1) {
+                      <span class="items-count-tag">+{{ order.itemsCount - 1 }} منتجات أخرى</span>
+                    }
+                  </div>
+                </div>
+
+                <!-- السعر والدفع -->
+                <div class="payment-block">
+                  <div class="payment-amount">
+                    <span class="total-label">المجموع:</span>
+                    <strong class="total-price">{{ order.totalPrice | number }} د.ل</strong>
+                  </div>
+                  <span class="payment-badge">
+                    <i class="fas fa-wallet"></i>
+                    {{ order.paymentMethod }}
+                  </span>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- ذيل البطاقة والإجراءات -->
+            <div class="order-card-footer">
+
+              <div class="footer-left-actions">
+                <button class="btn-detail"
+                        (click)="goToOrderDetail(order.id)"
+                        title="عرض الفاتورة الكاملة والتفاصيل">
+                  <i class="fas fa-file-invoice"></i>
+                  <span>عرض التفاصيل والفاتورة</span>
+                </button>
+                <button class="btn-quick-view"
+                        (click)="viewQuickDetail(order, $event)"
+                        title="معاينة سريعة">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+
+              <!-- إجراءات التاجر المباشرة للطلبات المعلقة والتحضير -->
+              <div class="footer-right-actions">
+                @if (order.status === 'pending' || order.status === 'new' || order.status === 'waiting_buyer') {
+                  <button class="btn-action-ready"
+                          (click)="markOrderReady(order, $event)"
+                          [disabled]="isUpdatingStatus()"
+                          title="تحديد الطلب كجاهز للاستلام">
+                    <i class="fas fa-check"></i>
+                    <span>جاهز للاستلام</span>
+                  </button>
+
+                  <button class="btn-action-cancel"
+                          (click)="openCancelModal(order, $event)"
+                          [disabled]="isUpdatingStatus()"
+                          title="إلغاء الطلب">
+                    <i class="fas fa-times"></i>
+                    <span>إلغاء الطلب</span>
+                  </button>
+                }
+
+                @if (order.status === 'preparing' || order.status === 'awaiting') {
+                  <button class="btn-action-ready"
+                          (click)="markOrderReady(order, $event)"
+                          [disabled]="isUpdatingStatus()"
+                          title="تحديد الطلب كجاهز للاستلام">
+                    <i class="fas fa-check"></i>
+                    <span>جاهز للاستلام</span>
+                  </button>
+
+                  <button class="btn-action-cancel"
+                          (click)="openCancelModal(order, $event)"
+                          [disabled]="isUpdatingStatus()"
+                          title="إلغاء الطلب">
+                    <i class="fas fa-times"></i>
+                    <span>إلغاء</span>
+                  </button>
+                }
+              </div>
+
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+
   </div>
+
+  <!-- ── مودال تأكيد إلغاء الطلب ── -->
+  @if (showCancelModal() && orderToCancel(); as ord) {
+    <div class="modal-backdrop" (click)="closeCancelModal()"></div>
+    <div class="modal-dialog">
+      <div class="modal-header danger">
+        <div>
+          <h3>إلغاء الطلب</h3>
+          <p>{{ ord.orderCode }}</p>
+        </div>
+        <button class="close-btn" (click)="closeCancelModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="warning-box">
+          <i class="fas fa-exclamation-triangle"></i>
+          <div>
+            <strong>هل أنت متأكد من رغبتك في إلغاء هذا الطلب؟</strong>
+            <p>سيتم إشعار الزبون بالإلغاء مع ذكر السبب وإعادة العناصر للمخزون.</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>سبب الإلغاء (مطلوب للزبون):</label>
+          <div class="preset-reasons">
+            <button type="button"
+                    class="btn-preset"
+                    [class.selected]="cancelReason() === 'المنتج غير متوفر حالياً'"
+                    (click)="cancelReason.set('المنتج غير متوفر حالياً')">
+              المنتج غير متوفر حالياً
+            </button>
+            <button type="button"
+                    class="btn-preset"
+                    [class.selected]="cancelReason() === 'المتجر مغلق مؤقتاً'"
+                    (click)="cancelReason.set('المتجر مغلق مؤقتاً')">
+              المتجر مغلق مؤقتاً
+            </button>
+            <button type="button"
+                    class="btn-preset"
+                    [class.selected]="cancelReason() === 'تعذر التواصل مع الزبون'"
+                    (click)="cancelReason.set('تعذر التواصل مع الزبون')">
+              تعذر التواصل مع الزبون
+            </button>
+          </div>
+          <textarea rows="3"
+                    placeholder="اكتب سبباً مخصصاً للإلغاء..."
+                    [value]="cancelReason()"
+                    (input)="cancelReason.set($any($event.target).value)"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-confirm-cancel"
+                (click)="confirmCancelOrder()"
+                [disabled]="!cancelReason().trim() || isUpdatingStatus()">
+          @if (isUpdatingStatus()) {
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>جاري الإلغاء...</span>
+          } @else {
+            <i class="fas fa-ban"></i>
+            <span>تأكيد إلغاء الطلب</span>
+          }
+        </button>
+        <button class="btn-dismiss" (click)="closeCancelModal()">
+          تراجع
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ── مودال المعاينة السريعة ── -->
+  @if (showOrderDetail() && selectedOrder(); as ord) {
+    <div class="modal-backdrop" (click)="closeQuickDetail()"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <h3>معاينة سريعة للطلب</h3>
+          <p>{{ ord.orderCode }}</p>
+        </div>
+        <button class="close-btn" (click)="closeQuickDetail()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="od-section">
+          <h4>بيانات الطلب</h4>
+          <div class="od-row">
+            <span>المشتري</span>
+            <strong>{{ ord.buyerName }}</strong>
+          </div>
+          @if (ord.buyerPhone) {
+            <div class="od-row">
+              <span>الهاتف</span>
+              <strong dir="ltr">{{ ord.buyerPhone }}</strong>
+            </div>
+          }
+          <div class="od-row">
+            <span>المنتج</span>
+            <strong>{{ ord.productName }}</strong>
+          </div>
+          <div class="od-row">
+            <span>المجموع</span>
+            <strong class="color-primary">{{ ord.totalPrice | number }} د.ل</strong>
+          </div>
+          <div class="od-row">
+            <span>طريقة الدفع</span>
+            <span>{{ ord.paymentMethod }}</span>
+          </div>
+          <div class="od-row">
+            <span>التاريخ</span>
+            <span>{{ formatDate(ord.date) }}</span>
+          </div>
+          <div class="od-row">
+            <span>الحالة</span>
+            <span class="order-status-badge" [class]="getOrderStatusClass(ord.status)">
+              {{ getOrderStatusLabel(ord.status) }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-go-full-invoice" (click)="goToOrderDetail(ord.id)">
+          <i class="fas fa-file-invoice"></i>
+          <span>فتح الفاتورة وإدارة المنتجات بالتفصيل</span>
+        </button>
+        <button class="btn-dismiss" (click)="closeQuickDetail()">
+          إغلاق
+        </button>
+      </div>
+    </div>
+  }
+
 </div>
+

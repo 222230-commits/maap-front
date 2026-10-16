@@ -1,0 +1,521 @@
+<div class="edit-product">
+
+  <!-- Header -->
+  <div class="page-header">
+    <button class="btn-back"
+            (click)="router.navigate(['/merchant/products'])">
+      <i class="fas fa-arrow-right"></i>
+    </button>
+    <div>
+      <h1>تعديل المنتج</h1>
+      @if (!isLoading() && title()) {
+        <p>{{ title() }}</p>
+      }
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <i class="fas fa-circle-notch fa-spin"></i>
+      <p>جاري تحميل المنتج...</p>
+    </div>
+  }
+
+  @if (!isLoading()) {
+
+    @if (successMessage()) {
+      <div class="alert-success">
+        <i class="fas fa-check-circle"></i>
+        {{ successMessage() }}
+      </div>
+    }
+    @if (error()) {
+      <div class="alert-error">
+        <i class="fas fa-exclamation-circle"></i>
+        {{ error() }}
+      </div>
+    }
+
+    <!-- Tabs -->
+    <div class="tabs-bar">
+      <button [class.active]="activeTab() === 'info'"
+              (click)="activeTab.set('info')">
+        <i class="fas fa-info-circle"></i> المعلومات
+      </button>
+      <button [class.active]="activeTab() === 'images'"
+              (click)="activeTab.set('images')">
+        <i class="fas fa-images"></i>
+        الصور
+        @if (productImages().total_count > 0) {
+          <span class="count-badge">
+            {{ productImages().total_count }}
+          </span>
+        }
+      </button>
+      <button [class.active]="activeTab() === 'extras'"
+              (click)="activeTab.set('extras')">
+        <i class="fas fa-tags"></i> تاغات وميزات
+      </button>
+    </div>
+
+    <!-- Tab: المعلومات -->
+    @if (activeTab() === 'info') {
+      <div class="form-card">
+
+        <div class="form-group">
+          <label>عنوان المنتج *</label>
+          <input type="text"
+                 [value]="title()"
+                 (input)="title.set($any($event.target).value)" />
+        </div>
+
+        <div class="form-group">
+          <label>الوصف</label>
+          <textarea rows="3"
+                    [value]="description()"
+                    (input)="description.set($any($event.target).value)">
+          </textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>السعر (د.ل)</label>
+            <input type="number" min="0"
+                   [value]="price()"
+                   (input)="price.set(+$any($event.target).value)" />
+          </div>
+          <div class="form-group">
+            <label>السعر قبل الخصم</label>
+            <input type="number" min="0"
+                   [value]="compareAtPrice()"
+                   (input)="compareAtPrice.set(+$any($event.target).value)" />
+          </div>
+          <div class="form-group">
+            <label>المخزون</label>
+            <input type="number" min="0"
+                   [value]="stock()"
+                   (input)="stock.set(+$any($event.target).value)" />
+          </div>
+        </div>
+
+        <!-- التصنيف الرئيسي -->
+        <div class="form-group">
+          <label>التصنيف الرئيسي</label>
+          <select [value]="selectedRootCategoryId()"
+                  (change)="onRootCategoryChange($any($event.target).value)">
+            <option value="">{{ currentCategoryName() ? 'التصنيف الحالي: ' + currentCategoryName() + ' (انقر للتغيير)' : 'اختر التصنيف الرئيسي' }}</option>
+            @for (cat of rootCategories(); track cat.id) {
+              <option [value]="cat.id">{{ cat.name }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- التصنيف الفرعي (المطلوب للمنتج) -->
+        @if (selectedRootCategoryId()) {
+          <div class="form-group">
+            <label class="flex items-center justify-between">
+              <span>التصنيف الفرعي * <span class="text-xs text-red-500 font-bold">(مطلوب)</span></span>
+              @if (isLoadingSubCategories()) {
+                <span class="text-xs text-primary"><i class="fas fa-circle-notch fa-spin"></i> جاري التحميل...</span>
+              }
+            </label>
+            @if (!isLoadingSubCategories() && subCategories().length === 0) {
+              <div class="p-3 bg-amber-50 text-amber-800 text-xs rounded-lg border border-amber-200">
+                لا توجد تصنيفات فرعية مسجلة تحت هذا القسم. اختر قسماً رئيسياً آخر.
+              </div>
+            } @else {
+              <select [value]="selectedSubCategoryId()"
+                      [disabled]="isLoadingSubCategories()"
+                      (change)="onSubCategoryChange($any($event.target).value)">
+                <option value="">اختر التصنيف الفرعي للمنتج</option>
+                @for (sub of subCategories(); track sub.id) {
+                  <option [value]="sub.id">{{ sub.name }}</option>
+                }
+              </select>
+            }
+          </div>
+        }
+
+        <!-- تصنيف تفصيلي إضافي -->
+        @if (selectedSubCategoryId() && (isLoadingChildCategories() || childCategories().length > 0)) {
+          <div class="form-group">
+            <label class="flex items-center justify-between">
+              <span>تصنيف إضافي (اختياري)</span>
+              @if (isLoadingChildCategories()) {
+                <span class="text-xs text-primary"><i class="fas fa-circle-notch fa-spin"></i> جاري الفحص...</span>
+              }
+            </label>
+            @if (childCategories().length > 0) {
+              <select [value]="selectedChildCategoryId()"
+                      (change)="onChildCategoryChange($any($event.target).value)">
+                <option value="">(اختياري) اختر تصنيفاً أدق</option>
+                @for (child of childCategories(); track child.id) {
+                  <option [value]="child.id">{{ child.name }}</option>
+                }
+              </select>
+            }
+          </div>
+        }
+
+        <div class="form-group">
+          <label>الألوان</label>
+          <div class="colors-grid">
+            @for (color of colors(); track color.id) {
+              <div class="color-chip"
+                   [class.selected]="selectedColorIds().includes(color.id)"
+                   (click)="toggleColor(color.id)">
+                <span class="color-dot"
+                      [style.background]="color.hex_code"
+                      [style.border]="color.hex_code === '#FFFFFF'
+                        ? '1px solid #e5e7eb' : 'none'">
+                </span>
+                {{ color.name }}
+                @if (selectedColorIds().includes(color.id)) {
+                  <i class="fas fa-check"></i>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>المقاسات</label>
+          <div class="sizes-grid">
+            @for (size of sizes(); track size.id) {
+              <div class="size-chip"
+                   [class.selected]="selectedSizeIds().includes(size.id)"
+                   (click)="toggleSize(size.id)">
+                {{ size.name }}
+              </div>
+            }
+          </div>
+        </div>
+
+        <button class="btn-save"
+                (click)="saveProduct()"
+                [disabled]="isSaving()">
+          @if (isSaving()) {
+            <i class="fas fa-spinner fa-spin"></i> جاري الحفظ...
+          } @else {
+            <i class="fas fa-save"></i> حفظ التعديلات
+          }
+        </button>
+
+      </div>
+    }
+
+    <!-- Tab: الصور -->
+    @if (activeTab() === 'images') {
+      <div class="images-section">
+
+        <!-- رفع صور مرتبطة بلون -->
+        <div class="upload-card">
+          <h3><i class="fas fa-palette"></i> رفع صور مرتبطة بلون</h3>
+
+          <div class="form-group">
+            <label>اختر اللون</label>
+            <select [value]="selectedColorForUpload()"
+                    (change)="selectedColorForUpload.set($any($event.target).value)">
+              <option value="">اختر اللون</option>
+              @for (color of colors(); track color.id) {
+                <option [value]="color.id">{{ color.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="upload-area">
+            <input type="file" accept="image/*" multiple
+                   hidden id="color-images"
+                   (change)="onColorImagesChange($event)" />
+            <label for="color-images" class="upload-label">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <span>اختر صوراً لهذا اللون</span>
+            </label>
+          </div>
+
+          @if (colorImagePreviews().length > 0) {
+            <div class="previews-row">
+              @for (preview of colorImagePreviews(); track $index) {
+                <img [src]="preview" class="preview-thumb" />
+              }
+            </div>
+            <button class="btn-upload"
+                    (click)="uploadColorImages()"
+                    [disabled]="isUploadingColorImage() || !selectedColorForUpload()">
+              @if (isUploadingColorImage()) {
+                <i class="fas fa-spinner fa-spin"></i> جاري الرفع...
+              } @else {
+                <i class="fas fa-upload"></i>
+                رفع {{ colorImagePreviews().length }} صورة لهذا اللون
+              }
+            </button>
+            @if (!selectedColorForUpload()) {
+              <p class="hint-text">اختر لوناً أولاً قبل الرفع</p>
+            }
+          }
+        </div>
+
+        <!-- رفع صور عامة -->
+        <div class="upload-card">
+          <h3><i class="fas fa-upload"></i> رفع صور جديدة</h3>
+
+          <div class="upload-area">
+            <input type="file" accept="image/*" multiple
+                   hidden id="general-images"
+                   (change)="onGeneralImagesChange($event)" />
+            <label for="general-images" class="upload-label">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <span>اختر صوراً للرفع</span>
+            </label>
+          </div>
+
+          @if (generalImagePreviews().length > 0) {
+            <div class="previews-row">
+              @for (preview of generalImagePreviews(); track $index) {
+                <img [src]="preview" class="preview-thumb" />
+              }
+            </div>
+            <button class="btn-upload"
+                    (click)="uploadGeneralImages()"
+                    [disabled]="isUploadingImage()">
+              @if (isUploadingImage()) {
+                <i class="fas fa-spinner fa-spin"></i> جاري الرفع...
+              } @else {
+                <i class="fas fa-upload"></i>
+                رفع {{ generalImagePreviews().length }} صورة
+              }
+            </button>
+          }
+        </div>
+
+        <!-- الصور الحالية -->
+        @if (productImages().total_count > 0) {
+          <div class="current-images">
+            <h3>
+              <i class="fas fa-images"></i>
+              الصور الحالية ({{ productImages().total_count }})
+            </h3>
+
+            @if (isSortingImages()) {
+              <div class="sorting-indicator">
+                <i class="fas fa-spinner fa-spin"></i> جاري حفظ الترتيب...
+              </div>
+            }
+
+            @for (group of getGroupedImages(); track group.key) {
+              <div class="image-group">
+                <div class="group-label">
+                  <i class="fas fa-tag"></i>
+                  {{ getColorName(group.key) }}
+                </div>
+                <div class="images-row">
+                  @for (img of group.images; track img.id) {
+                    <div class="image-item"
+                         [class.primary]="img.is_primary"
+                         [draggable]="true"
+                         (dragstart)="onImageDragStart(img.id)"
+                         (dragover)="$event.preventDefault()"
+                         (drop)="onImageDrop(img.id, group.key)">
+                      <img [src]="img.image_url" alt="" />
+
+                      @if (img.is_primary) {
+                        <div class="primary-label">
+                          <i class="fas fa-star"></i> غلاف
+                        </div>
+                      }
+
+                      <div class="image-actions">
+                        @if (!img.is_primary) {
+                          <button class="img-btn primary-btn"
+                                  [disabled]="isSettingPrimary() === img.id"
+                                  (click)="setPrimaryImage(img.id)"
+                                  title="جعلها غلاف">
+                            @if (isSettingPrimary() === img.id) {
+                              <i class="fas fa-spinner fa-spin"></i>
+                            } @else {
+                              <i class="fas fa-star"></i>
+                            }
+                          </button>
+                        }
+                        <button class="img-btn delete-btn"
+                                [disabled]="isDeletingImageId() === img.id"
+                                (click)="deleteImage(img.id)"
+                                title="حذف">
+                          @if (isDeletingImageId() === img.id) {
+                            <i class="fas fa-spinner fa-spin"></i>
+                          } @else {
+                            <i class="fas fa-trash"></i>
+                          }
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="no-images">
+            <i class="fas fa-image"></i>
+            <p>لا توجد صور بعد — ارفع صوراً من الأعلى</p>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Tab: Extras -->
+    @if (activeTab() === 'extras') {
+      <div class="extras-section">
+
+        <!-- Tags -->
+        <div class="extras-card">
+          <h3><i class="fas fa-tags"></i> الكلمات الدلالية</h3>
+
+          <div class="tags-list">
+            @for (tag of availableTags(); track tag.id) {
+              <span class="tag-chip" [style.opacity]="isSystemItem(tag) ? '0.55' : '1'"
+                    [style.background]="isSystemItem(tag) ? '#f1f5f9' : ''">
+                @if (editingTagId() === tag.id) {
+                  <input type="text" class="inline-edit-input"
+                         [value]="editingTagName()"
+                         (input)="editingTagName.set($any($event.target).value)"
+                         (keyup.enter)="saveTagEdit()" />
+                  <button class="remove-chip" [disabled]="isSavingEdit()" (click)="saveTagEdit()">
+                    @if (isSavingEdit()) { <i class="fas fa-spinner fa-spin"></i> }
+                    @else { <i class="fas fa-check" style="color:#16a34a"></i> }
+                  </button>
+                  <button class="remove-chip" (click)="editingTagId.set(null)">
+                    <i class="fas fa-times"></i>
+                  </button>
+                } @else {
+                  {{ tag.name }}
+                  @if (!isSystemItem(tag)) {
+                    <button class="remove-chip" (click)="startEditTag(tag)" title="تعديل">
+                      <i class="fas fa-pen"></i>
+                    </button>
+                    <button class="remove-chip" style="color:#dc2626"
+                            (click)="requestDelete('tag', tag.id, tag.name)" title="حذف">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  }
+                }
+              </span>
+            }
+            @if (availableTags().length === 0) {
+              <p class="empty-extras">لا توجد كلمات دلالية بعد</p>
+            }
+          </div>
+
+          <div class="add-extras">
+            <input type="text"
+                   placeholder="اكتب كلمة دلالية جديدة..."
+                   [value]="newTagName()"
+                   (input)="newTagName.set($any($event.target).value)"
+                   (keyup.enter)="createAndAttachTag()" />
+            <button class="btn-add"
+                    (click)="createAndAttachTag()"
+                    [disabled]="isAddingTag() || !newTagName()">
+              @if (isAddingTag()) {
+                <i class="fas fa-spinner fa-spin"></i>
+              } @else {
+                <i class="fas fa-plus"></i>
+              }
+            </button>
+          </div>
+          <p style="font-size:11px;color:#9ca3af;margin-top:4px;padding:0 4px">
+            تنبيه: المسافات تتحول تلقائياً إلى شرطات عند الحفظ
+          </p>
+        </div>
+
+        <!-- Features -->
+        <div class="extras-card">
+          <h3><i class="fas fa-star"></i> مميزات المنتج</h3>
+
+          <div class="features-list">
+            @for (feature of availableFeatures(); track feature.id) {
+              <div class="feature-item" [style.opacity]="isSystemItem(feature) ? '0.55' : '1'">
+                <i class="fas fa-check-circle" [style.color]="isSystemItem(feature) ? '#9ca3af' : ''"></i>
+                @if (editingFeatureId() === feature.id) {
+                  <input type="text" class="inline-edit-input"
+                         [value]="editingFeatureName()"
+                         (input)="editingFeatureName.set($any($event.target).value)"
+                         (keyup.enter)="saveFeatureEdit()" />
+                  <button class="remove-feature" [disabled]="isSavingEdit()" (click)="saveFeatureEdit()">
+                    @if (isSavingEdit()) { <i class="fas fa-spinner fa-spin"></i> }
+                    @else { <i class="fas fa-check" style="color:#16a34a"></i> }
+                  </button>
+                  <button class="remove-feature" (click)="editingFeatureId.set(null)">
+                    <i class="fas fa-times"></i>
+                  </button>
+                } @else {
+                  <span>{{ feature.name }}</span>
+                  @if (!isSystemItem(feature)) {
+                    <button class="remove-feature" (click)="startEditFeature(feature)" title="تعديل">
+                      <i class="fas fa-pen"></i>
+                    </button>
+                    <button class="remove-feature" style="color:#dc2626"
+                            (click)="requestDelete('feature', feature.id, feature.name)" title="حذف">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  }
+                }
+              </div>
+            }
+            @if (availableFeatures().length === 0) {
+              <p class="empty-extras">لا توجد مميزات بعد</p>
+            }
+          </div>
+
+          <div class="add-extras">
+            <input type="text"
+                   placeholder="اكتب ميزة جديدة..."
+                   [value]="newFeatureName()"
+                   (input)="newFeatureName.set($any($event.target).value)"
+                   (keyup.enter)="createAndAttachFeature()" />
+            <button class="btn-add"
+                    (click)="createAndAttachFeature()"
+                    [disabled]="isAddingFeature() || !newFeatureName()">
+              @if (isAddingFeature()) {
+                <i class="fas fa-spinner fa-spin"></i>
+              } @else {
+                <i class="fas fa-plus"></i>
+              }
+            </button>
+          </div>
+        </div>
+
+      </div>
+    }
+
+  }
+</div>
+
+<!-- Modal تأكيد الحذف النهائي -->
+@if (confirmDeleteItem()) {
+  <div class="modal-backdrop" (click)="confirmDeleteItem.set(null)"></div>
+  <div class="modal delete-modal">
+    <div class="modal-header">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h3>تأكيد الحذف النهائي</h3>
+    </div>
+    <div class="modal-body">
+      <p>
+        سيتم حذف "{{ confirmDeleteItem()!.name }}" نهائياً وإزالته
+        من جميع منتجاتك المرتبطة به دفعة واحدة.
+        هذا الإجراء لا يمكن التراجع عنه.
+      </p>
+      <div class="modal-actions" style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn-secondary" (click)="confirmDeleteItem.set(null)">تراجع</button>
+        <button class="btn-danger"
+                [disabled]="deletingItemId() === confirmDeleteItem()!.id"
+                (click)="executeDelete()">
+          @if (deletingItemId() === confirmDeleteItem()!.id) {
+            <i class="fas fa-spinner fa-spin"></i>
+          } @else {
+            حذف نهائي
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}

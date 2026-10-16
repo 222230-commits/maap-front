@@ -1,317 +1,302 @@
-<div class="space-y-6">
-  <!-- Header -->
-  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-darkest p-6 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
-    <div>
-      <div class="flex items-center gap-3 mb-2">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">مرحباً مدير النظام</h1>
-        <span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium border border-primary/20">لوحة التحكم الإدارية</span>
+<div class="admin-page">
+
+  <!-- Top Bar -->
+  <div class="admin-topbar">
+    <div class="topbar-right">
+      <h2 class="page-title">لوحة التحكم</h2>
+      <p class="page-sub">نظرة عامة على منصة مأب</p>
+    </div>
+    <div class="topbar-left">
+      <div class="admin-badge">
+        <div class="admin-avatar">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <div class="admin-info">
+          <span class="admin-name">
+            {{ authService.currentUser()?.full_name }}
+          </span>
+          <span class="admin-role">مدير النظام</span>
+        </div>
       </div>
-      <p class="text-gray-500 dark:text-gray-400 text-sm">
-        <i class="fas fa-calendar-alt me-2"></i> {{ currentDate | date:'fullDate' }}
-      </p>
     </div>
   </div>
 
-  <!-- Stats Grid -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-    <!-- Buyers -->
-    <div (click)="goTo('/admin/users')" class="cursor-pointer bg-white dark:bg-darkest p-4 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md hover:border-blue-300 dark:hover:border-blue-800 transition-all group">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-          <i class="fas fa-users"></i>
-        </div>
-        <div>
-          <p class="text-sm text-gray-500 dark:text-gray-400">المشترون</p>
-          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ animatedStats().buyers }}</p>
-        </div>
-      </div>
-    </div>
+  <!-- Content -->
+  <div class="admin-content">
 
-    <!-- Merchants -->
-    <div (click)="goTo('/admin/users')" class="cursor-pointer bg-white dark:bg-darkest p-4 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md hover:border-purple-300 dark:hover:border-purple-800 transition-all group">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-          <i class="fas fa-store"></i>
+      @if (isLoading()) {
+        <div class="content-loading">
+          <i class="fas fa-circle-notch fa-spin"></i>
+          <p>جاري تحميل البيانات...</p>
         </div>
-        <div>
-          <p class="text-sm text-gray-500 dark:text-gray-400">التجار</p>
-          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ animatedStats().merchants }}</p>
-        </div>
-      </div>
-    </div>
+      }
 
-    <!-- Products -->
-    <div class="bg-white dark:bg-darkest p-4 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm transition-all group">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-          <i class="fas fa-box"></i>
-        </div>
-        <div>
-          <p class="text-sm text-gray-500 dark:text-gray-400">المنتجات</p>
-          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ animatedStats().products }}</p>
-        </div>
-      </div>
-    </div>
+      @if (!isLoading()) {
 
-    <!-- Orders -->
-    <div class="bg-white dark:bg-darkest p-4 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm transition-all group">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-          <i class="fas fa-shopping-bag"></i>
-        </div>
-        <div>
-          <p class="text-sm text-gray-500 dark:text-gray-400">الطلبات</p>
-          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ animatedStats().orders }}</p>
-        </div>
-      </div>
-    </div>
+        <!-- Stats Grid -->
+        <div class="stats-grid">
 
-    <!-- Pending Applications -->
-    <div (click)="goTo('/admin/applications')" class="cursor-pointer bg-white dark:bg-darkest p-4 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md hover:border-yellow-300 dark:hover:border-yellow-800 transition-all group relative overflow-hidden">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-          <i class="fas fa-clock"></i>
+          <div class="stat-card clickable"
+               (click)="goTo('/admin/users')">
+            <div class="stat-card-header">
+              <div class="stat-icon buyers">
+                <i class="fas fa-users"></i>
+              </div>
+              <i class="fas fa-chevron-left stat-chevron"></i>
+            </div>
+            <div class="stat-number">
+              {{ animatedStats().buyers }}
+            </div>
+            <div class="stat-label">المشترون</div>
+            <div class="stat-sub">مسجّل في المنصة</div>
+          </div>
+
+          <div class="stat-card clickable"
+               (click)="goTo('/admin/applications')">
+            <div class="stat-card-header">
+              <div class="stat-icon sellers">
+                <i class="fas fa-store"></i>
+              </div>
+              <i class="fas fa-chevron-left stat-chevron"></i>
+            </div>
+            <div class="stat-number">
+              {{ animatedStats().sellers }}
+            </div>
+            <div class="stat-label">التجار</div>
+            <div class="stat-sub">تاجر معتمد</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <div class="stat-icon products">
+                <i class="fas fa-box"></i>
+              </div>
+            </div>
+            <div class="stat-number">
+              {{ animatedStats().products }}
+            </div>
+            <div class="stat-label">المنتجات</div>
+            <div class="stat-sub">منتج في المنصة</div>
+          </div>
+
+          <div class="stat-card clickable"
+               (click)="goTo('/admin/applications')">
+            <div class="stat-card-header">
+              <div class="stat-icon orders">
+                <i class="fas fa-shopping-bag"></i>
+              </div>
+              <i class="fas fa-chevron-left stat-chevron"></i>
+            </div>
+            <div class="stat-number">
+              {{ animatedStats().orders }}
+            </div>
+            <div class="stat-label">الطلبات</div>
+            <div class="stat-sub">إجمالي الطلبات</div>
+          </div>
+
+          <div class="stat-card alert-card clickable"
+               [class.has-alert]="stats().pending_applications_count > 0"
+               (click)="goTo('/admin/applications')">
+            <div class="stat-card-header">
+              <div class="stat-icon pending">
+                <i class="fas fa-clock"></i>
+              </div>
+              @if (stats().pending_applications_count > 0) {
+                <div class="alert-pulse"></div>
+              }
+            </div>
+            <div class="stat-number">
+              {{ stats().pending_applications_count }}
+            </div>
+            <div class="stat-label">طلبات معلقة</div>
+            <div class="stat-sub urgent">تحتاج مراجعة</div>
+          </div>
+
+          <div class="stat-card alert-card clickable"
+               [class.has-alert]="stats().new_reports_count > 0"
+               (click)="goTo('/admin/reports')">
+            <div class="stat-card-header">
+              <div class="stat-icon reports">
+                <i class="fas fa-flag"></i>
+              </div>
+              @if (stats().new_reports_count > 0) {
+                <div class="alert-pulse red"></div>
+              }
+            </div>
+            <div class="stat-number">
+              {{ stats().new_reports_count }}
+            </div>
+            <div class="stat-label">بلاغات جديدة</div>
+            <div class="stat-sub urgent">تحتاج مراجعة</div>
+          </div>
+
         </div>
-        <div>
-          <p class="text-sm text-gray-500 dark:text-gray-400">طلبات معلقة</p>
-          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats().pendingApplications }}</p>
+
+        <!-- Footer Counters -->
+        @if (footerCounters()) {
+          <div class="footer-counters">
+            <div class="counter-item">
+              <span class="counter-num">
+                {{ footerCounters().total_users }}
+              </span>
+              <span class="counter-label">إجمالي المستخدمين</span>
+            </div>
+            <div class="counter-divider"></div>
+            <div class="counter-item">
+              <span class="counter-num">
+                {{ footerCounters().approval_rate_percentage }}%
+              </span>
+              <span class="counter-label">نسبة القبول</span>
+            </div>
+            <div class="counter-divider"></div>
+            <div class="counter-item">
+              <span class="counter-num">
+                {{ footerCounters().active_shops_count }}
+              </span>
+              <span class="counter-label">متاجر نشطة</span>
+            </div>
+          </div>
+        }
+
+        <!-- Two Column -->
+        <div class="two-col">
+
+          <!-- Applications Chart -->
+          @if (applicationsChart()) {
+            <div class="content-card">
+              <div class="card-header">
+                <h3>
+                  <i class="fas fa-chart-pie"></i>
+                  طلبات التجار
+                </h3>
+              </div>
+              <div class="chart-bars">
+                <div class="chart-row">
+                  <span class="chart-label">
+                    <div class="chart-dot pending"></div>
+                    معلق
+                  </span>
+                  <div class="chart-track">
+                    <div class="chart-fill pending"
+                         [style.width.%]="applicationsChart().pending.percentage">
+                    </div>
+                  </div>
+                  <span class="chart-val">
+                    {{ applicationsChart().pending.count }}
+                    ({{ applicationsChart().pending.percentage }}%)
+                  </span>
+                </div>
+                <div class="chart-row">
+                  <span class="chart-label">
+                    <div class="chart-dot approved"></div>
+                    مقبول
+                  </span>
+                  <div class="chart-track">
+                    <div class="chart-fill approved"
+                         [style.width.%]="applicationsChart().approved.percentage">
+                    </div>
+                  </div>
+                  <span class="chart-val">
+                    {{ applicationsChart().approved.count }}
+                    ({{ applicationsChart().approved.percentage }}%)
+                  </span>
+                </div>
+                <div class="chart-row">
+                  <span class="chart-label">
+                    <div class="chart-dot rejected"></div>
+                    مرفوض
+                  </span>
+                  <div class="chart-track">
+                    <div class="chart-fill rejected"
+                         [style.width.%]="applicationsChart().rejected.percentage">
+                    </div>
+                  </div>
+                  <span class="chart-val">
+                    {{ applicationsChart().rejected.count }}
+                    ({{ applicationsChart().rejected.percentage }}%)
+                  </span>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Recent Activities -->
+          @if (recentActivities().length > 0) {
+            <div class="content-card">
+              <div class="card-header">
+                <h3>
+                  <i class="fas fa-bell"></i>
+                  آخر الأنشطة
+                </h3>
+              </div>
+              <div class="activities-list">
+                @for (act of recentActivities(); track $index) {
+                  <div class="activity-item">
+                    <div class="activity-icon">
+                      @if (act.type === 'application') {
+                        <i class="fas fa-store"></i>
+                      } @else {
+                        <i class="fas fa-bell"></i>
+                      }
+                    </div>
+                    <div class="activity-info">
+                      <p>{{ act.title }}</p>
+                      <span>{{ act.time_ago }}</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
         </div>
-      </div>
-      @if (stats().pendingApplications > 0) {
-        <div class="absolute top-0 left-0 w-1 h-full bg-yellow-500 animate-pulse"></div>
+
+        <!-- Pending Applications -->
+        @if (recentApplications().length > 0) {
+          <div class="content-card">
+            <div class="card-header">
+              <h3>
+                <i class="fas fa-store"></i>
+                طلبات التجار المعلقة
+              </h3>
+              <button class="btn-view-all"
+                      (click)="goTo('/admin/applications')">
+                عرض الكل
+                <i class="fas fa-arrow-left"></i>
+              </button>
+            </div>
+            <div class="applications-table">
+              @for (app of recentApplications(); track app.id) {
+                <div class="app-row"
+                     (click)="goTo('/admin/applications')">
+                  <div class="app-logo">
+                    @if (app.business_logo_url) {
+                      <img [src]="app.business_logo_url"
+                           [alt]="app.business_name" />
+                    } @else {
+                      <i class="fas fa-store"></i>
+                    }
+                  </div>
+                  <div class="app-info">
+                    <h4>{{ app.business_name }}</h4>
+                    <p>{{ app.email }}</p>
+                  </div>
+                  <div class="app-address">
+                    <i class="fas fa-map-marker-alt"></i>
+                    {{ app.business_address }}
+                  </div>
+                  <span class="app-badge pending">
+                    <i class="fas fa-clock"></i>
+                    معلق
+                  </span>
+                  <i class="fas fa-chevron-left app-arrow"></i>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
       }
     </div>
 
-    <!-- New Reports -->
-    <div (click)="goTo('/admin/reports')" class="cursor-pointer bg-white dark:bg-darkest p-4 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md hover:border-red-300 dark:hover:border-red-800 transition-all group relative overflow-hidden">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-          <i class="fas fa-flag"></i>
-        </div>
-        <div>
-          <p class="text-sm text-gray-500 dark:text-gray-400">بلاغات جديدة</p>
-          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats().newReports }}</p>
-        </div>
-      </div>
-      @if (stats().newReports > 0) {
-        <div class="absolute top-0 left-0 w-1 h-full bg-red-500 animate-pulse"></div>
-      }
-    </div>
-  </div>
-
-  <!-- Charts Section -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Chart 1: User Distribution -->
-    <div class="bg-white dark:bg-darkest p-6 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col items-center">
-      <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4 w-full text-right">توزيع المستخدمين</h2>
-      <svg viewBox="0 0 36 36" class="w-40 h-40 -rotate-90">
-        <!-- المشترون -->
-        <circle cx="18" cy="18" r="15.9" fill="none"
-                stroke="#522B5B" stroke-width="3.5"
-                [attr.stroke-dasharray]="buyersPercent() + ' 100'"
-                stroke-dashoffset="0"
-                class="transition-all duration-1000"/>
-        <!-- التجار -->
-        <circle cx="18" cy="18" r="15.9" fill="none"
-                stroke="#854F6C" stroke-width="3.5"
-                [attr.stroke-dasharray]="merchantsPercent() + ' 100'"
-                [attr.stroke-dashoffset]="-buyersPercent()"
-                class="transition-all duration-1000"/>
-      </svg>
-      <div class="mt-4 flex gap-4 w-full justify-center">
-        <div class="flex items-center gap-2">
-          <div class="w-3 h-3 rounded-sm bg-[#522B5B]"></div>
-          <span class="text-sm text-gray-600 dark:text-gray-300">المشترون: {{stats().totalBuyers}}</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="w-3 h-3 rounded-sm bg-[#854F6C]"></div>
-          <span class="text-sm text-gray-600 dark:text-gray-300">التجار: {{stats().totalMerchants}}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Chart 2: Applications Status -->
-    <div class="bg-white dark:bg-darkest p-6 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col justify-center">
-      <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-6">حالة طلبات التجار</h2>
-      <div class="space-y-4">
-        <!-- معلقة -->
-        <div>
-          <div class="flex justify-between text-sm mb-1">
-            <span class="text-gray-700 dark:text-gray-300">معلقة ({{pendingPercent()}}%)</span>
-          </div>
-          <div class="w-full bg-gray-100 dark:bg-gray-800 rounded-r h-6 flex overflow-hidden">
-            <div class="h-6 bg-yellow-400 transition-all duration-1000 flex items-center px-2 text-xs font-bold text-yellow-900 whitespace-nowrap"
-                 [style.width.%]="pendingPercent()">
-              @if (pendingPercent() > 0) {
-                <span>{{adminService.pendingApplications().length}} معلق</span>
-              }
-            </div>
-          </div>
-        </div>
-        
-        <!-- موافق عليها -->
-        <div>
-          <div class="flex justify-between text-sm mb-1">
-            <span class="text-gray-700 dark:text-gray-300">موافق عليها ({{approvedPercent()}}%)</span>
-          </div>
-          <div class="w-full bg-gray-100 dark:bg-gray-800 rounded-r h-6 flex overflow-hidden">
-            <div class="h-6 bg-green-500 transition-all duration-1000 flex items-center px-2 text-xs font-bold text-white whitespace-nowrap"
-                 [style.width.%]="approvedPercent()">
-              @if (approvedPercent() > 0) {
-                <span>{{approvedApplicationsCount()}} موافق</span>
-              }
-            </div>
-          </div>
-        </div>
-
-        <!-- مرفوضة -->
-        <div>
-          <div class="flex justify-between text-sm mb-1">
-            <span class="text-gray-700 dark:text-gray-300">مرفوضة ({{rejectedPercent()}}%)</span>
-          </div>
-          <div class="w-full bg-gray-100 dark:bg-gray-800 rounded-r h-6 flex overflow-hidden">
-            <div class="h-6 bg-red-500 transition-all duration-1000 flex items-center px-2 text-xs font-bold text-white whitespace-nowrap"
-                 [style.width.%]="rejectedPercent()">
-              @if (rejectedPercent() > 0) {
-                <span>{{rejectedApplicationsCount()}} مرفوض</span>
-              }
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Sections (Pending Apps & Reports) -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Pending Applications Preview -->
-    <div class="bg-white dark:bg-darkest rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col h-full overflow-hidden">
-      <div class="p-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
-        <h2 class="text-lg font-bold text-gray-900 dark:text-white">طلبات التجار المعلقة</h2>
-        <button (click)="goTo('/admin/applications')" class="text-sm text-primary hover:text-dark transition-colors font-medium">عرض الكل</button>
-      </div>
-      <div class="p-5 flex-1 flex flex-col">
-        @if (pendingApplications().length > 0) {
-          <div class="space-y-4">
-            @for (app of pendingApplications() | slice:0:3; track app.id) {
-              <div class="flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 hover:border-primary/30 transition-colors">
-                <div>
-                  <h3 class="font-bold text-gray-900 dark:text-white text-base">{{ app.businessName }}</h3>
-                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-1"><i class="fas fa-user text-xs me-1"></i> {{ app.ownerName }}</p>
-                  <p class="text-xs text-gray-400 mt-1"><i class="fas fa-calendar text-xs me-1"></i> {{ app.createdAt }}</p>
-                </div>
-                <button (click)="goTo('/admin/applications')" class="px-3 py-1.5 bg-white dark:bg-darkest border border-gray-200 dark:border-gray-700 rounded text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm">
-                  مراجعة
-                </button>
-              </div>
-            }
-          </div>
-        } @else {
-          <div class="flex-1 flex flex-col items-center justify-center py-8 text-gray-500 dark:text-gray-400 text-center">
-            <i class="fas fa-check-circle text-4xl mb-3 text-green-400/50"></i>
-            <p>لا توجد طلبات معلقة</p>
-          </div>
-        }
-      </div>
-    </div>
-
-    <!-- New Reports Preview -->
-    <div class="bg-white dark:bg-darkest rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col h-full overflow-hidden">
-      <div class="p-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
-        <h2 class="text-lg font-bold text-gray-900 dark:text-white">أحدث البلاغات</h2>
-        <button (click)="goTo('/admin/reports')" class="text-sm text-primary hover:text-dark transition-colors font-medium">عرض البلاغات</button>
-      </div>
-      <div class="p-5 flex-1 flex flex-col">
-        @if (pendingReports().length > 0) {
-          <div class="space-y-4">
-            @for (report of pendingReports() | slice:0:3; track report.id) {
-              <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 hover:border-red-300 dark:hover:border-red-800/50 transition-colors">
-                <div class="flex items-start justify-between mb-2 gap-2">
-                  <h3 class="font-bold text-gray-900 dark:text-white text-sm line-clamp-1 flex-1">{{ report.reason }}</h3>
-                  @switch (report.targetType) {
-                    @case ('product') {
-                      <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded border border-green-200 shrink-0">منتج</span>
-                    }
-                    @case ('shop') {
-                      <span class="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded border border-purple-200 shrink-0">متجر</span>
-                    }
-                    @case ('user') {
-                      <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded border border-blue-200 shrink-0">مستخدم</span>
-                    }
-                  }
-                </div>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">مُقدم ضد: <span class="text-gray-700 dark:text-gray-300">{{ report.targetName }}</span></p>
-                <p class="text-xs text-gray-400"><i class="fas fa-user-shield text-xs me-1"></i> المُبلّغ: {{ report.reporterName }}</p>
-              </div>
-            }
-          </div>
-        } @else {
-          <div class="flex-1 flex flex-col items-center justify-center py-8 text-gray-500 dark:text-gray-400 text-center">
-            <i class="fas fa-shield-alt text-4xl mb-3 text-green-400/50"></i>
-            <p>لا توجد بلاغات جديدة</p>
-          </div>
-        }
-      </div>
-    </div>
-  </div>
-
-  <!-- Recent Activity -->
-  <div class="bg-white dark:bg-darkest rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
-    <div class="p-5 border-b border-gray-100 dark:border-gray-800">
-      <h2 class="text-lg font-bold text-gray-900 dark:text-white">النشاط الأخير</h2>
-    </div>
-    <div class="p-0">
-      <div class="divide-y divide-gray-100 dark:divide-gray-800">
-        @for (activity of recentActivity(); track activity.id) {
-          <div class="p-5 flex items-start gap-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-            <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" 
-                 [class.bg-purple-100]="activity.type === 'application'" [class.text-purple-600]="activity.type === 'application'"
-                 [class.bg-red-100]="activity.type === 'report'" [class.text-red-600]="activity.type === 'report'"
-                 [class.bg-blue-100]="activity.type === 'user'" [class.text-blue-600]="activity.type === 'user'"
-                 [class.bg-teal-100]="activity.type === 'category'" [class.text-teal-600]="activity.type === 'category'">
-              @switch (activity.type) {
-                @case ('application') { <i class="fas fa-store"></i> }
-                @case ('report') { <i class="fas fa-flag"></i> }
-                @case ('user') { <i class="fas fa-user"></i> }
-                @case ('category') { <i class="fas fa-tag"></i> }
-              }
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-gray-900 dark:text-white mb-1">{{ activity.message }}</p>
-              <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                <i class="fas fa-clock text-[10px]"></i> {{ activity.time }}
-              </p>
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-  </div>
-
-  <!-- Quick Stats Bar -->
-  <div class="bg-gray-900 text-white p-4 rounded-xl shadow-lg flex flex-wrap gap-6 items-center justify-between lg:justify-around">
-    <div (click)="goTo('/admin/users')" class="cursor-pointer hover:text-blue-300 transition-colors flex items-center gap-2">
-      <i class="fas fa-users text-xl"></i>
-      <span class="font-medium text-sm sm:text-base">إجمالي المستخدمين:</span>
-      <span class="font-bold text-lg">{{stats().totalBuyers + stats().totalMerchants}}</span>
-    </div>
-    
-    <div (click)="goTo('/admin/applications')" class="cursor-pointer hover:text-green-300 transition-colors flex items-center gap-2">
-      <i class="fas fa-check-circle text-xl"></i>
-      <span class="font-medium text-sm sm:text-base">نسبة الموافقة:</span>
-      <span class="font-bold text-lg">{{approvedPercent()}}%</span>
-    </div>
-
-    <div (click)="goTo('/admin/reports')" class="cursor-pointer hover:text-red-300 transition-colors flex items-center gap-2">
-      <i class="fas fa-flag text-xl"></i>
-      <span class="font-medium text-sm sm:text-base">البلاغات المعلقة:</span>
-      <span class="font-bold text-lg">{{pendingReports().length}}</span>
-    </div>
-
-    <div (click)="goTo('/admin/users')" class="cursor-pointer hover:text-purple-300 transition-colors flex items-center gap-2">
-      <i class="fas fa-store text-xl"></i>
-      <span class="font-medium text-sm sm:text-base">المتاجر النشطة:</span>
-      <span class="font-bold text-lg">{{stats().totalShops}}</span>
-    </div>
-  </div>
 </div>

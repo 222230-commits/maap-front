@@ -1,14 +1,14 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthMockService } from '../api/mock/auth.mock.service';
+import { AuthService } from '../services/auth.service';
 
 export const adminGuard: CanActivateFn = () => {
-  const authService = inject(AuthMockService);
+  const authService = inject(AuthService);
   const router = inject(Router);
 
-  if (authService.role() === 'admin') {
+  if (authService.currentUser()?.role === 'admin') {
     return true;
   }
-  
+
   return router.createUrlTree(['/auth/login']);
 };

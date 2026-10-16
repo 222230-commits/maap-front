@@ -1,15 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './navbar/navbar.component';
 import { FooterComponent } from './footer/footer.component';
+import { CartService } from '../../core/services/cart.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-main-layout',
   imports: [RouterOutlet, NavbarComponent, FooterComponent],
   template: `
-    <div class="min-h-screen flex flex-col bg-white dark:bg-darkest text-darkest dark:text-light transition-colors duration-300">
+    <div style="min-height:100vh; display:flex; flex-direction:column;">
       <app-navbar></app-navbar>
-      <main class="flex-grow">
+      <main style="flex:1; padding-top:64px;">
         <router-outlet></router-outlet>
       </main>
       <app-footer></app-footer>
@@ -17,5 +19,14 @@ import { FooterComponent } from './footer/footer.component';
   `,
   styles: ``
 })
-export class MainLayoutComponent {
+export class MainLayoutComponent implements OnInit {
+  private cartService = inject(CartService);
+  private authService = inject(AuthService);
+
+  ngOnInit(): void {
+    // لو المستخدم مسجل دخول → حمّل السلة فوراً حتى يظهر العداد في الـ navbar
+    if (this.authService.isLoggedIn()) {
+      this.cartService.loadCart().subscribe();
+    }
+  }
 }

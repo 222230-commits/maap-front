@@ -2,8 +2,10 @@
 
   <!-- Header -->
   <div class="page-header">
-    <h1><i class="fas fa-box-open"></i> المنتجات</h1>
-    <p>{{ filteredProducts().length }} منتج متاح</p>
+    <h1>
+      <i class="fas fa-box-open"></i> استكشف المنتجات
+    </h1>
+    <p>تصفح أحدث وأفضل المنتجات من المتاجر المحلية</p>
   </div>
 
   <!-- Search + Filters -->
@@ -12,7 +14,7 @@
     <div class="search-input">
       <i class="fas fa-search"></i>
       <input type="text"
-             placeholder="ابحث عن منتج أو متجر..."
+             placeholder="ابحث عن منتج..."
              [value]="searchQuery()"
              (input)="updateSearch($any($event.target).value)" />
     </div>
@@ -42,16 +44,66 @@
     </select>
   </div>
 
-  <!-- النتائج -->
-  @if (filteredProducts().length === 0) {
-    <div class="empty-state">
-      <i class="fas fa-search"></i>
-      <p>لا توجد منتجات تطابق بحثك</p>
-      <button (click)="searchQuery.set(''); selectedCategory.set(null)">
-        <i class="fas fa-times"></i> مسح الفلاتر
+  <!-- حالة: لم يبدأ البحث بعد -->
+  @if (searchState() === 'idle') {
+    <div class="search-idle-state">
+      <div class="idle-icon">
+        <i class="fas fa-box-open"></i>
+      </div>
+      <h3>تصفح المنتجات</h3>
+      <p>اكتب اسم منتج أو اختر تصنيفاً للبدء</p>
+    </div>
+  }
+
+  <!-- حالة: جارٍ البحث -->
+  @if (searchState() === 'loading') {
+    <div class="products-skeleton-grid">
+      @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+        <div class="product-skeleton-card">
+          <div class="psc-image shimmer"></div>
+          <div class="psc-info">
+            <div class="psc-shop shimmer"></div>
+            <div class="psc-title shimmer"></div>
+            <div class="psc-price-row">
+              <div class="psc-price shimmer"></div>
+              <div class="psc-rating shimmer"></div>
+            </div>
+            <div class="psc-btn shimmer"></div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- حالة: خطأ في البحث -->
+  @if (searchState() === 'ai-error') {
+    <div class="search-error-state">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p>{{ aiError() || 'تعذر تحميل المنتجات حالياً' }}</p>
+      <button (click)="loadPublicProducts()">
+        <i class="fas fa-redo"></i>
+        إعادة المحاولة
       </button>
     </div>
-  } @else {
+  }
+
+  <!-- حالة: لا نتائج -->
+  @if (searchState() === 'no-results') {
+    <div class="search-no-results">
+      <i class="fas fa-box-open"></i>
+      <h3>لا توجد نتائج مطابقة</h3>
+      <p>جرّب كلمات أخرى أو غيّر الفلاتر</p>
+    </div>
+  }
+
+  <!-- النتائج -->
+  @if (searchState() === 'results') {
+    @if (searchQuery()) {
+      <div class="search-results-header">
+        <i class="fas fa-search"></i>
+        <span>نتائج البحث عن "{{ searchQuery() }}"</span>
+      </div>
+    }
     <div class="products-grid">
       @for (product of filteredProducts(); track product.id) {
         <app-product-card

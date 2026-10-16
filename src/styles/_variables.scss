@@ -5,4 +5,26 @@
   --color-accent: #854F6C;
   --color-soft: #DFB6B2;
   --color-light: #FBE4D8;
+
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-card: #ffffff;
+  --text-primary: #190019;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border-color: #e5e7eb;
+  --navbar-bg: rgba(255,255,255,0.95);
+  --input-bg: #f3f4f6;
+}
+
+.dark {
+  --bg-primary: #0f0014;
+  --bg-secondary: #1a0025;
+  --bg-card: #1e0030;
+  --text-primary: #F8F5FB;
+  --text-secondary: #EDE4F7;
+  --text-muted: #D8CCE4;
+  --border-color: #522B5B;
+  --navbar-bg: rgba(25,0,25,0.95);
+  --input-bg: #2B124C;
 }

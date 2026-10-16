@@ -1,112 +1,244 @@
-@if (shop()) {
-<div class="store-page">
+<div class="store-detail-page">
 
-  <!-- هيدر المتجر -->
-  <div class="store-header">
-    <div class="store-avatar">
-      <i class="fas fa-store text-5xl"></i>
+  @if (isLoadingShop()) {
+    <div class="page-loading">
+      <i class="fas fa-circle-notch fa-spin"></i>
     </div>
-    <div class="store-info">
-      <h1>{{ shop()!.name }}</h1>
-      <p>{{ shop()!.description }}</p>
-      <div class="store-meta">
-        <span>
-          <i class="fas fa-star"></i>
-          {{ shop()!.rating }}
-        </span>
-        <span>
-          <i class="fas fa-users"></i>
-          {{ isFollowing() ? shop()!.followersCount + 1 : shop()!.followersCount }} متابع
-        </span>
-        <span>
-          <i class="fas fa-box"></i>
-          {{ shopProducts().length }} منتج
-        </span>
-        <span>
-          <i class="fas fa-tag"></i>
-          {{ getCategoryName(shop()!.categoryId) }}
-        </span>
-      </div>
-    </div>
-    <div class="store-actions">
-      <button class="follow-btn"
-              [class.following]="isFollowing()"
-              (click)="toggleFollow()">
-        @if (isFollowing()) {
-          <i class="fas fa-check"></i> تتابع
-        } @else {
-          <i class="fas fa-plus"></i> متابعة
-        }
-      </button>
-    </div>
-  </div>
+  }
 
-  <!-- وسائل التواصل -->
-  <div class="contact-section">
-    <h3><i class="fas fa-share-alt"></i> تواصل مع المتجر</h3>
-    <div class="contact-links">
-      @if (shop()!.socialLinks.whatsapp) {
-        <a [href]="'https://wa.me/' + shop()!.socialLinks.whatsapp"
-           target="_blank" class="whatsapp">
-          <i class="fab fa-whatsapp"></i> واتساب
-        </a>
-      }
-      @if (shop()!.socialLinks.instagram) {
-        <a [href]="'https://instagram.com/' + shop()!.socialLinks.instagram"
-           target="_blank" class="instagram">
-          <i class="fab fa-instagram"></i> انستقرام
-        </a>
-      }
-      @if (shop()!.socialLinks.facebook) {
-        <a [href]="'https://facebook.com/' + shop()!.socialLinks.facebook"
-           target="_blank" class="facebook">
-          <i class="fab fa-facebook"></i> فيسبوك
-        </a>
-      }
-      @if (shop()!.socialLinks.tiktok) {
-        <a [href]="'https://tiktok.com/@' + shop()!.socialLinks.tiktok"
-           target="_blank" class="tiktok">
-          <i class="fab fa-tiktok"></i> تيك توك
-        </a>
-      }
+  @if (!isLoadingShop() && !shop()) {
+    <div class="page-error">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p>فشل تحميل المتجر</p>
     </div>
-  </div>
+  }
 
-  <!-- منتجات المتجر -->
-  <div class="store-products">
-    <h2>
-      <i class="fas fa-box-open"></i>
-      منتجات {{ shop()!.name }}
-      <span>({{ shopProducts().length }})</span>
-    </h2>
+  @if (!isLoadingShop() && shop()) {
 
-    @if (shopProducts().length === 0) {
-      <div class="empty">
-        <i class="fas fa-box-open"></i>
-        <p>لا توجد منتجات بعد</p>
-      </div>
-    } @else {
-      <div class="products-grid">
-        @for (product of shopProducts(); track product.id) {
-          <app-product-card
-            [product]="product"
-            (productClick)="goToProduct($event)"
-            (wishlistToggle)="productService.toggleWishlist($event)"
-            (loginRequired)="showLoginPrompt.set(true)" />
-        }
+    @if (shop().is_active === false) {
+      <div class="store-suspended-alert">
+        <i class="fas fa-ban"></i>
+        <div>
+          <h4>هذا المتجر موقوف حالياً</h4>
+          <p>تم تجميد وإيقاف نشاط هذا المتجر من قِبل إدارة المنصة. لا يمكن متابعة المتجر أو شراء منتجاته حتى رفع الإيقاف.</p>
+        </div>
       </div>
     }
-  </div>
 
-  <app-login-prompt
-    [isVisible]="showLoginPrompt()"
-    (closed)="showLoginPrompt.set(false)" />
+    <!-- ══ STORE HERO ══ -->
+    <div class="store-hero-section">
+
+      <div class="store-banner">
+        @if (shop().banner_url) {
+          <img [src]="getImageUrl(shop().banner_url)" [alt]="shop().name" class="banner-img" />
+        } @else {
+          <div class="banner-default"></div>
+        }
+        <div class="banner-overlay"></div>
+      </div>
+
+      <div class="store-identity-bar">
+        <div class="store-logo-big">
+          @if (shop().logo_url) {
+            <img [src]="getImageUrl(shop().logo_url)" [alt]="shop().name" />
+          } @else {
+            <i class="fas fa-store"></i>
+          }
+        </div>
+
+        <div class="store-identity-info">
+          <h1>{{ shop().name }}</h1>
+          <p class="store-desc-hero">{{ shop().description }}</p>
+
+          <div class="store-stats-row">
+            <div class="store-stat">
+              <span class="stat-n">{{ shop().followers_count ?? 0 }}</span>
+              <span class="stat-l">متابع</span>
+            </div>
+            <div class="stat-sep"></div>
+            <div class="store-stat">
+              <span class="stat-n">{{ shop().products_count ?? shopProducts().length }}</span>
+              <span class="stat-l">منتج</span>
+            </div>
+            @if (shop().rating > 0) {
+              <div class="stat-sep"></div>
+              <div class="store-stat">
+                <span class="stat-n">
+                  <i class="fas fa-star" style="color:#F59E0B;font-size:13px"></i>
+                  {{ shop().rating }}
+                </span>
+                <span class="stat-l">تقييم</span>
+              </div>
+            }
+          </div>
+
+          @if (shop().business_address) {
+            <p class="store-address">
+              <i class="fas fa-map-marker-alt"></i>
+              {{ shop().business_address }}
+            </p>
+          }
+        </div>
+
+        <div class="store-hero-actions">
+          @if (authService.role() !== 'admin') {
+            <button class="btn-follow-hero"
+                    [class.following]="isFollowing()"
+                    [disabled]="isTogglingFollow()"
+                    (click)="toggleFollow()">
+              @if (isTogglingFollow()) {
+                <i class="fas fa-spinner fa-spin"></i>
+              } @else if (isFollowing()) {
+                <i class="fas fa-user-check"></i> متابَع
+              } @else {
+                <i class="fas fa-user-plus"></i> تابع المتجر
+              }
+            </button>
+          } @else {
+            <div class="admin-preview-pill">
+              <i class="fas fa-shield-alt"></i>
+              <span>وضع المعاينة الإدارية</span>
+            </div>
+          }
+
+          <button class="btn-report-store"
+                  type="button"
+                  (click)="openReport()"
+                  title="الإبلاغ عن المتجر">
+            <i class="fas fa-flag"></i>
+          </button>
+
+          <div class="store-social-icons">
+            @if (shop().social_links?.instagram) {
+              <a [href]="shop().social_links.instagram" target="_blank" class="social-icon instagram">
+                <i class="fab fa-instagram"></i>
+              </a>
+            }
+            @if (shop().social_links?.facebook) {
+              <a [href]="shop().social_links.facebook" target="_blank" class="social-icon facebook">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+            }
+            @if (shop().social_links?.whatsapp) {
+              <a [href]="'https://wa.me/' + shop().social_links.whatsapp" target="_blank" class="social-icon whatsapp">
+                <i class="fab fa-whatsapp"></i>
+              </a>
+            }
+          </div>
+
+          <button class="btn-report" (click)="openReport()">
+            <i class="fas fa-flag"></i> إبلاغ
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ STORE BADGES ══ -->
+    <div class="store-badges-bar">
+      @if (shop().accepts_returns) {
+        <div class="store-badge-item"><i class="fas fa-undo"></i><span>يقبل الإرجاع</span></div>
+      }
+      @if (shop().accepts_card_payment) {
+        <div class="store-badge-item"><i class="fas fa-credit-card"></i><span>يقبل البطاقة</span></div>
+      }
+      @if (shop().categories?.length > 0) {
+        @for (cat of shop().categories.slice(0,3); track $index) {
+          <div class="store-badge-item cat"><i class="fas fa-tag"></i><span>{{ cat.name }}</span></div>
+        }
+      }
+    </div>
+
+    <!-- ══ REPORT MESSAGE ══ -->
+    @if (reportMsg()) {
+      <div class="report-toast" [class.error]="reportMsg().includes('خطأ')">
+        {{ reportMsg() }}
+      </div>
+    }
+
+    <!-- ══ TABS ══ -->
+    <div class="store-tabs-bar">
+      <button [class.active]="!showReportDialog()" (click)="showReportDialog.set(false)">
+        <i class="fas fa-box"></i> المنتجات ({{ shopProducts().length }})
+      </button>
+      <button (click)="showReportDialog.set(false)">
+        <i class="fas fa-info-circle"></i> عن المتجر
+      </button>
+    </div>
+
+    <!-- ══ PRODUCTS ══ -->
+    <div class="store-products-section">
+      @if (isLoadingProducts()) {
+        <div class="products-loading"><i class="fas fa-circle-notch fa-spin"></i></div>
+      } @else if (shopProducts().length === 0) {
+        <div class="no-products"><i class="fas fa-box-open"></i><p>لا توجد منتجات بعد</p></div>
+      } @else {
+        <div class="store-products-grid">
+          @for (product of shopProducts(); track product.id) {
+            <div class="store-product-card" (click)="navigateToProduct(product)">
+              <div class="spc-img">
+                @if (getProductImage(product)) {
+                  <img [src]="getProductImage(product)" [alt]="product.title" />
+                } @else {
+                  <div class="spc-img-placeholder"><i class="fas fa-box"></i></div>
+                }
+              </div>
+              <div class="spc-info">
+                <h4>{{ product.title }}</h4>
+                <div class="spc-price-row">
+                  <span class="spc-price">{{ product.price }} د.ل</span>
+                  @if (product.compare_at_price > product.price) {
+                    <span class="spc-old">{{ product.compare_at_price }} د.ل</span>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- ══ ABOUT ══ -->
+    <div class="store-about-section">
+      <div class="about-container">
+        @if (shop().policy_description) {
+          <div class="about-card">
+            <h3><i class="fas fa-shield-alt"></i> سياسة الإرجاع</h3>
+            <p>{{ shop().policy_description }}</p>
+          </div>
+        }
+        <div class="about-card">
+          <h3><i class="fas fa-info-circle"></i> عن المتجر</h3>
+          <p>{{ shop().description || 'لا يوجد وصف.' }}</p>
+        </div>
+      </div>
+    </div>
+
+  }
+
+  <!-- ══ REPORT DIALOG ══ -->
+  @if (showReportDialog()) {
+    <div class="modal-backdrop" (click)="showReportDialog.set(false)"></div>
+    <div class="report-modal">
+      <h3><i class="fas fa-flag"></i> إبلاغ عن هذا المتجر</h3>
+      <textarea rows="4" placeholder="اكتب سبب البلاغ..."
+                [value]="reportReason()"
+                (input)="reportReason.set($any($event.target).value)"></textarea>
+      <div class="report-actions">
+        <button class="btn-submit-report" (click)="submitReport()" [disabled]="isSubmittingReport() || !reportReason().trim()">
+          @if (isSubmittingReport()) { <i class="fas fa-spinner fa-spin"></i> } @else { <i class="fas fa-paper-plane"></i> }
+          إرسال البلاغ
+        </button>
+        <button class="btn-cancel-report" (click)="showReportDialog.set(false)">إلغاء</button>
+      </div>
+    </div>
+  }
+
+  <!-- ══ LOGIN PROMPT ══ -->
+  @if (showLoginPrompt()) {
+    <app-login-prompt (close)="showLoginPrompt.set(false)" />
+  }
+
+  <app-report-modal></app-report-modal>
 
 </div>
-} @else {
-  <div class="not-found">
-    <i class="fas fa-store-slash"></i>
-    <h2>المتجر غير موجود</h2>
-    <a routerLink="/">العودة للرئيسية</a>
-  </div>
-}

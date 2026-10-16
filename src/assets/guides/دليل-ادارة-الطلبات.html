@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>دليل إدارة الطلبات — للفرونت إند</title>
+<style>
+  :root{
+    --bg:#F7F6F2;
+    --card-bg:#FFFFFF;
+    --border:#E4E2D8;
+    --border-strong:#CFCDC0;
+    --text-primary:#242320;
+    --text-secondary:#5F5E58;
+    --text-muted:#8B897F;
+    --teal:#0F6E56;
+    --teal-light:#E1F5EE;
+    --teal-border:#9FE1CB;
+    --teal-dark:#085041;
+    --coral:#993C1D;
+    --coral-light:#FAECE7;
+    --coral-border:#F0997B;
+    --coral-dark:#4A1B0C;
+    --purple:#534AB7;
+    --purple-light:#EEEDFE;
+    --purple-border:#AFA9EC;
+    --gray-fill:#F1EFE8;
+    --gray-border:#D3D1C7;
+    --blue:#185FA5;
+    --blue-light:#E6F1FB;
+    --code-bg:#242320;
+    --code-text:#F1EFE8;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text-primary);
+    font-family:"Segoe UI",Tahoma,Arial,sans-serif;
+    line-height:1.8;
+    display:flex;
+    min-height:100vh;
+  }
+  code, .mono{
+    font-family:"Consolas","Courier New",monospace;
+    direction:ltr;
+    unicode-bidi:embed;
+  }
+  a{color:var(--teal);}
+
+  nav.side{
+    position:sticky;
+    top:0;
+    align-self:flex-start;
+    width:260px;
+    min-width:260px;
+    height:100vh;
+    overflow-y:auto;
+    background:var(--card-bg);
+    border-left:1px solid var(--border);
+    padding:24px 18px;
+  }
+  nav.side .brand{
+    font-size:14px;
+    font-weight:700;
+    color:var(--teal-dark);
+    margin-bottom:24px;
+  }
+  nav.side .grp-title{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    color:var(--text-muted);
+    margin:20px 0 8px;
+  }
+  nav.side a{
+    display:block;
+    font-size:13.5px;
+    color:var(--text-secondary);
+    text-decoration:none;
+    padding:6px 8px;
+    border-radius:6px;
+    margin-bottom:2px;
+  }
+  nav.side a:hover{background:var(--teal-light);color:var(--teal-dark);}
+
+  main{flex:1;padding:36px 48px 80px;max-width:1000px;}
+  .eyebrow{
+    font-size:12px;
+    font-weight:700;
+    color:var(--teal);
+    text-transform:uppercase;
+    letter-spacing:.6px;
+    margin-bottom:8px;
+  }
+  h1{font-size:30px;margin:0 0 10px;}
+  header p.desc{color:var(--text-secondary);font-size:15.5px;max-width:780px;}
+  header{margin-bottom:36px;padding-bottom:24px;border-bottom:1px solid var(--border);}
+
+  h2{
+    font-size:21px;
+    margin:44px 0 14px;
+    padding-top:8px;
+    scroll-margin-top:20px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  h3{font-size:16px;margin:22px 0 8px;}
+
+  .card{
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:20px 24px;
+    margin-bottom:18px;
+  }
+
+  table{width:100%;border-collapse:collapse;margin:12px 0 20px;font-size:13.5px;}
+  th,td{border:1px solid var(--border);padding:9px 12px;text-align:right;vertical-align:top;}
+  th{background:var(--teal-light);color:var(--teal-dark);font-weight:700;}
+  tr:nth-child(even) td{background:#FBFAF7;}
+
+  .badge-row{display:flex;align-items:center;gap:10px;margin:10px 0 14px;flex-wrap:wrap;}
+  .pill{
+    font-family:"Consolas","Courier New",monospace;
+    direction:ltr;
+    font-size:12.5px;
+    font-weight:700;
+    padding:4px 10px;
+    border-radius:999px;
+  }
+  .pill-get{background:var(--blue-light);color:var(--blue);}
+  .pill-post{background:var(--teal-light);color:var(--teal-dark);}
+  .pill-actor{background:var(--purple-light);color:#26215C;font-size:11.5px;}
+  .path{font-family:"Consolas","Courier New",monospace;direction:ltr;font-size:13.5px;color:var(--text-primary);}
+
+  pre{
+    background:var(--code-bg);
+    color:var(--code-text);
+    padding:14px 16px;
+    border-radius:8px;
+    overflow-x:auto;
+    direction:ltr;
+    text-align:left;
+    font-size:12.5px;
+    font-family:"Consolas","Courier New",monospace;
+    margin:8px 0 16px;
+  }
+  .code-label{font-size:12px;color:var(--text-muted);margin:14px 0 -4px;font-weight:700;}
+
+  .callout{
+    border-radius:8px;
+    padding:12px 16px;
+    margin:12px 0;
+    font-size:13.8px;
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+  }
+  .callout .ic{font-weight:700;font-size:15px;flex-shrink:0;}
+  .callout.warn{background:var(--coral-light);border:1px solid var(--coral-border);color:var(--coral-dark);}
+  .callout.warn .ic{color:var(--coral);}
+  .callout.tip{background:var(--teal-light);border:1px solid var(--teal-border);color:var(--teal-dark);}
+  .callout.tip .ic{color:var(--teal);}
+
+  .flow{display:flex;flex-direction:column;align-items:center;gap:4px;margin:24px 0;padding:24px 10px;background:#FBFAF7;border:1px dashed var(--border-strong);border-radius:12px;}
+  .fbox{
+    border-radius:10px;
+    padding:10px 18px;
+    text-align:center;
+    font-size:13.5px;
+    min-width:220px;
+    border:1px solid;
+  }
+  .fbox .t1{font-weight:700;margin-bottom:2px;}
+  .fbox .t2{font-size:12px;font-family:"Consolas","Courier New",monospace;direction:ltr;opacity:.85;}
+  .fbox.api{background:var(--purple-light);border-color:var(--purple-border);color:#26215C;}
+  .fbox.decision{background:var(--gray-fill);border-color:var(--gray-border);color:var(--text-primary);border-radius:999px;}
+  .fbox.ok{background:var(--teal-light);border-color:var(--teal-border);color:var(--teal-dark);}
+  .fbox.err{background:var(--coral-light);border-color:var(--coral-border);color:var(--coral-dark);}
+  .arrow-down{font-size:18px;color:var(--text-muted);}
+  .branch{display:flex;gap:40px;align-items:flex-start;justify-content:center;width:100%;flex-wrap:wrap;}
+  .branch .col{display:flex;flex-direction:column;align-items:center;gap:4px;}
+  .branch .label{font-size:11.5px;color:var(--text-muted);font-weight:700;}
+
+  .mockup-row{display:flex;gap:26px;flex-wrap:wrap;justify-content:center;margin:20px 0 6px;}
+  .phone{
+    width:260px;
+    background:#EFEDE4;
+    border-radius:26px;
+    padding:14px;
+    border:1px solid var(--border-strong);
+  }
+  .screen{
+    background:#FFFFFF;
+    border-radius:16px;
+    padding:14px;
+    min-height:280px;
+  }
+  .screen .stitle{font-size:13.5px;font-weight:700;margin-bottom:2px;}
+  .screen .ssub{font-size:11px;color:var(--text-muted);margin-bottom:10px;font-family:"Consolas","Courier New",monospace;direction:ltr;}
+  .row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+  .tab-chip{font-size:10.5px;padding:3px 9px;border-radius:999px;background:var(--gray-fill);color:var(--text-secondary);}
+  .tab-chip.active{background:var(--teal-light);color:var(--teal-dark);font-weight:700;}
+  .disabled-box, .lockbox{
+    background:var(--gray-fill);
+    border:1px dashed var(--border-strong);
+    border-radius:8px;
+    padding:10px;
+    font-size:11.2px;
+    color:var(--text-secondary);
+    margin-top:8px;
+  }
+  .badge-endpoint{
+    display:inline-block;
+    margin-top:10px;
+    font-family:"Consolas","Courier New",monospace;
+    direction:ltr;
+    font-size:11px;
+    background:var(--purple-light);
+    color:#26215C;
+    padding:4px 10px;
+    border-radius:999px;
+    text-align:center;
+  }
+  .mockup-col{display:flex;flex-direction:column;align-items:center;}
+
+  /* Dashboard table mockup (Angular/React style) */
+  .dash-card{
+    background:#FFFFFF;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px;
+    width:100%;
+    max-width:520px;
+  }
+  .dash-card .dtitle{font-size:14px;font-weight:700;margin-bottom:10px;}
+  .dash-table{width:100%;border-collapse:collapse;font-size:11.5px;}
+  .dash-table th{background:var(--teal-light);color:var(--teal-dark);padding:6px 8px;font-weight:700;text-align:right;}
+  .dash-table td{padding:6px 8px;border-bottom:1px solid var(--border);}
+  .status-chip{font-size:10px;padding:2px 8px;border-radius:999px;}
+  .status-new{background:var(--purple-light);color:#26215C;}
+  .status-wait{background:var(--coral-light);color:var(--coral-dark);}
+
+  /* Modal */
+  .modal-wrap{display:flex;justify-content:center;padding:10px;}
+  .modal{
+    background:#FFFFFF;
+    border-radius:14px;
+    padding:18px;
+    width:280px;
+    border:1px solid var(--border);
+    box-shadow:0 8px 24px rgba(0,0,0,.06);
+  }
+  .modal .mtitle{font-size:14px;font-weight:700;margin-bottom:6px;}
+  .modal .msub{font-size:11.5px;color:var(--text-muted);margin-bottom:12px;}
+  .modal textarea{width:100%;height:56px;font-size:12px;border-radius:8px;border:1px solid var(--border);padding:8px;font-family:inherit;}
+  .modal .mbtns{display:flex;gap:8px;margin-top:12px;}
+  .modal button{flex:1;padding:8px;border-radius:8px;border:none;font-size:12.5px;font-family:inherit;}
+  .btn-danger{background:var(--coral);color:#fff;}
+  .btn-ghost{background:var(--gray-fill);color:var(--text-primary);}
+
+  footer{
+    margin-top:60px;
+    padding-top:20px;
+    border-top:1px solid var(--border);
+    font-size:12.5px;
+    color:var(--text-muted);
+    text-align:center;
+  }
+
+  .num-list{padding-right:20px;}
+  .num-list li{margin-bottom:10px;font-size:14px;}
+
+  @media(max-width:900px){
+    nav.side{display:none;}
+    main{padding:24px;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="side">
+  <div class="brand">دليل إدارة الطلبات</div>
+
+  <div class="grp-title">قوائم الطلبات (Index)</div>
+  <a href="#overview">نظرة عامة واختيار الأداة</a>
+  <a href="#index-buyer">قائمة طلبات المشتري</a>
+  <a href="#index-seller">قائمة طلبات التاجر</a>
+  <a href="#index-latest3">عرض أحدث 3 طلبات</a>
+
+  <div class="grp-title">إلغاء الطلب</div>
+  <a href="#cancel-flow">مخطط قرار الإلغاء</a>
+  <a href="#cancel-buyer">إلغاء الطلب (مشترٍ)</a>
+  <a href="#cancel-seller">إلغاء الطلب (تاجر)</a>
+
+  <div class="grp-title">تفاصيل الطلب</div>
+  <a href="#show-buyer">تفاصيل الطلب (مشترٍ)</a>
+  <a href="#show-seller">تفاصيل الطلب (تاجر)</a>
+  <a href="#order-code">حقل order_code الجديد</a>
+  <a href="#mockups">نماذج الشاشات</a>
+
+  <div class="grp-title">مرجع سريع</div>
+  <a href="#errors">جدول كل الأخطاء</a>
+  <a href="#tips">نصائح عملية</a>
+</nav>
+
+<main>
+  <header>
+    <div class="eyebrow">توثيق فرونت إند</div>
+    <h1>دليل إدارة الطلبات</h1>
+    <p class="desc">
+      شرح كامل لدوال عرض قوائم الطلبات (Index) لكل من المشتري والتاجر، ودوال إلغاء الطلب لكليهما،
+      ودالة عرض تفاصيل طلب معيّن (Invoice) لكليهما — مع تركيز خاص على حقل <code>order_code</code>
+      الجديد وأين يظهر باسم مختلف.
+    </p>
+  </header>
+
+  <h2 id="overview">نظرة عامة واختيار الأداة</h2>
+  <table>
+    <tr><th>الميزة</th><th>الأداة المقترحة</th><th>السبب</th></tr>
+    <tr>
+      <td>قائمة طلبات المشتري بتابات + تمرير متسلسل</td>
+      <td>Flutter</td>
+      <td>تجربة تصفح متسلسلة داخل تطبيق الموبايل، بتنقل بسيط بين تابات الحالة</td>
+    </tr>
+    <tr>
+      <td>لوحة تحكم طلبات التاجر (جدول + فلاتر تابات + إجراءات صف)</td>
+      <td>Angular / React</td>
+      <td>جدول بيانات يحتاج فرزاً وفلترة وإجراءات متعددة لكل صف، أقرب لتجربة لوحة تحكم منه لتطبيق موبايل</td>
+    </tr>
+    <tr>
+      <td>شاشة/مودال إلغاء الطلب (سبب نصي + تأكيد)</td>
+      <td>Flutter للمشتري، Angular/React للتاجر</td>
+      <td>نفس المنطق لكن كل طرف يستخدمه ضمن سياق واجهته الأساسية (موبايل مقابل لوحة تحكم)</td>
+    </tr>
+    <tr>
+      <td>شاشة تفاصيل الطلب (Invoice)</td>
+      <td>Flutter للمشتري، Angular/React للتاجر</td>
+      <td>عرض تفصيلي واحد؛ عند التاجر يحتاج أيضاً بيانات الزبون للتواصل، بخلاف المشتري الذي يحتاج بيانات المتجر</td>
+    </tr>
+  </table>
+
+  <h2 id="index-buyer">قائمة طلبات المشتري</h2>
+  <div class="badge-row">
+    <span class="pill pill-get">GET</span>
+    <span class="path">/Buyer/orders?tab=pending&per_page=10</span>
+    <span class="pill pill-actor">مشترٍ</span>
+  </div>
+
+  <div class="code-label">مثال الاستجابة — انتبه للتعشيش المزدوج لكلمة data</div>
+  <pre>{
+  "success": true,
+  "tabs_count": {
+    "all": 12,
+    "pending": 2,
+    "waiting_buyer": 1,
+    "preparing": 3,
+    "awaiting": 1,
+    "completed": 4,
+    "cancelled": 1
+  },
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": "uuid",
+        "order_code": "ORD-8F2A1C90",
+        "status": "pending",
+        "total_price": "245.00",
+        "payment_method": "Cash on Delivery",
+        "snapshot_shipping_address": "{\"city\":\"طرابلس\",\"street\":\"...\"}",
+        "requires_buyer_approval": false,
+        "created_at": "2026-07-30T10:00:00.000000Z",
+        "shop": { "id": "uuid", "name": "متجر الأناقة", "logo_url": "https://..." },
+        "items": [ { "id": "uuid", "product_id": "uuid", "quantity": 2, "price": "80.00", "product": { "id": "uuid", "title": "قميص قطني", "images": [ "..." ] } } ]
+      }
+    ],
+    "per_page": 10,
+    "last_page": 2,
+    "total": 12,
+    "links": [ "..." ]
+  }
+}</pre>
+
+  <table>
+    <tr><th>البارامتر</th><th>الوصف</th></tr>
+    <tr><td><code>tab</code></td><td>اختياري: <span class="mono">all</span> (افتراضي)، <span class="mono">pending</span>، <span class="mono">waiting_buyer</span>، <span class="mono">preparing</span>، <span class="mono">awaiting</span>، <span class="mono">completed</span>، <span class="mono">cancelled</span></td></tr>
+    <tr><td><code>per_page</code></td><td>اختياري، رقم — الافتراضي 10، ويُحترم فعلياً من الباك إند (يمكن تغييره)</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>
+      <b>عناصر القائمة الفعلية موجودة تحت <span class="mono">response.data.data</span> وليس
+      <span class="mono">response.data</span> مباشرة</b> — نفس الشكل يتكرر في كل استجابات
+      Laravel Paginator التي تُغلَّف يدوياً داخل مفتاح <code>data</code> خارجي. ومعلومات الصفحات
+      (current_page, last_page, total...) موجودة أيضاً داخل نفس الكائن الخارجي وليس في مفتاح
+      <code>meta</code> منفصل.
+    </span>
+  </div>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>
+      <b>فخ عدّاد التابات:</b> تاب "قيد الانتظار" في تجربة المستخدم يجب أن يعرض طلبات
+      <span class="mono">pending</span> و<span class="mono">waiting_buyer</span> معاً (هذا فعلياً ما
+      يحدث عند اختيار <span class="mono">tab=pending</span> — يُعيد كليهما مدمَجين). لكن
+      <code>tabs_count</code> يُعيد عددين منفصلين: <code>pending</code> و<code>waiting_buyer</code>
+      كل واحد لوحده. إن عرضت شارة رقمية على هذا التاب باستخدام <code>tabs_count.pending</code> فقط،
+      سيكون الرقم أقل من عدد الطلبات التي ستظهر فعلياً عند الضغط عليه. اجمع
+      <code>tabs_count.pending + tabs_count.waiting_buyer</code> بنفسك لعرض رقم صحيح على شارة هذا
+      التاب تحديداً.
+    </span>
+  </div>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>
+      عناصر هذه القائمة هي نماذج Eloquent خام (Raw Model) وليست مُنسّقة مثل شاشة التفاصيل: حقل
+      التاريخ اسمه <code>order_code</code> هنا (وليس <code>order_number</code> كما في التفاصيل)، و
+      <code>snapshot_shipping_address</code> يصل كـ <b>نص JSON خام (String)</b> غير محلَّل — يجب عليك
+      استدعاء <span class="mono">JSON.parse()</span> بنفسك إن احتجت قراءته من القائمة (بعكس شاشة
+      التفاصيل التي تصل بها كـ Object جاهز). لا تستخدم نفس دالة تحويل البيانات (Mapper) التي بنيتها
+      لشاشة تفاصيل الطلب على عناصر هذه القائمة.
+    </span>
+  </div>
+
+  <h2 id="index-seller">قائمة طلبات التاجر</h2>
+  <div class="badge-row">
+    <span class="pill pill-get">GET</span>
+    <span class="path">/store/orders?tab=new</span>
+    <span class="pill pill-actor">تاجر</span>
+  </div>
+
+  <div class="code-label">مثال الاستجابة</div>
+  <pre>{
+  "success": true,
+  "tabs_count": {
+    "all": 40,
+    "new": 3,
+    "preparing": 5,
+    "awaiting": 2,
+    "completed": 28,
+    "cancelled": 2
+  },
+  "data": {
+    "current_page": 1,
+    "data": [ "... نفس شكل عناصر Order الخام، لكن مع buyer بدل shop ..." ],
+    "per_page": 15,
+    "last_page": 3,
+    "total": 40
+  }
+}</pre>
+
+  <table>
+    <tr><th>البارامتر</th><th>الوصف</th></tr>
+    <tr><td><code>tab</code></td><td>اختياري: <span class="mono">all</span> (افتراضي)، <span class="mono">new</span> (يشمل pending و waiting_buyer معاً)، <span class="mono">preparing</span>، <span class="mono">awaiting</span>، <span class="mono">completed</span>، <span class="mono">cancelled</span></td></tr>
+  </table>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>
+      <b>لا تفترض نفس أسماء التابات بين شاشة المشتري وشاشة التاجر.</b> عند المشتري التابات هي
+      <span class="mono">pending</span> و<span class="mono">waiting_buyer</span> منفصلين، بينما عند
+      التاجر هما مدموجان في تاب واحد اسمه <span class="mono">new</span> فقط — ولا يوجد تاب باسم
+      <span class="mono">pending</span> عند التاجر إطلاقاً. لا يمكن استخدام نفس Enum/مكوّن التابات
+      بين تطبيق المشتري ولوحة التاجر دون تخصيص القيم لكل واحد.
+    </span>
+  </div>
+
+  <div class="callout tip">
+    <span class="ic">✓</span>
+    <span>
+      بعكس شاشة المشتري، <code>tabs_count.new</code> عند التاجر <b>مطابق تماماً</b> لعدد الطلبات التي
+      ستظهر عند اختيار <span class="mono">tab=new</span> (لأن الدمج تم مسبقاً في الباك إند هنا) — لا
+      حاجة لأي جمع يدوي من جهتك في شاشة التاجر.
+    </span>
+  </div>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>
+      <b>مسار التاجر لا يدعم بارامتر <span class="mono">per_page</span> إطلاقاً</b> — عدد العناصر في
+      الصفحة ثابت دائماً على 15 بغض النظر عمّا ترسله في الرابط. لا تبني منطقاً في الفرونت يعتمد على
+      تغيير هذا الرقم عبر الرابط لشاشة التاجر (راجع قسم "عرض أحدث 3 طلبات" أدناه لحل بديل).
+    </span>
+  </div>
+
+  <h2 id="index-latest3">كيف تعرض "أحدث 3 طلبات" باستخدام الرابط؟</h2>
+  <div class="card">
+    <p style="margin-top:0"><b>عند المشتري:</b> استخدم <span class="mono">GET /Buyer/orders?per_page=3</span>
+    مباشرة (بدون تحديد <code>tab</code> لجلب كل الحالات، أو مع <code>tab</code> إن أردت آخر 3 من حالة
+    معينة). القائمة مرتبة أصلاً بالأحدث أولاً (<span class="mono">latest()</span>)، لذلك أول صفحة
+    بحجم 3 تُعطيك أحدث 3 طلبات مباشرة دون أي فرز إضافي من جهتك.</p>
+    <p style="margin-bottom:0"><b>عند التاجر:</b> بما أن <span class="mono">per_page</span> غير مدعوم،
+    لا يمكنك طلب 3 فقط عبر الرابط. الحل العملي: نادِ نفس مسار القائمة العادي (سيُعيد حتى 15 طلباً
+    مرتبة بالأحدث أولاً)، ثم خذ أول 3 عناصر من <span class="mono">response.data.data</span> على مستوى
+    الفرونت (Slice محلي) لعرضها في ويدجت "أحدث الطلبات" على لوحة التحكم.</p>
+  </div>
+
+  <h2 id="cancel-flow">مخطط قرار إلغاء الطلب</h2>
+  <p>نفس دالة الإلغاء في الباك إند تُستخدم لكل من المشتري والتاجر، لكن التحقق من الصلاحية يختلف:</p>
+  <div class="flow">
+    <div class="fbox api"><div class="t1">طلب إلغاء الطلب</div><div class="t2">POST {order}/cancel</div></div>
+    <div class="arrow-down">↓</div>
+    <div class="fbox decision">تاجر: يملك هذا الطلب؟</div>
+    <div class="branch">
+      <div class="col">
+        <div class="label">لا</div>
+        <div class="fbox err"><div class="t1">403 ممنوع</div><div class="t2">هذا الفحص للتاجر فقط</div></div>
+      </div>
+      <div class="col">
+        <div class="label">نعم (تاجر) / بلا فحص (مشترٍ)</div>
+        <div class="fbox decision">الحالة completed أو cancelled؟</div>
+      </div>
+    </div>
+    <div class="branch">
+      <div class="col">
+        <div class="label">نعم</div>
+        <div class="fbox err"><div class="t1">استثناء غير مُلتقط</div><div class="t2">شكل الخطأ غير مضمون</div></div>
+      </div>
+      <div class="col">
+        <div class="label">لا (يشمل حتى حالة awaiting)</div>
+        <div class="fbox ok"><div class="t1">تنفيذ الإلغاء بنجاح</div><div class="t2">بلا data في الاستجابة</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>
+      <b>الإلغاء مسموح في أي حالة تقريباً</b> ما عدا <span class="mono">completed</span> و
+      <span class="mono">cancelled</span> — يشمل هذا حتى حالة <span class="mono">awaiting</span>
+      (الطلب جاهز بانتظار تأكيد استلام المشتري). لا تُخفِ زر الإلغاء في هذه الحالة بافتراض أنه "متأخر
+      جداً" — الباك إند يسمح به فعلياً.
+    </span>
+  </div>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>
+      <b>لا يوجد try/catch حول عملية الإلغاء في أي من المسارين</b> (لا عند المشتري ولا عند التاجر).
+      إن حاول أحدهم إلغاء طلب مكتمل أو مُلغى بالفعل (مثلاً بسبب تأخر تحديث الشاشة)، فشكل استجابة
+      الخطأ الناتج غير مضمون بنفس الصيغة الموحّدة <span class="mono">{success:false, message:"..."}</span>
+      المستخدَمة في باقي هذا الدليل. تعامل مع الفشل هنا بمعالجة عامة (Generic Error Handling) بدل
+      الاعتماد على قراءة حقل <code>message</code> تحديداً.
+    </span>
+  </div>
+
+  <h2 id="cancel-buyer">إلغاء الطلب — المشتري</h2>
+  <div class="badge-row">
+    <span class="pill pill-post">POST</span>
+    <span class="path">/Buyer/orders/{order}/cancel</span>
+    <span class="pill pill-actor">مشترٍ</span>
+  </div>
+
+  <div class="code-label">الطلب (Request Body)</div>
+  <pre>{
+  "reason": "غيّرت رأيي بخصوص الطلب"
+}</pre>
+
+  <table>
+    <tr><th>الحقل</th><th>القاعدة</th></tr>
+    <tr><td><code>reason</code></td><td>مطلوب، نص، <b>بدون حد أقصى للطول</b> من جهة الباك إند</td></tr>
+  </table>
+
+  <div class="code-label">استجابة النجاح — 200</div>
+  <pre>{
+  "success": true,
+  "message": "تم إلغاء الطلب."
+}</pre>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>
+      <b>لا يوجد أي تحقق في هذا المسار من أن الطلب فعلاً يخص المستخدم الحالي.</b> على عكس دالة عرض
+      تفاصيل الطلب التي تتحقق صراحة أن <span class="mono">buyer_id</span> يطابق المستخدم المسجّل،
+      دالة الإلغاء عند المشتري لا تحتوي هذا الفحص لا في الكنترولر ولا في السيرفس. من الناحية العملية
+      هذا يعني أن الحماية الوحيدة حالياً تعتمد على أن الفرونت لا يرسل إلا معرّفات طلبات يملكها
+      المستخدم فعلاً (كما تعرضها له شاشة "طلباتي"). لا تبني أي شاشة تسمح بإدخال رقم/معرّف طلب يدوياً
+      ثم استدعاء هذا المسار عليه مباشرة.
+    </span>
+  </div>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>
+      حد أقصى الطول لحقل <code>reason</code> غير مفروض من الباك إند هنا (بعكس نسخة التاجر أدناه التي
+      تفرض 255 حرفاً). يُنصح رغم ذلك بوضع حد معقول (مثل 255 حرفاً) في واجهة الإدخال نفسها لتفادي نص
+      طويل جداً بلا داعٍ، حتى لو لم يرفضه الباك إند.
+    </span>
+  </div>
+
+  <div class="callout tip">
+    <span class="ic">i</span>
+    <span>
+      إلغاء المشتري لطلب "عادي" (وليس بسبب رفض توفر منتجات من طرف التاجر) يُحتسب ضمن حد إلغاءات
+      المشتري الذي قد يؤدي لحظر مؤقت من الطلب عند تكراره كثيراً خلال فترة قصيرة. لا يوجد أي حقل في
+      الاستجابة يخبرك برصيد الإلغاءات المتبقي، لذلك يُفضَّل تنبيه المستخدم بجملة عامة عند الإلغاء
+      (مثل: "الإلغاء المتكرر قد يؤدي لتقييد مؤقت لحسابك") بدل محاولة عرض عدّاد دقيق غير متوفر أصلاً.
+    </span>
+  </div>
+
+  <h2 id="cancel-seller">إلغاء الطلب — التاجر</h2>
+  <div class="badge-row">
+    <span class="pill pill-post">POST</span>
+    <span class="path">/store/orders/{order}/cancel</span>
+    <span class="pill pill-actor">تاجر</span>
+  </div>
+
+  <div class="code-label">الطلب (Request Body)</div>
+  <pre>{
+  "reason": "المتجر مغلق مؤقتاً"
+}</pre>
+
+  <table>
+    <tr><th>الحقل</th><th>القاعدة</th></tr>
+    <tr><td><code>reason</code></td><td>مطلوب، نص، بحد أقصى 255 حرفاً</td></tr>
+  </table>
+
+  <div class="code-label">استجابة النجاح — 200</div>
+  <pre>{
+  "success": true,
+  "message": "تم إلغاء الطلب بنجاح وإشعار الزبون."
+}</pre>
+
+  <div class="code-label">استجابة الخطأ — 403 (الطلب لا يخص متجر هذا التاجر)</div>
+  <pre>{
+  "success": false,
+  "message": "غير مصرح لك بإلغاء هذا الطلب."
+}</pre>
+
+  <div class="callout tip">
+    <span class="ic">✓</span>
+    <span>
+      هذا المسار (بعكس نسخة المشتري) يتحقق فعلياً من ملكية الطلب: <span class="mono">order.shop_id</span>
+      يجب أن يطابق متجر التاجر الحالي، وإلا يرجع 403 فوراً قبل أي محاولة إلغاء.
+    </span>
+  </div>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>
+      عند إلغاء التاجر للطلب، يُعاد المخزون تلقائياً فقط للعناصر التي لم يسبق للتاجر تحديدها كـ
+      "غير متوفرة" (لأن مخزونها أُعيد مسبقاً في خطوة المراجعة). لا تحتاج الواجهة فعل أي شيء متعلق
+      بالمخزون — هذا يحدث بالكامل في الباك إند ولا يظهر أي أثر له في الاستجابة.
+    </span>
+  </div>
+
+  <h2 id="show-buyer">تفاصيل الطلب (Invoice) — المشتري</h2>
+  <div class="badge-row">
+    <span class="pill pill-get">GET</span>
+    <span class="path">/Buyer/orders/{id}</span>
+    <span class="pill pill-actor">مشترٍ</span>
+  </div>
+
+  <div class="code-label">مثال الاستجابة — 200 (مختصر)</div>
+  <pre>{
+  "success": true,
+  "invoice": {
+    "order_id": "uuid",
+    "order_number": "ORD-8F2A1C90",
+    "order_date": "2026-07-30 10:00 AM",
+    "status": "preparing",
+    "payment_method": "Cash on Delivery",
+    "total_price": 245.0,
+    "shipping_address": { "city": "طرابلس", "street": "..." },
+    "shop_details": {
+      "id": "uuid",
+      "name": "متجر الأناقة",
+      "logo_url": "https://...",
+      "business_phone": "0910000000",
+      "accepts_returns": true,
+      "policy_description": "استرجاع خلال 7 أيام"
+    },
+    "requires_buyer_approval": false,
+    "items": [
+      {
+        "product_title": "قميص قطني",
+        "quantity": 2,
+        "unit_price": 80.0,
+        "total_item_price": 160.0,
+        "color": "أزرق",
+        "size": "L",
+        "availability": "available",
+        "image": "https://..."
+      }
+    ],
+    "timeline": [ "... سجل تغييرات الحالة ..." ],
+    "intervention_details": { "partial_request": null, "cancellation": null }
+  }
+}</pre>
+
+  <table>
+    <tr><th>الحقل</th><th>الوصف</th></tr>
+    <tr><td><code>shipping_address</code></td><td>يصل هنا كـ Object جاهز (مُحلَّل من JSON مسبقاً في الباك إند) — بعكس نفس الحقل في القائمة</td></tr>
+    <tr><td><code>items[].availability</code></td><td><span class="mono">available</span> / <span class="mono">unavailable</span> / <span class="mono">pending</span> (التاجر لم يراجع هذا العنصر بعد)</td></tr>
+    <tr><td><code>intervention_details</code></td><td>يحتوي تفاصيل أي طلب جزئي (نقص منتجات) أو إلغاء، أو null لكليهما إن لم يحدث شيء استثنائي</td></tr>
+  </table>
+
+  <h2 id="show-seller">تفاصيل الطلب (Invoice) — التاجر</h2>
+  <div class="badge-row">
+    <span class="pill pill-get">GET</span>
+    <span class="path">/store/orders/{id}</span>
+    <span class="pill pill-actor">تاجر</span>
+  </div>
+
+  <div class="code-label">مثال الاستجابة — 200 (مختصر)</div>
+  <pre>{
+  "success": true,
+  "invoice": {
+    "order_number": "ORD-8F2A1C90",
+    "order_date": "2026-07-30 10:00 AM",
+    "status": "preparing",
+    "payment_method": "Cash on Delivery",
+    "total_price": 245.0,
+    "shipping_address": { "city": "طرابلس", "street": "..." },
+    "buyer_details": {
+      "id": "uuid",
+      "full_name": "أحمد محمد",
+      "email": "ahmed@example.com",
+      "phone_number": "0920000000",
+      "avatar_url": null
+    },
+    "requires_buyer_approval": false,
+    "items": [
+      {
+        "product_title": "قميص قطني",
+        "quantity": 2,
+        "unit_price": 80.0,
+        "total_item_price": 160.0,
+        "color": "أزرق",
+        "size": "L",
+        "availability": "pending",
+        "image": "https://...",
+        "item_id": "uuid",
+        "product_id": "uuid",
+        "review_notes": null
+      }
+    ],
+    "timeline": [ "... سجل تغييرات الحالة ..." ],
+    "intervention_details": { "partial_request": null, "cancellation": null }
+  }
+}</pre>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>
+      <b>لا يوجد حقل <code>order_id</code> في نسخة التاجر إطلاقاً</b> (موجود فقط عند المشتري). إن كنت
+      تحتاج معرّف الطلب الخام (UUID) في شاشة التاجر لأي غرض (مثل بناء رابط أو استدعاء مسار آخر)،
+      استخدم نفس <code>{id}</code> الذي استدعيت به هذا المسار أصلاً — لا تحاول قراءته من داخل
+      الاستجابة.
+    </span>
+  </div>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>
+      <code>buyer_details</code> عند التاجر ليس مجرد نسخة أخرى من <code>shop_details</code> عند
+      المشتري — هو كائن مختلف تماماً بحقول مختلفة (بيانات تواصل الزبون: email، phone_number)، بينما
+      <code>shop_details</code> عند المشتري يحتوي بيانات المتجر وسياسة الاسترجاع. لا تبني نموذج بيانات
+      موحّد (Shared Model) لهذا الحقل بين شاشتي المشتري والتاجر — عاملهما ككيانين مختلفين تماماً حتى
+      لو وقعا في نفس مكان الكائن.
+    </span>
+  </div>
+
+  <div class="callout tip">
+    <span class="ic">✓</span>
+    <span>
+      عناصر <code>items</code> عند التاجر تحتوي حقولاً إضافية غير موجودة عند المشتري:
+      <code>item_id</code>، <code>product_id</code>، و<code>review_notes</code>. هذه ضرورية لأن
+      التاجر يحتاجها لاحقاً عند إرسال مراجعة توفر المنتجات (مسار مراجعة منفصل خارج نطاق هذا الدليل) —
+      احتفظ بـ <code>item_id</code> من هذه الشاشة إن كانت شاشتك ستنتقل لاحقاً لشاشة مراجعة العناصر.
+    </span>
+  </div>
+
+  <h2 id="order-code">حقل order_code الجديد — أين يظهر وبأي اسم؟</h2>
+  <div class="card">
+    <p style="margin-top:0">
+      <code>order_code</code> هو رقم مرجعي مقروء للطلب (بصيغة تقريبية <span class="mono">ORD-XXXXXXXX</span>)
+      يُولَّد تلقائياً عند إنشاء الطلب، ليُستخدم في عرضه للمستخدم أو خدمة العملاء بدل المعرّف التقني
+      الطويل (UUID). لكن اسم الحقل <b>يختلف حسب المسار</b>:
+    </p>
+    <table style="margin-bottom:0">
+      <tr><th>المسار</th><th>اسم الحقل</th><th>ملاحظة</th></tr>
+      <tr>
+        <td>قائمة الطلبات (Index) — مشترٍ وتاجر</td>
+        <td><code>order_code</code></td>
+        <td>اسم العمود الخام كما هو في قاعدة البيانات</td>
+      </tr>
+      <tr>
+        <td>تفاصيل الطلب (Invoice) — مشترٍ</td>
+        <td><code>order_number</code></td>
+        <td>قيمته = <span class="mono">order_code ?? order_id</span> (يوجد احتياطي إن كان فارغاً)</td>
+      </tr>
+      <tr>
+        <td>تفاصيل الطلب (Invoice) — تاجر</td>
+        <td><code>order_number</code></td>
+        <td>قيمته = <span class="mono">order_code</span> مباشرة <b>بدون احتياطي</b> — إن كان فارغاً لأي سبب ستحصل على null</td>
+      </tr>
+    </table>
+  </div>
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>
+      لا تبحث عن <code>order_code</code> في استجابة شاشة التفاصيل (Invoice) — لن تجده هناك، الاسم
+      هناك دائماً <code>order_number</code>. وبالعكس، لا تبحث عن <code>order_number</code> في قائمة
+      الطلبات — الاسم هناك <code>order_code</code>. إن كان لديك دالة واحدة لعرض "رقم الطلب" تُستخدم
+      في كلتا الشاشتين، مرّر لها اسم الحقل الصحيح حسب مصدر البيانات، أو وحّد الاسم بنفسك عند استقبال
+      البيانات في الفرونت (مثلاً بتحويلها لحقل داخلي موحّد <span class="mono">displayOrderNumber</span>
+      عند الاستقبال مباشرة).
+    </span>
+  </div>
+
+  <h2 id="mockups">نماذج الشاشات الرئيسية</h2>
+  <h3>قائمة الطلبات (مشترٍ) — تابات وعدّاد</h3>
+  <div class="mockup-row">
+    <div class="mockup-col">
+      <div class="phone"><div class="screen">
+        <div class="stitle">طلباتي</div>
+        <div class="ssub">GET Buyer/orders?tab=pending</div>
+        <div class="tabs">
+          <span class="tab-chip">الكل 12</span>
+          <span class="tab-chip active">قيد الانتظار 3</span>
+          <span class="tab-chip">قيد التجهيز 3</span>
+        </div>
+        <div class="row"><span>ORD-8F2A1C — pending</span><span>245 د.ل</span></div>
+        <div class="row" style="border-bottom:none"><span>ORD-3B7E91 — waiting_buyer</span><span>120 د.ل</span></div>
+        <div class="disabled-box">"3" هنا = tabs_count.pending (2) + tabs_count.waiting_buyer (1) مجموعة يدوياً، وليست قيمة مباشرة من الاستجابة</div>
+      </div></div>
+      <div class="badge-endpoint">GET Buyer/orders</div>
+    </div>
+
+    <div class="mockup-col">
+      <div class="dash-card">
+        <div class="dtitle">لوحة تحكم التاجر — الطلبات</div>
+        <table class="dash-table">
+          <tr><th>رقم الطلب</th><th>الزبون</th><th>الحالة</th><th></th></tr>
+          <tr><td class="mono">ORD-8F2A1C</td><td>أحمد محمد</td><td><span class="status-chip status-new">جديد</span></td><td>عرض</td></tr>
+          <tr><td class="mono">ORD-3B7E91</td><td>سارة علي</td><td><span class="status-chip status-wait">بانتظار الزبون</span></td><td>عرض</td></tr>
+        </table>
+        <div class="disabled-box" style="margin-top:10px">تاب "جديد" هنا = tabs_count.new مباشرة بدون أي جمع يدوي</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>مودال إلغاء الطلب (مشترك بين الطرفين بمنطق مختلف قليلاً)</h3>
+  <div class="modal-wrap">
+    <div class="modal">
+      <div class="mtitle">إلغاء الطلب</div>
+      <div class="msub">ORD-8F2A1C — لا يمكن التراجع بعد التأكيد</div>
+      <textarea placeholder="اكتب سبب الإلغاء..."></textarea>
+      <div class="mbtns">
+        <button class="btn-ghost">تراجع</button>
+        <button class="btn-danger">تأكيد الإلغاء</button>
+      </div>
+    </div>
+  </div>
+  <div class="badge-endpoint" style="display:block;text-align:center;width:fit-content;margin:8px auto 0">POST {order}/cancel</div>
+
+  <h2 id="errors">جدول ملخّص لكل الأخطاء المتوقعة</h2>
+  <table>
+    <tr><th>الكود</th><th>يظهر في</th><th>المعنى</th><th>ماذا يفعل الفرونت</th></tr>
+    <tr>
+      <td>401</td>
+      <td>كل المسارات</td>
+      <td>لا يوجد توكن صالح</td>
+      <td>أعد المستخدم لشاشة تسجيل الدخول</td>
+    </tr>
+    <tr>
+      <td>404</td>
+      <td>index / cancel / show (تاجر)</td>
+      <td>لا يوجد متجر مرتبط بحساب التاجر الحالي</td>
+      <td>وجّه التاجر لإكمال إعداد متجره أولاً</td>
+    </tr>
+    <tr>
+      <td>403</td>
+      <td>cancel (تاجر)</td>
+      <td>الطلب لا يخص متجر هذا التاجر</td>
+      <td>اعرض رسالة الخطأ كما هي، ولا تعرض زر الإلغاء أصلاً لطلبات ليست ضمن قائمة التاجر</td>
+    </tr>
+    <tr>
+      <td>404</td>
+      <td>show (مشترٍ وتاجر)</td>
+      <td>الطلب غير موجود أو لا يخص هذا المستخدم (مشترٍ)</td>
+      <td>اعرض شاشة "الطلب غير موجود"</td>
+    </tr>
+    <tr>
+      <td>شكل غير موحّد (على الأرجح 500)</td>
+      <td>cancel (مشترٍ وتاجر)</td>
+      <td>محاولة إلغاء طلب مكتمل أو مُلغى بالفعل — استثناء غير مُلتقط في الكود</td>
+      <td>عالجه بمعالجة أخطاء عامة، ولا تفترض وجود حقل message موثوق</td>
+    </tr>
+    <tr>
+      <td>422</td>
+      <td>cancel (كلا الطرفين)</td>
+      <td>حقل reason مفقود أو فارغ (أو أطول من 255 عند التاجر)</td>
+      <td>اعرض رسالة تحقق تحت حقل السبب مباشرة</td>
+    </tr>
+  </table>
+
+  <h2 id="tips">نصائح عملية لتفادي الاحتكاك مع الباك إند</h2>
+  <div class="card">
+    <ol class="num-list">
+      <li>عند قراءة أي قائمة طلبات (مشترٍ أو تاجر)، استخرج العناصر من <code>response.data.data</code>
+      وليس <code>response.data</code> مباشرة.</li>
+      <li>احسب عدّاد تاب "قيد الانتظار" عند المشتري بجمع <code>pending + waiting_buyer</code> يدوياً؛
+      لا تحتاج لذلك عند التاجر لأن <code>tabs_count.new</code> جاهز مسبقاً.</li>
+      <li>لا تفترض أن أسماء التابات متطابقة بين شاشة المشتري وشاشة التاجر — استخدم قائمة قيم منفصلة
+      لكل واجهة.</li>
+      <li>لعرض "أحدث 3 طلبات": استخدم <span class="mono">?per_page=3</span> عند المشتري، واقتطع أول 3
+      عناصر محلياً من نتيجة القائمة العادية عند التاجر (لأن per_page غير مدعوم هناك).</li>
+      <li>لا تشارك نفس دالة تحويل بيانات الطلب (Mapper/Model) بين شاشة القائمة وشاشة التفاصيل — أسماء
+      الحقول وأشكال البيانات (خصوصاً العنوان ورقم الطلب) مختلفة بينهما.</li>
+      <li>وحّد اسم "رقم الطلب" عند استقبال البيانات في الفرونت (<code>order_code</code> من القائمة،
+      <code>order_number</code> من التفاصيل) بدل التحقق من الاسمين في كل مكان تعرض فيه هذه القيمة.</li>
+      <li>اعرض زر الإلغاء في كل الحالات ما عدا <span class="mono">completed</span> و
+      <span class="mono">cancelled</span>، بما في ذلك حالة <span class="mono">awaiting</span>.</li>
+      <li>غلّف استدعاء إلغاء الطلب بمعالجة أخطاء عامة (Generic catch) في الفرونت، لأن شكل استجابة فشل
+      هذا المسار تحديداً غير مضمون التوحيد.</li>
+      <li>لا تعرض حقل رقم أو معرّف طلب يقبل إدخالاً يدوياً من المستخدم لاستدعاء مسار الإلغاء عليه —
+      اعتمد فقط على المعرّفات القادمة من شاشة "طلباتي" الخاصة بالمستخدم نفسه.</li>
+    </ol>
+  </div>
+
+  <footer>
+    دليل إدارة الطلبات — تم إعداده لفريق الفرونت إند · ملف HTML مستقل بدون اتصال إنترنت
+  </footer>
+</main>
+
+</body>
+</html>

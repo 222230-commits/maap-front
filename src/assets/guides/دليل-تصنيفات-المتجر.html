@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دليل تصنيفات المتجر — للفرونت إند</title>
+<style>
+  :root{
+    --bg:#F5F7F6;
+    --panel:#FFFFFF;
+    --ink:#16211D;
+    --sub:#5B675F;
+    --mute:#8B958F;
+    --line:#DFE4E1;
+    --teal:#0F6E56;
+    --teal-light:#E1F5EE;
+    --teal-dark:#04342C;
+    --coral:#B4491F;
+    --coral-light:#FAECE7;
+    --amber:#8A5A0B;
+    --amber-light:#FAEEDA;
+    --code-bg:#101917;
+    --code-ink:#D7E4DF;
+    --radius:10px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI","Tahoma",-apple-system,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.8;
+  }
+  code, .mono{
+    font-family:"SF Mono","Consolas","Cascadia Code",monospace;
+    direction:ltr;
+    unicode-bidi:isolate;
+  }
+  .shell{display:flex; max-width:1240px; margin:0 auto;}
+  nav.side{
+    width:250px; flex:none; position:sticky; top:0; height:100vh;
+    overflow-y:auto; padding:28px 20px; border-left:1px solid var(--line);
+  }
+  nav.side .brand{font-weight:600; font-size:15px; margin-bottom:22px; color:var(--teal-dark)}
+  nav.side a{
+    display:block; padding:7px 10px; margin-bottom:2px; border-radius:8px;
+    color:var(--sub); text-decoration:none; font-size:13.5px;
+  }
+  nav.side a:hover{background:var(--teal-light); color:var(--teal-dark)}
+  nav.side .grp{font-size:11px; color:var(--mute); margin:16px 0 4px; padding:0 10px; text-transform:uppercase; letter-spacing:.04em}
+  main{flex:1; padding:40px 56px 100px; min-width:0;}
+  header.hero{margin-bottom:44px;}
+  header.hero .eyebrow{color:var(--teal); font-size:13px; font-weight:600; letter-spacing:.03em; margin-bottom:8px;}
+  header.hero h1{font-size:28px; font-weight:600; margin:0 0 12px; color:var(--ink)}
+  header.hero p{color:var(--sub); font-size:15.5px; max-width:640px; margin:0}
+  section{margin-bottom:52px; scroll-margin-top:20px;}
+  h2{font-size:20px; font-weight:600; border-bottom:2px solid var(--teal-light); padding-bottom:10px; margin:0 0 18px; color:var(--ink)}
+  h3{font-size:16px; font-weight:600; margin:26px 0 10px; color:var(--ink)}
+  p{color:var(--sub); font-size:14.5px;}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:20px 22px; margin:14px 0;}
+  table{width:100%; border-collapse:collapse; font-size:13.5px; background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;}
+  th,td{padding:10px 14px; text-align:right; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{background:var(--teal-light); color:var(--teal-dark); font-weight:600; font-size:12.5px;}
+  tr:last-child td{border-bottom:none}
+  pre{
+    background:var(--code-bg); color:var(--code-ink); padding:16px 18px; border-radius:var(--radius);
+    overflow-x:auto; font-size:13px; direction:ltr; text-align:left; margin:10px 0;
+  }
+  .pill{display:inline-block; padding:3px 10px; border-radius:20px; font-size:11.5px; font-weight:600;}
+  .pill-get{background:#E6F1FB; color:#0C447C;}
+  .pill-post{background:var(--teal-light); color:var(--teal-dark);}
+  .callout{border-radius:var(--radius); padding:14px 18px; margin:14px 0; font-size:14px; border:1px solid transparent;}
+  .callout.warn{background:var(--coral-light); border-color:#F0997B; color:#4A1B0C;}
+  .callout.tip{background:var(--teal-light); border-color:#5DCAA5; color:var(--teal-dark);}
+  .callout b{display:block; margin-bottom:4px;}
+  .badge-endpoint{display:inline-block; margin-top:10px; padding:8px 12px; background:var(--teal-light); color:var(--teal-dark); border-radius:8px; font-size:12px;}
+  .flow{display:flex; flex-direction:column; align-items:center; gap:0; margin:20px 0;}
+  .fbox{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:12px 20px; text-align:center; min-width:220px;}
+  .fbox .t{font-weight:600; font-size:14px;}
+  .fbox .s{font-size:12px; color:var(--mute); margin-top:2px;}
+  .fbox.purple{border-color:#AFA9EC; background:#EEEDFE; color:#26215C;}
+  .fbox.gray{border-color:var(--line); background:#F1EFE8; color:#2C2C2A;}
+  .fbox.teal{border-color:#5DCAA5; background:var(--teal-light); color:var(--teal-dark);}
+  .fbox.coral{border-color:#F0997B; background:var(--coral-light); color:#4A1B0C;}
+  .arrow{width:2px; height:26px; background:var(--line);}
+  .branch{display:flex; gap:36px; align-items:flex-start; margin:0 0 0;}
+  .branch-col{display:flex; flex-direction:column; align-items:center;}
+  .branch-label{font-size:11.5px; color:var(--mute); margin-bottom:6px;}
+  /* mockups */
+  .phone{max-width:300px; margin:16px auto; background:#EDEEEC; border-radius:26px; padding:12px; border:1px solid var(--line);}
+  .phone .screen{background:var(--panel); border-radius:16px; overflow:hidden; border:1px solid var(--line);}
+  .row{display:flex; align-items:center; justify-content:space-between; padding:13px 16px; border-bottom:1px solid var(--line);}
+  .row:last-child{border-bottom:none}
+  .row .left{display:flex; align-items:center; gap:10px;}
+  .thumb{width:34px; height:34px; border-radius:8px; background:#E7E6E1;}
+  .chev{color:var(--mute); font-size:14px;}
+  .tag-ok{font-size:10.5px; background:#EAF3DE; color:#27500A; padding:3px 8px; border-radius:6px;}
+  .tree{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px 20px; max-width:520px; margin:16px auto;}
+  .tnode{display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--line); font-size:14px;}
+  .tnode:last-child{border-bottom:none}
+  .tnode .lbl{color:var(--mute); font-size:11px;}
+  .leaf{padding-right:44px;}
+  .midleaf{padding-right:22px;}
+  .modal-wrap{background:#00000033; border-radius:12px; padding:24px; display:flex; justify-content:center; max-width:520px; margin:16px auto;}
+  .modal{background:var(--panel); border-radius:12px; max-width:340px; width:100%; padding:20px; border:1px solid var(--line);}
+  .modal .title-row{display:flex; align-items:center; gap:8px; font-weight:600; font-size:14.5px; color:#8B2E12; margin-bottom:8px;}
+  .modal p{margin:0 0 8px; font-size:13px;}
+  .btn{display:inline-block; padding:8px 16px; border-radius:8px; border:1px solid var(--line); font-size:13px; background:var(--panel); cursor:default;}
+  .btn.primary{border-color:var(--teal); color:var(--teal-dark); background:var(--teal-light);}
+  footer{border-top:1px solid var(--line); padding:24px 56px; color:var(--mute); font-size:12.5px;}
+  @media (max-width:900px){
+    nav.side{display:none;}
+    main{padding:28px 20px 80px;}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<nav class="side">
+  <div class="brand">دليل تصنيفات المتجر</div>
+  <a href="#overview">نظرة عامة والأداة المناسبة</a>
+  <div class="grp">تصفح المشتري</div>
+  <a href="#buyer">مسار /dynamic</a>
+  <a href="#buyer-mockup">شاشة التصفح</a>
+  <div class="grp">إدارة تصنيفات التاجر</div>
+  <a href="#flow">مخطط التدفق الكامل</a>
+  <a href="#step1">1. حفظ التصنيفات</a>
+  <a href="#step1-mockup">شاشة الحفظ</a>
+  <a href="#step2">2. جلب البدائل</a>
+  <a href="#step3">3. تنفيذ النقل</a>
+  <a href="#transfer-mockup">مودال النقل</a>
+  <div class="grp">مرجع سريع</div>
+  <a href="#errors">جدول الأخطاء</a>
+  <a href="#tips">نصائح عملية</a>
+  <a href="#backend-note">ملاحظة للباك إند</a>
+</nav>
+
+<main>
+
+<header class="hero">
+  <div class="eyebrow">توثيق فني — Buyer &amp; Seller Categories</div>
+  <h1>دليل تصفح وتعديل تصنيفات المتجر</h1>
+  <p>مرجع مشترك للفرونت إند (Flutter / Angular) يغطي مسار تصفح المشتري الديناميكي، ومسار إدارة تصنيفات التاجر بخطواته الثلاث، مع كل الفخاخ التي يجب معرفتها قبل البرمجة.</p>
+</header>
+
+<section id="overview">
+  <h2>1. أي أداة تُستخدم لكل جزء؟</h2>
+  <p>القرار يعتمد على مكان ظهور الميزة، وليس على "الأفضل" بإطلاق.</p>
+  <table>
+    <tr><th>الميزة</th><th>المكان الطبيعي</th><th>الأداة المُوصى بها</th><th>السبب</th></tr>
+    <tr>
+      <td>تصفح المشتري <code>/dynamic</code></td>
+      <td>تطبيق الجوال للمشتري</td>
+      <td><b>Flutter</b></td>
+      <td>تجربة Drill-down تُبنى بسهولة بـ Navigator.push وشاشة قائمة معاد استخدامها</td>
+    </tr>
+    <tr>
+      <td>إدارة تصنيفات المتجر (3 مسارات)</td>
+      <td>لوحة تحكم التاجر (ويب)</td>
+      <td><b>Angular</b></td>
+      <td>تحتاج شجرة اختيار متعدد ومودالات تأكيد — نمط لوحة إدارة تتفوق فيه مكتبات الويب</td>
+    </tr>
+  </table>
+  <div class="callout tip">
+    <b>ملاحظة</b>
+    كلا الميزتين تتقاسمان نفس مفهوم "الفرع الأخير" (is_leaf)، لذا يُفضّل عزل منطق شجرة التصنيفات في طبقة واحدة (Service / Repository) حتى لو استُخدمت الأداتان معاً.
+  </div>
+</section>
+
+<section id="buyer">
+  <h2>2. تصفح المشتري الديناميكي</h2>
+  <div><span class="pill pill-get">GET</span> <code>/Buyer/Categories/dynamic</code></div>
+  <p style="margin-top:10px">يتيح للمشتري التنقل خطوة بخطوة داخل شجرة التصنيفات حتى يصل لفرع نهائي يمكن تصفح منتجاته.</p>
+
+  <h3>الطلب</h3>
+  <pre>{ "parent_id": "uuid | null" }</pre>
+  <p>عدم إرسال parent_id = طلب الجذور. إرساله = طلب أبناء ذلك القسم.</p>
+
+  <h3>الاستجابة — تصفح عادي</h3>
+  <pre>{
+  "success": true,
+  "is_leaf": false,
+  "current_parent": { "id": "...", "name": "ملابس رجالية", "parent_id": "..." },
+  "data": [
+    { "id": "...", "name": "قمصان",   "is_leaf": false, ... },
+    { "id": "...", "name": "فساتين",  "is_leaf": true,  ... }
+  ]
+}</pre>
+
+  <h3>الاستجابة — وصل لفرع نهائي</h3>
+  <pre>{
+  "success": true,
+  "is_leaf": true,
+  "current_parent": { "id": "...", "name": "فساتين سهرة" },
+  "message": "هذا القسم هو نهاية الشجرة...",
+  "data": []
+}</pre>
+
+  <div class="callout warn">
+    <b>⚠️ الفخ الأهم في هذا المسار</b>
+    لا تخلط بين <code>is_leaf</code> على المستوى الأعلى (يخص القسم الأب الذي تتصفحه) وبين <code>is_leaf</code> داخل كل عنصر من <code>data</code> (يخص ذلك العنصر تحديداً). استخدم الثاني لتقرر فوراً: افتح شاشة منتجات مباشرة، أو نادِ /dynamic مرة أخرى — لا داعي لانتظار استجابة "فرع نهائي" لتعرف ذلك مسبقاً.
+  </div>
+
+  <h3 id="buyer-mockup">شاشة التصفح (Flutter)</h3>
+  <div class="phone">
+    <div class="screen">
+      <div class="row"><div class="left"><span style="color:var(--mute)">←</span><b>ملابس رجالية</b></div></div>
+      <div class="row"><div class="left"><div class="thumb"></div><span>قمصان</span></div><span class="chev">‹</span></div>
+      <div class="row"><div class="left"><div class="thumb"></div><span>فساتين سهرة</span></div><span class="tag-ok">منتجات</span></div>
+    </div>
+  </div>
+  <div class="badge-endpoint" style="text-align:center; display:block;"><code>GET /Buyer/Categories/dynamic?parent_id=...</code></div>
+</section>
+
+<section id="flow">
+  <h2>3. مخطط التدفق الكامل لإدارة تصنيفات التاجر</h2>
+  <p>هذه الميزة آلة حالة من 3 خطوات، وليست 3 أزرار منفصلة.</p>
+  <div class="flow">
+    <div class="fbox purple"><div class="t">حفظ التصنيفات</div><div class="s">POST /categories</div></div>
+    <div class="arrow"></div>
+    <div class="fbox gray"><div class="t">فحص وجود منتجات</div><div class="s">في الفروع المحذوفة</div></div>
+    <div class="arrow"></div>
+    <div class="branch">
+      <div class="branch-col">
+        <div class="branch-label">لا يوجد منتجات</div>
+        <div class="fbox teal"><div class="t">تم الحفظ</div><div class="s">200 OK</div></div>
+      </div>
+      <div class="branch-col">
+        <div class="branch-label">يوجد منتجات</div>
+        <div class="fbox coral"><div class="t">تعارض 422</div><div class="s">requires_transfer</div></div>
+      </div>
+    </div>
+    <div class="arrow" style="margin-right:118px;"></div>
+    <div class="fbox purple"><div class="t">جلب البدائل</div><div class="s">GET /Targets/{id}</div></div>
+    <div class="arrow"></div>
+    <div class="fbox gray"><div class="t">اختيار الوجهة</div><div class="s">قسم شقيق بلا أبناء</div></div>
+    <div class="arrow"></div>
+    <div class="fbox purple"><div class="t">تنفيذ النقل</div><div class="s">POST /Transfer</div></div>
+    <div class="arrow"></div>
+    <div class="fbox teal"><div class="t">اكتمل الترحيل</div><div class="s">حذف القديم تلقائياً</div></div>
+  </div>
+</section>
+
+<section id="step1">
+  <h2>4. الخطوة 1 — الحفظ بالمزامنة</h2>
+  <div><span class="pill pill-post">POST</span> <code>/categories</code></div>
+  <pre>{ "category_ids": ["uuid-leaf-1", "uuid-leaf-2", "uuid-leaf-3"] }</pre>
+  <p><b>الفكرة الجوهرية:</b> هذا المسار يستقبل القائمة الكاملة المطلوبة نهائياً، والباك إند يحسب الفرق (إضافة/حذف) بنفسه.</p>
+
+  <table>
+    <tr><th>القاعدة</th><th>ماذا يعني هذا للفرونت</th></tr>
+    <tr><td>ممنوع إرسال قسم رئيسي (جذر)</td><td>لا Checkbox على مستوى القسم الرئيسي</td></tr>
+    <tr><td>ممنوع إرسال قسم متوسط (له أبناء)</td><td>الاختيار مفعّل فقط عند العقد التي is_leaf = true</td></tr>
+    <tr><td>الجذر الأكبر للفرع يجب أن يكون مفعّلاً للمتجر مسبقاً</td><td>غير ذلك يرجع 403 مع اسم القسم</td></tr>
+  </table>
+
+  <h3>استجابة التعارض</h3>
+  <pre>HTTP 422
+{
+  "success": false,
+  "requires_transfer": true,
+  "message": "التصنيف الذي تحاول إزالته يحتوي على منتجات بمتجرك..."
+}</pre>
+  <div class="callout warn">
+    <b>⚠️ الباك إند لا يخبرك بأي تصنيف بالتحديد فيه التعارض</b>
+    احسب بنفسك <code>removedLeafIds = originalCategoryIds - newSelectedCategoryIds</code> قبل الإرسال، واحتفظ بها في الحالة — ستحتاجها في الخطوة 2.
+  </div>
+
+  <h3 id="step1-mockup">شاشة الحفظ (Angular)</h3>
+  <div class="tree">
+    <div class="tnode"><span>ملابس</span><span class="lbl">قسم رئيسي، غير قابل للاختيار</span></div>
+    <div class="tnode midleaf"><span>قمصان</span><span class="lbl">له أبناء، غير قابل للاختيار</span></div>
+    <div class="tnode leaf"><label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" checked disabled> قمصان كاجوال</label></div>
+    <div class="tnode leaf"><label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" disabled> قمصان رسمية</label></div>
+  </div>
+  <div style="text-align:center;"><span class="btn primary">حفظ التصنيفات</span></div>
+  <div class="badge-endpoint" style="text-align:center; display:block; max-width:400px; margin:12px auto 0;"><code>POST /categories { category_ids: [...] }</code></div>
+</section>
+
+<section id="step2">
+  <h2>5. الخطوة 2 — جلب الأشقاء المتاحين</h2>
+  <div><span class="pill pill-get">GET</span> <code>/categories/Targets/{CategoryId}</code></div>
+  <p><code>{CategoryId}</code> هنا هو أحد عناصر <code>removedLeafIds</code> التي حسبتها في الخطوة 1.</p>
+  <pre>{ "success": true, "data": [ { "id": "uuid", "name": "قمصان رسمية" } ] }</pre>
+
+  <div class="callout warn">
+    <b>⚠️ الفخ الأخطر في العملية كلها</b>
+    هذا المسار لا يعيد كل إخوة القسم من الكتالوج العام — بل فقط الإخوة الذين التاجر نفسه أضافهم مسبقاً لمتجره وهم أوراق أيضاً. قد ترجع <code>data: []</code> فارغة رغم وجود إخوة كثر في الكتالوج العام. هذا قيد عمل متعمد، وليس خطأ من الفرونت.
+  </div>
+  <div class="callout tip">
+    <b>توصية للحالة الفارغة</b>
+    اعرض رسالة: "لا يوجد قسم فرعي بديل مضاف لمتجرك تحت نفس القسم الرئيسي. أضف قسماً آخر أولاً." ولا تسمح بحقل إدخال يدوي لمعرّف القسم الجديد.
+  </div>
+</section>
+
+<section id="step3">
+  <h2>6. الخطوة 3 — تنفيذ النقل الفعلي</h2>
+  <div><span class="pill pill-post">POST</span> <code>/categories/Transfer</code></div>
+  <pre>{ "old_category_id": "uuid", "new_category_id": "uuid" }</pre>
+  <p>ينقل كل منتجات المتجر من القسم القديم للجديد، ويحذف القديم من قائمة تصنيفات المتجر — كل هذا داخل معاملة واحدة غير قابلة للتراجع.</p>
+  <div class="callout tip">
+    <b>بعد النجاح</b>
+    أعد جلب بروفايل المتجر (getProfile) لتحديث الحالة المحلية، بدلاً من التعديل اليدوي على القائمة.
+  </div>
+
+  <h3 id="transfer-mockup">مودال النقل</h3>
+  <div class="modal-wrap">
+    <div class="modal">
+      <div class="title-row">⚠ لا يمكن حذف «قمصان كاجوال»</div>
+      <p style="color:var(--sub)">يحتوي هذا القسم على منتجات بمتجرك.</p>
+      <div style="background:var(--coral-light); color:#4A1B0C; padding:6px 10px; border-radius:6px; font-size:11px; margin-bottom:12px;"><code>422 requires_transfer</code></div>
+      <p>اختر وجهة نقل المنتجات:</p>
+      <label style="display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--line); font-size:13.5px;"><input type="radio" name="t" checked> قمصان رسمية</label>
+      <div style="margin-top:14px; display:flex; gap:8px;">
+        <span class="btn primary">نقل وحذف القديم</span>
+        <span class="btn">إلغاء</span>
+      </div>
+      <div class="badge-endpoint" style="margin-top:12px;"><code>GET /Targets/{id} ← POST /Transfer</code></div>
+    </div>
+  </div>
+</section>
+
+<section id="errors">
+  <h2>7. جدول ملخص لكل الأخطاء المتوقعة</h2>
+  <table>
+    <tr><th>الكود</th><th>يظهر في</th><th>المعنى</th><th>ماذا يفعل الفرونت</th></tr>
+    <tr><td>400</td><td>كل المسارات</td><td>مدخل غير صالح</td><td>Validation محلي قبل الإرسال</td></tr>
+    <tr><td>403</td><td>Targets, Transfer, POST categories</td><td>ملكية أو صلاحية غير متحققة</td><td>اعرض رسالة الباك إند نصياً</td></tr>
+    <tr><td>404</td><td>dynamic, Targets</td><td>id غير موجود</td><td>نظّف الـ cache المحلي لهذا العنصر</td></tr>
+    <tr><td>422</td><td>POST categories</td><td>يحتاج نقل، أو قسم متوسط</td><td>افتح تدفق النقل الفرعي</td></tr>
+    <tr><td>500</td><td>الكل</td><td>خطأ سيرفر</td><td>رسالة عامة + إعادة محاولة</td></tr>
+  </table>
+</section>
+
+<section id="tips">
+  <h2>8. نصائح عملية لتفادي الاحتكاك مع الباك إند</h2>
+  <div class="card">
+    <ol style="color:var(--sub); font-size:14.5px; padding-inline-start:20px; margin:0;">
+      <li>لا تُرسل أبداً IDs لأقسام رئيسية أو متوسطة — عطّل الـ Checkbox فعلياً وليس فقط بصرياً.</li>
+      <li>لا تحسب الفرق بنفسك لإرساله — أرسل دائماً القائمة الكاملة، الباك إند يقارن.</li>
+      <li>احتفظ بنسخة أصلية (snapshot) من category_ids فور تحميل البروفايل لحساب removedLeafIds لاحقاً.</li>
+      <li>تعامل مع GET /Targets/{id} دائماً كاستجابة قد تكون فارغة، واعرض حالة فارغة واضحة.</li>
+      <li>أعد جلب بروفايل المتجر بعد أي Transfer ناجح بدلاً من التعديل اليدوي محلياً.</li>
+      <li>مساري المشتري والتاجر منفصلان تماماً في الباك إند — لا تشارك الكاش بينهما رغم تشابه شكل البيانات.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="backend-note">
+  <h2>9. ملاحظة مقترحة لفريق الباك إند</h2>
+  <div class="callout tip">
+    استجابة 422 ترجع <code>requires_transfer: true</code> بدون قائمة IDs المتعارضة فعلياً. لو أضاف الباك إند حقل <code>conflicting_category_ids</code> سيوفر ذلك على الفرونت حساب الفرق يدوياً بالكامل.
+  </div>
+</section>
+
+</main>
+</div>
+
+<footer>دليل تقني داخلي — تصفح وتعديل تصنيفات المتجر (Buyer &amp; Seller Categories)</footer>
+</body>
+</html>

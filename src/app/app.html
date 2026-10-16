@@ -1,1 +1,6 @@
+<app-splash-screen></app-splash-screen>
 <router-outlet></router-outlet>
+
+@if (authService.isBanned()) {
+  <app-banned-modal></app-banned-modal>
+}

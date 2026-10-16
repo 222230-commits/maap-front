@@ -1,0 +1,146 @@
+<div class="reviews-page" dir="rtl">
+
+  <div class="page-header">
+    <h1><i class="fas fa-star"></i> تقييمات منتجاتك</h1>
+    <p class="subtitle">آراء المشترين على منتجاتك</p>
+  </div>
+
+  <!-- Summary Card -->
+  @if (!isLoading() && reviews().length > 0) {
+    <div class="summary-card">
+      <div class="avg-block">
+        <span class="avg-number">{{ averageRating() }}</span>
+        <div class="avg-stars">
+          @for (star of getStars(); track star) {
+            <i class="fas fa-star" [class.filled]="star <= averageRating()"></i>
+          }
+        </div>
+        <span class="total-label">{{ reviews().length }} تقييم</span>
+      </div>
+      <div class="dist-block">
+        @for (star of [5,4,3,2,1]; track star) {
+          <div class="dist-row" (click)="setFilterRating(filterRating() === star ? 0 : star)"
+               [class.active-filter]="filterRating() === star" style="cursor:pointer">
+            <span class="dist-star">{{ star }} <i class="fas fa-star filled-small"></i></span>
+            <div class="dist-bar">
+              <div class="dist-fill"
+                   [style.width.%]="reviews().length > 0
+                     ? (getRatingCount(star) / reviews().length * 100)
+                     : 0">
+              </div>
+            </div>
+            <span class="dist-count">{{ getRatingCount(star) }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Filter chips -->
+  @if (!isLoading() && reviews().length > 0) {
+    <div class="filter-chips">
+      <button [class.active]="filterRating() === 0" (click)="setFilterRating(0)">الكل</button>
+      @for (star of [5,4,3,2,1]; track star) {
+        <button [class.active]="filterRating() === star" (click)="setFilterRating(filterRating() === star ? 0 : star)">
+          {{ star }} <i class="fas fa-star"></i>
+        </button>
+      }
+    </div>
+  }
+
+  <!-- Loading -->
+  @if (isLoading()) {
+    <div class="loading-state">
+      <i class="fas fa-circle-notch fa-spin"></i>
+      <p>جاري تحميل التقييمات...</p>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (error()) {
+    <div class="error-state">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p>{{ error() }}</p>
+    </div>
+  }
+
+  <!-- Empty -->
+  @if (!isLoading() && !error() && reviews().length === 0) {
+    <div class="empty-state">
+      <i class="fas fa-star-half-alt"></i>
+      <h3>لا توجد تقييمات بعد</h3>
+      <p>ستظهر هنا تقييمات المشترين على منتجاتك عند وصول أول طلب مكتمل</p>
+    </div>
+  }
+
+  <!-- Reviews List -->
+  @if (!isLoading() && filteredReviews().length > 0) {
+    <div class="reviews-list">
+      @for (review of filteredReviews(); track review.id) {
+        <div class="review-card">
+          <div class="review-header">
+            <div class="reviewer-info">
+              @if (review.buyer?.avatar_url) {
+                <img [src]="review.buyer.avatar_url" class="avatar" [alt]="review.buyer?.full_name" />
+              } @else {
+                <div class="avatar-placeholder"><i class="fas fa-user"></i></div>
+              }
+              <div>
+                <p class="reviewer-name">{{ review.buyer?.full_name ?? review.buyer_name ?? 'مستخدم' }}</p>
+                <p class="review-date">{{ review.created_at_human ?? review.created_at }}</p>
+              </div>
+            </div>
+            <div class="stars-display">
+              @for (star of getStars(); track star) {
+                <i class="fas fa-star" [class.filled]="star <= review.rating"></i>
+              }
+            </div>
+          </div>
+
+          <!-- Product info -->
+          @if (review.product) {
+            <div class="product-tag">
+              <i class="fas fa-box"></i>
+              <span>{{ review.product.title }}</span>
+            </div>
+          }
+
+          <!-- Comment -->
+          @if (review.comment) {
+            <p class="review-comment">{{ review.comment }}</p>
+          } @else {
+            <p class="no-comment">— تقييم بالنجوم فقط، بدون تعليق</p>
+          }
+
+          <!-- Verified badge -->
+          @if (review.verified_purchase ?? review.verified) {
+            <span class="verified-badge">
+              <i class="fas fa-check-circle"></i> مشتري موثّق
+            </span>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Pagination -->
+    @if (lastPage() > 1) {
+      <div class="pagination-row">
+        <button [disabled]="currentPage() === 1" (click)="goToPage(currentPage() - 1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+        <span>{{ currentPage() }} / {{ lastPage() }}</span>
+        <button [disabled]="currentPage() === lastPage()" (click)="goToPage(currentPage() + 1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      </div>
+    }
+  }
+
+  @if (!isLoading() && filterRating() > 0 && filteredReviews().length === 0) {
+    <div class="empty-filter">
+      <p>لا توجد تقييمات بـ {{ filterRating() }} نجوم</p>
+      <button (click)="setFilterRating(0)">عرض الكل</button>
+    </div>
+  }
+
+</div>

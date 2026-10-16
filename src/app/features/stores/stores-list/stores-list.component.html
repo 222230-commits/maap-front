@@ -1,0 +1,74 @@
+<div class="stores-page">
+  <div class="page-header">
+    <h1><i class="fas fa-store"></i> المتاجر</h1>
+    <p>{{ filteredShops().length }} متجر نشط</p>
+  </div>
+
+  <div class="filters">
+    <div class="search-bar">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="ابحث عن متجر..."
+             [value]="searchQuery()"
+             (input)="updateSearch($any($event.target).value)" />
+    </div>
+    <div class="category-filters">
+      <button [class.active]="selectedCategory() === null"
+              (click)="selectedCategory.set(null)">
+        <i class="fas fa-th"></i> الكل
+      </button>
+      @for (cat of categories(); track cat.id) {
+        <button [class.active]="selectedCategory() === cat.id"
+                (click)="selectedCategory.set(cat.id)">
+          <i [class]="cat.icon"></i> {{ cat.nameAr }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (filteredShops().length === 0) {
+    <div class="empty">
+      <i class="fas fa-store-slash"></i>
+      <p>لا توجد متاجر تطابق بحثك</p>
+    </div>
+  } @else {
+    <div class="shops-grid">
+      @for (shop of filteredShops(); track shop.id) {
+        <div class="shop-card" (click)="goToShop(shop.id)">
+          <div class="shop-avatar">
+            <i class="fas fa-store text-4xl"></i>
+          </div>
+          <div class="shop-info">
+            <h3>{{ shop.name }}</h3>
+            <p>{{ shop.description }}</p>
+            <div class="shop-category">
+              <i class="fas fa-tag"></i>
+              {{ getCategoryName(shop.categoryId) }}
+            </div>
+            <div class="shop-stats">
+              <span><i class="fas fa-star"></i> {{ shop.rating }}</span>
+              <span><i class="fas fa-users"></i> {{ shop.followersCount }}</span>
+              <span><i class="fas fa-box"></i> {{ shop.productsCount }} منتج</span>
+            </div>
+            <div class="social-icons">
+              @if (shop.socialLinks.whatsapp) {
+                <i class="fab fa-whatsapp"></i>
+              }
+              @if (shop.socialLinks.instagram) {
+                <i class="fab fa-instagram"></i>
+              }
+              @if (shop.socialLinks.facebook) {
+                <i class="fab fa-facebook"></i>
+              }
+              @if (shop.socialLinks.tiktok) {
+                <i class="fab fa-tiktok"></i>
+              }
+            </div>
+          </div>
+          <div class="visit-btn">
+            <i class="fas fa-arrow-left"></i>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

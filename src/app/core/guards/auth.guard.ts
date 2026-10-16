@@ -1,14 +1,18 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthMockService } from '../api/mock/auth.mock.service';
+import { AuthService } from '../services/auth.service';
 
 export const authGuard: CanActivateFn = () => {
-  const authService = inject(AuthMockService);
+  const authService = inject(AuthService);
   const router = inject(Router);
+
+  if (authService.isBanned()) {
+    return false;
+  }
 
   if (authService.isLoggedIn()) {
     return true;
   }
-  
+
   return router.createUrlTree(['/auth/login']);
 };

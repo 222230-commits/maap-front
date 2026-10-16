@@ -1,0 +1,78 @@
+<div class="notifications-page">
+
+  <div class="page-header">
+    <button class="btn-back" (click)="router.navigate(['/'])">
+      <i class="fas fa-arrow-right"></i>
+    </button>
+    <div>
+      <h1>الإشعارات</h1>
+      @if (unreadCount() > 0) {
+        <p>{{ unreadCount() }} غير مقروء</p>
+      }
+    </div>
+    @if (notifications().length > 0) {
+      <div class="header-actions">
+        <button class="btn-mark-all" (click)="markAllRead()">
+          <i class="fas fa-check-double"></i>
+          قراءة الكل
+        </button>
+        <button class="btn-clear-all" (click)="clearAll()">
+          <i class="fas fa-trash"></i>
+          مسح الكل
+        </button>
+      </div>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <i class="fas fa-circle-notch fa-spin"></i>
+    </div>
+  }
+
+  @if (!isLoading() && notifications().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-bell-slash"></i>
+      </div>
+      <h2>لا توجد إشعارات</h2>
+      <p>ستظهر هنا إشعاراتك عند وصولها</p>
+    </div>
+  }
+
+  @if (!isLoading() && notifications().length > 0) {
+    <div class="notifications-list">
+      @for (notif of notifications(); track notif.id) {
+        <div class="notif-item"
+             [class.unread]="!notif.isRead"
+             (click)="onNotifClick(notif)">
+
+          <div class="notif-icon" [class]="'notif-icon ' + getNotifClass(notif.type)">
+            <i [class]="getNotifIcon(notif.type)"></i>
+          </div>
+
+          <div class="notif-content">
+            <h4>{{ notif.title }}</h4>
+            <p>{{ notif.body }}</p>
+            <span class="notif-time">
+              <i class="fas fa-clock"></i>
+              {{ notif.createdAt | date:'yyyy/MM/dd HH:mm' }}
+            </span>
+          </div>
+
+          <div class="notif-end">
+            @if (!notif.isRead) {
+              <div class="unread-dot"></div>
+            }
+            <button class="btn-dismiss"
+                    (click)="dismiss(notif.id); $event.stopPropagation()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+</div>

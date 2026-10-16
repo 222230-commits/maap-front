@@ -1,308 +1,118 @@
-<div class="space-y-6">
-  <!-- Header & Tabs -->
-  <div class="bg-white dark:bg-darkest rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm p-6 pb-0">
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">طلبات التجار</h1>
-    
-    <div class="flex gap-6 overflow-x-auto">
-      <!-- Pending Tab -->
-      <button (click)="activeTab.set('pending')"
-              class="pb-4 px-2 text-sm font-medium transition-colors relative whitespace-nowrap"
-              [class.text-primary]="activeTab() === 'pending'"
-              [class.dark:text-soft]="activeTab() === 'pending'"
-              [class.text-gray-500]="activeTab() !== 'pending'"
-              [class.dark:text-gray-400]="activeTab() !== 'pending'"
-              [class.hover:text-gray-700]="activeTab() !== 'pending'"
-              [class.dark:hover:text-gray-300]="activeTab() !== 'pending'">
-        معلقة
-        <span class="ms-2 px-2 py-0.5 rounded-full text-xs font-bold"
-              [class.bg-yellow-100]="activeTab() === 'pending'"
-              [class.text-yellow-700]="activeTab() === 'pending'"
-              [class.bg-gray-100]="activeTab() !== 'pending'"
-              [class.dark:bg-gray-800]="activeTab() !== 'pending'"
-              [class.text-gray-600]="activeTab() !== 'pending'"
-              [class.dark:text-gray-300]="activeTab() !== 'pending'">
-          {{ pendingCount() }}
-        </span>
-        @if (activeTab() === 'pending') {
-          <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary dark:bg-soft rounded-t-lg"></div>
-        }
-      </button>
+<div class="admin-page">
 
-      <!-- Approved Tab -->
-      <button (click)="activeTab.set('approved')"
-              class="pb-4 px-2 text-sm font-medium transition-colors relative whitespace-nowrap"
-              [class.text-primary]="activeTab() === 'approved'"
-              [class.dark:text-soft]="activeTab() === 'approved'"
-              [class.text-gray-500]="activeTab() !== 'approved'"
-              [class.dark:text-gray-400]="activeTab() !== 'approved'"
-              [class.hover:text-gray-700]="activeTab() !== 'approved'"
-              [class.dark:hover:text-gray-300]="activeTab() !== 'approved'">
-        موافق عليها
-        <span class="ms-2 px-2 py-0.5 rounded-full text-xs font-bold"
-              [class.bg-green-100]="activeTab() === 'approved'"
-              [class.text-green-700]="activeTab() === 'approved'"
-              [class.bg-gray-100]="activeTab() !== 'approved'"
-              [class.dark:bg-gray-800]="activeTab() !== 'approved'"
-              [class.text-gray-600]="activeTab() !== 'approved'"
-              [class.dark:text-gray-300]="activeTab() !== 'approved'">
-          {{ approvedCount() }}
-        </span>
-        @if (activeTab() === 'approved') {
-          <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary dark:bg-soft rounded-t-lg"></div>
-        }
-      </button>
-
-      <!-- Rejected Tab -->
-      <button (click)="activeTab.set('rejected')"
-              class="pb-4 px-2 text-sm font-medium transition-colors relative whitespace-nowrap"
-              [class.text-primary]="activeTab() === 'rejected'"
-              [class.dark:text-soft]="activeTab() === 'rejected'"
-              [class.text-gray-500]="activeTab() !== 'rejected'"
-              [class.dark:text-gray-400]="activeTab() !== 'rejected'"
-              [class.hover:text-gray-700]="activeTab() !== 'rejected'"
-              [class.dark:hover:text-gray-300]="activeTab() !== 'rejected'">
-        مرفوضة
-        <span class="ms-2 px-2 py-0.5 rounded-full text-xs font-bold"
-              [class.bg-red-100]="activeTab() === 'rejected'"
-              [class.text-red-700]="activeTab() === 'rejected'"
-              [class.bg-gray-100]="activeTab() !== 'rejected'"
-              [class.dark:bg-gray-800]="activeTab() !== 'rejected'"
-              [class.text-gray-600]="activeTab() !== 'rejected'"
-              [class.dark:text-gray-300]="activeTab() !== 'rejected'">
-          {{ rejectedCount() }}
-        </span>
-        @if (activeTab() === 'rejected') {
-          <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary dark:bg-soft rounded-t-lg"></div>
-        }
-      </button>
+  <div class="admin-topbar">
+    <div>
+      <h2 class="page-title"><i class="fas fa-store"></i> طلبات التجار</h2>
+      <p class="page-sub">{{ applications().length }} طلب</p>
     </div>
   </div>
 
-  <!-- Grid View -->
-  @if (currentApps().length > 0) {
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-      @for (app of currentApps(); track app.id) {
-        <div class="bg-white dark:bg-darkest rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden hover:shadow-md hover:border-primary/30 transition-all flex flex-col h-full">
-          <div class="p-5 flex-1">
-            <!-- Header (Business Name + Badge) -->
-            <div class="flex justify-between items-start mb-4 gap-2">
-              <h2 class="text-lg font-bold text-gray-900 dark:text-white line-clamp-2">{{ app.businessName }}</h2>
-              @switch (app.status) {
-                @case ('pending') {
-                  <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded shrink-0">معلق</span>
-                }
-                @case ('approved') {
-                  <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded shrink-0">موافق عليه</span>
-                }
-                @case ('rejected') {
-                  <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded shrink-0">مرفوض</span>
-                }
-              }
-            </div>
+  <div class="admin-content">
 
-            <!-- Owner & Date -->
-            <div class="space-y-2 mb-4 text-sm text-gray-600 dark:text-gray-300">
-              <div class="flex items-center gap-2">
-                <i class="fas fa-user w-4 text-center text-gray-400"></i>
-                <span>{{ app.ownerName }}</span>
+    <div class="tabs-bar-full">
+      <button [class.active]="activeTab() === 'pending'" (click)="changeTab('pending')"><i class="fas fa-clock"></i> معلقة</button>
+      <button [class.active]="activeTab() === 'approved'" (click)="changeTab('approved')"><i class="fas fa-check-circle"></i> موافق عليها</button>
+      <button [class.active]="activeTab() === 'rejected'" (click)="changeTab('rejected')"><i class="fas fa-times-circle"></i> مرفوضة</button>
+      <button [class.active]="activeTab() === 'all'" (click)="changeTab('all')"><i class="fas fa-list"></i> الكل</button>
+    </div>
+
+    @if (isLoading()) {
+      <div class="content-loading"><i class="fas fa-circle-notch fa-spin"></i><p>جاري التحميل...</p></div>
+    }
+
+    @if (error()) {
+      <div class="content-error"><i class="fas fa-exclamation-triangle"></i><p>{{ error() }}</p><button (click)="loadApplications()"><i class="fas fa-redo"></i> إعادة</button></div>
+    }
+
+    @if (!isLoading() && !error()) {
+      @if (applications().length === 0) {
+        <div class="content-empty"><i class="fas fa-inbox"></i><p>لا توجد طلبات</p></div>
+      } @else {
+        <div class="apps-grid">
+          @for (app of applications(); track app.id) {
+            <div class="app-card" [class.pending]="app.status === 'pending'" [class.approved]="app.status === 'approved'" [class.rejected]="app.status === 'rejected'">
+              <div class="app-card-header">
+                <div class="app-logo">
+                  @if (app.business_logo_url) { <img [src]="app.business_logo_url" [alt]="app.business_name" /> } @else { <i class="fas fa-store"></i> }
+                </div>
+                <div class="app-info">
+                  <h3>{{ app.business_name }}</h3>
+                  <p>{{ app.email }}</p>
+                </div>
+                <span class="status-pill" [class]="'pill-' + app.status">{{ getStatusLabel(app.status) }}</span>
               </div>
-              <div class="flex items-center gap-2">
-                <i class="fas fa-calendar w-4 text-center text-gray-400"></i>
-                <span>{{ app.createdAt }}</span>
+              <p class="app-desc">{{ app.business_description }}</p>
+              <div class="app-meta-row">
+                <span><i class="fas fa-phone"></i> {{ app.phone_number }}</span>
+                <span><i class="fas fa-map-marker-alt"></i> {{ app.business_address }}</span>
+                <span><i class="fas fa-calendar"></i> {{ formatDate(app.created_at) }}</span>
               </div>
+              <button class="btn-open-detail" (click)="openDetail(app)"><i class="fas fa-eye"></i> عرض التفاصيل واتخاذ قرار</button>
             </div>
-
-            <!-- Categories -->
-            <div class="flex flex-wrap gap-2 mb-5">
-              @for (cat of app.categories; track cat) {
-                <span class="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs rounded-full border border-gray-200 dark:border-gray-700">{{ cat }}</span>
-              }
-            </div>
-
-            <!-- Social Links -->
-            <div class="flex gap-4 text-gray-400 text-lg">
-              @if (app.socialLinks.instagram) { <i class="fab fa-instagram hover:text-pink-600 transition-colors cursor-pointer" title="Instagram"></i> }
-              @if (app.socialLinks.facebook) { <i class="fab fa-facebook hover:text-blue-600 transition-colors cursor-pointer" title="Facebook"></i> }
-              @if (app.socialLinks.tiktok) { <i class="fab fa-tiktok hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer" title="TikTok"></i> }
-              @if (app.socialLinks.snapchat) { <i class="fab fa-snapchat hover:text-yellow-500 transition-colors cursor-pointer" title="Snapchat"></i> }
-            </div>
-          </div>
-          
-          <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/30">
-            <button (click)="openDetail(app)" class="w-full px-4 py-2.5 bg-white dark:bg-darkest border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-bold text-primary hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm">
-              عرض التفاصيل
-            </button>
-          </div>
+          }
         </div>
       }
-    </div>
-  } @else {
-    <div class="bg-white dark:bg-darkest rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm p-12 flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
-      <div class="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center text-4xl mb-4">
-        <i class="fas fa-inbox"></i>
+    }
+
+  </div>
+
+  @if (showDetailModal() && selectedApp()) {
+    <div class="modal-backdrop" (click)="closeDetail()"></div>
+    <div class="detail-modal">
+      <div class="detail-modal-header">
+        <div class="modal-app-logo">
+          @if (selectedApp()!.business_logo_url) { <img [src]="selectedApp()!.business_logo_url" /> } @else { <i class="fas fa-store"></i> }
+        </div>
+        <div>
+          <h3>{{ selectedApp()!.business_name }}</h3>
+          <p>{{ selectedApp()!.email }}</p>
+        </div>
+        <button class="close-btn" (click)="closeDetail()"><i class="fas fa-times"></i></button>
       </div>
-      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">لا توجد طلبات</h3>
-      <p>لا توجد طلبات بهذه الحالة في الوقت الحالي.</p>
+      <div class="detail-modal-body">
+        @if (actionSuccess()) { <div class="action-toast success"><i class="fas fa-check-circle"></i> {{ actionSuccess() }}</div> }
+        @if (actionError()) { <div class="action-toast error"><i class="fas fa-exclamation-circle"></i> {{ actionError() }}</div> }
+
+        <div class="detail-section">
+          <h4><i class="fas fa-info-circle"></i> تفاصيل المتجر</h4>
+          <div class="detail-grid">
+            <div class="detail-item"><span class="di-label">الوصف</span><span class="di-val">{{ selectedApp()!.business_description }}</span></div>
+            <div class="detail-item"><span class="di-label">الهاتف</span><span class="di-val">{{ selectedApp()!.phone_number }}</span></div>
+            <div class="detail-item"><span class="di-label">العنوان</span><span class="di-val">{{ selectedApp()!.business_address }}</span></div>
+            <div class="detail-item"><span class="di-label">تاريخ التقديم</span><span class="di-val">{{ formatDate(selectedApp()!.created_at) }}</span></div>
+            <div class="detail-item"><span class="di-label">الحالة</span><span class="status-pill" [class]="'pill-' + selectedApp()!.status">{{ getStatusLabel(selectedApp()!.status) }}</span></div>
+            @if (selectedApp()!.rejection_reason) {
+              <div class="detail-item full"><span class="di-label">سبب الرفض السابق</span><span class="di-val rejection">{{ selectedApp()!.rejection_reason }}</span></div>
+            }
+          </div>
+        </div>
+
+        @if (selectedApp()!.status === 'pending') {
+          @if (!showRejectForm()) {
+            <div class="action-buttons">
+              <button class="btn-approve" (click)="approve()" [disabled]="isActing()">
+                @if (isActing()) { <i class="fas fa-spinner fa-spin"></i> } @else { <i class="fas fa-check"></i> } موافقة على الطلب
+              </button>
+              <button class="btn-reject-trigger" (click)="showRejectForm.set(true)"><i class="fas fa-times"></i> رفض الطلب</button>
+            </div>
+          }
+          @if (showRejectForm()) {
+            <div class="reject-form">
+              <h4><i class="fas fa-times-circle"></i> سبب الرفض</h4>
+              <textarea rows="3" placeholder="اكتب سبب الرفض للتاجر..." [value]="rejectionReason()" (input)="updateRejectionReason($any($event.target).value)"></textarea>
+              <textarea rows="2" placeholder="ملاحظات إدارية (اختياري)..." [value]="adminNotes()" (input)="updateAdminNotes($any($event.target).value)"></textarea>
+              <div class="reject-form-actions">
+                <button class="btn-confirm-reject" (click)="reject()" [disabled]="isActing() || !rejectionReason()">
+                  @if (isActing()) { <i class="fas fa-spinner fa-spin"></i> } @else { <i class="fas fa-times"></i> } تأكيد الرفض
+                </button>
+                <button class="btn-cancel-reject" (click)="showRejectForm.set(false)">إلغاء</button>
+              </div>
+            </div>
+          }
+        }
+
+      </div>
     </div>
   }
+
 </div>
-
-<!-- Modal -->
-@if (showDetailModal() && selectedApp()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-    <div class="bg-white dark:bg-darkest w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
-      
-      <!-- Modal Header -->
-      <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-3">
-          <h2 class="text-xl font-bold text-gray-900 dark:text-white">تفاصيل الطلب</h2>
-          @switch (selectedApp()?.status) {
-            @case ('pending') { <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded shrink-0">معلق</span> }
-            @case ('approved') { <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded shrink-0">موافق عليه</span> }
-            @case ('rejected') { <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded shrink-0">مرفوض</span> }
-          }
-        </div>
-        <button (click)="closeDetail()" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-
-      <!-- Modal Body -->
-      <div class="p-6 overflow-y-auto flex-1 space-y-6">
-        
-        <!-- Store Info -->
-        <div>
-          <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">{{ selectedApp()?.businessName }}</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{{ selectedApp()?.description }}</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Contact Info -->
-          <div class="space-y-4">
-            <h4 class="font-bold text-sm text-gray-900 dark:text-white uppercase tracking-wider">بيانات الاتصال</h4>
-            <div class="space-y-3 text-sm text-gray-600 dark:text-gray-300">
-              <div class="flex items-center gap-3">
-                <i class="fas fa-user w-4 text-center text-gray-400"></i>
-                <span>{{ selectedApp()?.ownerName }}</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <i class="fas fa-envelope w-4 text-center text-gray-400"></i>
-                <span dir="ltr">{{ selectedApp()?.email }}</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <i class="fas fa-phone w-4 text-center text-gray-400"></i>
-                <span dir="ltr">{{ selectedApp()?.phone }}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Social Links -->
-          <div class="space-y-4">
-            <h4 class="font-bold text-sm text-gray-900 dark:text-white uppercase tracking-wider">التواصل الاجتماعي</h4>
-            <div class="space-y-3 text-sm text-gray-600 dark:text-gray-300">
-              @if (selectedApp()?.socialLinks?.instagram) {
-                <div class="flex items-center gap-3">
-                  <i class="fab fa-instagram w-4 text-center text-pink-600"></i>
-                  <span dir="ltr">{{ selectedApp()?.socialLinks?.instagram }}</span>
-                </div>
-              }
-              @if (selectedApp()?.socialLinks?.facebook) {
-                <div class="flex items-center gap-3">
-                  <i class="fab fa-facebook w-4 text-center text-blue-600"></i>
-                  <span dir="ltr">{{ selectedApp()?.socialLinks?.facebook }}</span>
-                </div>
-              }
-              @if (selectedApp()?.socialLinks?.tiktok) {
-                <div class="flex items-center gap-3">
-                  <i class="fab fa-tiktok w-4 text-center text-gray-900 dark:text-white"></i>
-                  <span dir="ltr">{{ selectedApp()?.socialLinks?.tiktok }}</span>
-                </div>
-              }
-              @if (selectedApp()?.socialLinks?.snapchat) {
-                <div class="flex items-center gap-3">
-                  <i class="fab fa-snapchat w-4 text-center text-yellow-500"></i>
-                  <span dir="ltr">{{ selectedApp()?.socialLinks?.snapchat }}</span>
-                </div>
-              }
-            </div>
-          </div>
-        </div>
-
-        <!-- Categories -->
-        <div>
-          <h4 class="font-bold text-sm text-gray-900 dark:text-white uppercase tracking-wider mb-3">التصنيفات المطلوبة</h4>
-          <div class="flex flex-wrap gap-2">
-            @for (cat of selectedApp()?.categories; track cat) {
-              <span class="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm rounded-lg border border-gray-200 dark:border-gray-700">{{ cat }}</span>
-            }
-          </div>
-        </div>
-
-        <!-- Admin Actions (if pending) -->
-        @if (selectedApp()?.status === 'pending') {
-          <div class="border-t border-gray-100 dark:border-gray-800 pt-6">
-            @if (!showRejectForm()) {
-              <div class="space-y-3">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">ملاحظات الإدارة (اختياري)</label>
-                <textarea 
-                  [ngModel]="adminNote()" 
-                  (ngModelChange)="updateAdminNote($event)"
-                  rows="3" 
-                  class="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-darkest text-gray-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary dark:focus:ring-soft p-3"
-                  placeholder="ملاحظات تظهر للتاجر عند الرد..."></textarea>
-              </div>
-            } @else {
-              <div class="space-y-3">
-                <label class="block text-sm font-bold text-red-600 dark:text-red-400">سبب الرفض (مطلوب)</label>
-                <textarea 
-                  [ngModel]="adminNote()" 
-                  (ngModelChange)="updateAdminNote($event)"
-                  rows="3" 
-                  class="w-full rounded-lg border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-900/10 text-gray-900 dark:text-white shadow-sm focus:border-red-500 focus:ring-red-500 p-3 outline-none"
-                  placeholder="اكتب سبب الرفض ليظهر للتاجر..."></textarea>
-              </div>
-            }
-          </div>
-        } @else {
-          <!-- Display Admin Note if Approved/Rejected -->
-          @if (selectedApp()?.adminNote) {
-            <div class="border-t border-gray-100 dark:border-gray-800 pt-6">
-              <h4 class="font-bold text-sm text-gray-900 dark:text-white uppercase tracking-wider mb-3">ملاحظات الإدارة</h4>
-              <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-300">
-                {{ selectedApp()?.adminNote }}
-              </div>
-            </div>
-          }
-        }
-      </div>
-
-      <!-- Modal Footer -->
-      <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/30 rounded-b-2xl flex flex-wrap-reverse items-center justify-between gap-3 shrink-0">
-        <button (click)="closeDetail()" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-darkest hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-          إغلاق
-        </button>
-        
-        @if (selectedApp()?.status === 'pending') {
-          <div class="flex items-center gap-3">
-            @if (!showRejectForm()) {
-              <button (click)="showRejectForm.set(true)" class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors shadow-sm flex items-center gap-2">
-                <i class="fas fa-times"></i> رفض الطلب
-              </button>
-              <button (click)="approve()" class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition-colors shadow-sm flex items-center gap-2">
-                <i class="fas fa-check"></i> موافقة
-              </button>
-            } @else {
-              <button (click)="showRejectForm.set(false)" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-darkest hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                رجوع
-              </button>
-              <button (click)="reject()" [disabled]="!adminNote().trim()" class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                <i class="fas fa-ban"></i> تأكيد الرفض
-              </button>
-            }
-          </div>
-        }
-      </div>
-
-    </div>
-  </div>
-}

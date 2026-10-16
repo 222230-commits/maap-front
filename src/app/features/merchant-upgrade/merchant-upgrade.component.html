@@ -1,0 +1,304 @@
+<div class="upgrade-page">
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <i class="fas fa-circle-notch fa-spin"></i>
+      <p>جاري التحقق من حالة حسابك...</p>
+    </div>
+  }
+
+  @if (!isLoading()) {
+
+    <!-- الخطوة: تمت الترقية بنجاح -->
+    @if (currentStep() === 'approved') {
+      <div class="pending-card approved-card">
+        <div class="pending-icon approved-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h2>تهانينا! تمت ترقية حسابك إلى تاجر 🎉</h2>
+        <p>
+          تم تفعيل متجرك على منصة مآب بنجاح.
+          يمكنك الآن الدخول مباشرة إلى لوحة تحكم التاجر لبدء إدارة المنتجات والطلبات والمبيعات.
+        </p>
+        <button class="btn-go-merchant"
+                (click)="router.navigate(['/merchant'])">
+          <i class="fas fa-store"></i>
+          الانتقال إلى لوحة التاجر
+        </button>
+      </div>
+    }
+
+    <!-- الخطوة: التحقق المعلق -->
+    @if (currentStep() === 'pending') {
+      <div class="pending-card">
+        <div class="pending-icon">
+          <i class="fas fa-clock"></i>
+        </div>
+        <h2>طلبك قيد المراجعة</h2>
+        <p>
+          تم استلام طلبك لفتح متجر وهو قيد المراجعة
+          من قبل فريق مآب. سيتم إخطارك بالنتيجة فوراً.
+        </p>
+        @if (successMessage()) {
+          <div class="alert-success" style="margin-bottom: 16px;">
+            <i class="fas fa-info-circle"></i>
+            {{ successMessage() }}
+          </div>
+        }
+        <div class="pending-info">
+          <i class="fas fa-info-circle"></i>
+          تستغرق المراجعة عادةً من 1 إلى 3 أيام عمل
+        </div>
+        <div class="pending-buttons">
+          <button class="btn-check-status"
+                  (click)="checkStatusAgain()"
+                  [disabled]="isCheckingStatus()">
+            @if (isCheckingStatus()) {
+              <i class="fas fa-spinner fa-spin"></i>
+              جاري التحقق...
+            } @else {
+              <i class="fas fa-rotate"></i>
+              التحقق من حالة الطلب الآن
+            }
+          </button>
+          <button class="btn-home"
+                  (click)="router.navigate(['/'])">
+            <i class="fas fa-home"></i>
+            العودة للرئيسية
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- الخطوة: الفورم -->
+    @if (currentStep() === 'form') {
+      <div class="upgrade-container">
+
+        <div class="upgrade-header">
+          <div class="upgrade-hero-icon">
+            <i class="fas fa-store"></i>
+          </div>
+          <h1>افتح متجرك على مآب</h1>
+          <p>انضم لآلاف التجار وابدأ رحلتك التجارية</p>
+        </div>
+
+        @if (error()) {
+          <div class="alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ error() }}
+          </div>
+        }
+
+        <div class="form-card">
+          <h2><i class="fas fa-info-circle"></i> بيانات المتجر</h2>
+
+          <div class="form-group">
+            <label>اسم المتجر *</label>
+            <input type="text"
+                   placeholder="مثال: متجر الأزياء الليبية"
+                   [value]="businessName()"
+                   (input)="businessName.set($any($event.target).value)" />
+          </div>
+
+          <div class="form-group">
+            <label>وصف المتجر *</label>
+            <textarea rows="3"
+                      placeholder="اكتب وصفاً مختصراً لنشاط متجرك..."
+                      [value]="businessDescription()"
+                      (input)="businessDescription.set($any($event.target).value)">
+            </textarea>
+          </div>
+
+          <div class="form-group">
+            <label>عنوان المتجر *</label>
+            <input type="text"
+                   placeholder="مثال: طرابلس، شارع جرس"
+                   [value]="businessAddress()"
+                   (input)="businessAddress.set($any($event.target).value)" />
+          </div>
+
+          <div class="form-group">
+            <label><i class="fas fa-image"></i> شعار المتجر (اختياري)</label>
+            <div class="logo-upload-box">
+              @if (logoPreview()) {
+                <img [src]="logoPreview()" alt="معاينة الشعار" class="logo-preview-img" />
+              }
+              <input type="file" accept="image/*" (change)="onLogoSelected($event)" class="logo-file-input" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>رقم الهاتف *</label>
+              <input type="tel" dir="ltr"
+                     placeholder="0912345678"
+                     [value]="phoneNumber()"
+                     (input)="phoneNumber.set($any($event.target).value)" />
+            </div>
+            <div class="form-group">
+              <label>البريد الإلكتروني *</label>
+              <input type="email" dir="ltr"
+                     [value]="email()"
+                     (input)="email.set($any($event.target).value)" />
+            </div>
+          </div>
+
+        </div>
+
+        <div class="form-card">
+          <h2><i class="fas fa-th-large"></i> التصنيفات *</h2>
+          <p class="section-desc">اختر التصنيف الذي يناسب نشاط متجرك</p>
+          <div class="categories-grid">
+            @for (cat of availableCategories(); track cat.id) {
+              <div class="category-chip"
+                   [class.selected]="isSelectedCategory(cat.id)"
+                   (click)="toggleCategory(cat.id)">
+                <i class="fas fa-check"
+                   [style.opacity]="isSelectedCategory(cat.id) ? '1' : '0'">
+                </i>
+                {{ cat.name }}
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="form-card">
+          <h2><i class="fas fa-share-alt"></i> روابط التواصل (اختياري)</h2>
+
+          <div class="form-group">
+            <label><i class="fab fa-instagram"></i> انستغرام</label>
+            <input type="url" dir="ltr"
+                   placeholder="https://instagram.com/..."
+                   [value]="instagram()"
+                   (input)="instagram.set($any($event.target).value)" />
+          </div>
+
+          <div class="form-group">
+            <label><i class="fab fa-facebook"></i> فيسبوك</label>
+            <input type="url" dir="ltr"
+                   placeholder="https://facebook.com/..."
+                   [value]="facebook()"
+                   (input)="facebook.set($any($event.target).value)" />
+          </div>
+
+          <div class="form-group">
+            <label><i class="fab fa-whatsapp"></i> واتساب</label>
+            <input type="tel" dir="ltr"
+                   placeholder="0912345678"
+                   [value]="whatsapp()"
+                   (input)="whatsapp.set($any($event.target).value)" />
+          </div>
+        </div>
+
+        <div class="form-card terms-card">
+          <label class="terms-label"
+                 (click)="acceptedTerms.set(!acceptedTerms())">
+            <div class="checkbox"
+                 [class.checked]="acceptedTerms()">
+              @if (acceptedTerms()) {
+                <i class="fas fa-check"></i>
+              }
+            </div>
+            <span>
+              أوافق على
+              <span class="terms-link">الشروط والأحكام</span>
+              الخاصة بالتجار في منصة مآب
+            </span>
+          </label>
+        </div>
+
+        @if (error()) {
+          <div class="alert-error" style="margin-bottom: 16px;">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ error() }}
+          </div>
+        }
+
+        <button class="btn-submit"
+                (click)="submitForm()"
+                [disabled]="isSaving()">
+          @if (isSaving()) {
+            <i class="fas fa-spinner fa-spin"></i>
+            جاري إرسال الطلب...
+          } @else {
+            <i class="fas fa-paper-plane"></i>
+            تقديم الطلب
+          }
+        </button>
+
+      </div>
+    }
+
+    <!-- الخطوة: OTP -->
+    @if (currentStep() === 'otp') {
+      <div class="otp-card">
+        <div class="otp-icon">
+          <i class="fas fa-envelope-open-text"></i>
+        </div>
+        <h2>تحقق من بريدك الإلكتروني</h2>
+        <p>
+          أرسلنا رمز التحقق إلى
+          <strong>{{ email() }}</strong>
+        </p>
+
+        @if (error()) {
+          <div class="alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ error() }}
+          </div>
+        }
+        @if (successMessage()) {
+          <div class="alert-success">
+            <i class="fas fa-check-circle"></i>
+            {{ successMessage() }}
+          </div>
+        }
+
+        <div class="otp-input-wrapper">
+          <input type="text" maxlength="6"
+                 placeholder="000000"
+                 class="otp-input"
+                 [value]="otpCode()"
+                 inputmode="numeric"
+                 (input)="updateOtp($any($event.target).value)" />
+        </div>
+
+        <button class="btn-verify"
+                (click)="verifyOtp()"
+                [disabled]="isSaving() || otpCode().length < 4">
+          @if (isSaving()) {
+            <i class="fas fa-spinner fa-spin"></i>
+            جاري التحقق...
+          } @else {
+            <i class="fas fa-check"></i>
+            تأكيد الرمز
+          }
+        </button>
+
+        <div class="resend-section">
+          @if (resendCooldown() > 0) {
+            <p class="cooldown">
+              <i class="fas fa-clock"></i>
+              إعادة الإرسال بعد {{ resendCooldown() }} ثانية
+            </p>
+          } @else {
+            <p>لم يصلك الرمز؟</p>
+            <button class="btn-resend"
+                    (click)="resendOtp()"
+                    [disabled]="isResending()">
+              <i class="fas fa-redo"></i>
+              إعادة الإرسال
+            </button>
+          }
+        </div>
+
+        <button class="btn-back-form"
+                (click)="currentStep.set('form')">
+          <i class="fas fa-arrow-right"></i>
+          العودة للتعديل
+        </button>
+      </div>
+    }
+
+  }
+</div>

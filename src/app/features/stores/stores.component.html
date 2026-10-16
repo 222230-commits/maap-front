@@ -1,0 +1,157 @@
+<div class="stores-page">
+
+  <!-- ══ HEADER ══ -->
+  <div class="stores-header">
+    <div class="stores-header-inner">
+      <div class="header-text">
+        <h1>المتاجر</h1>
+        <p>اكتشف أفضل المتاجر الليبية</p>
+      </div>
+      <div class="header-search">
+        <i class="fas fa-search"></i>
+        <input type="text"
+               placeholder="ابحث عن متجر..."
+               [value]="searchQuery()"
+               (input)="updateSearch($any($event.target).value)" />
+      </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+      <button [class.active]="activeFilter() === 'all'"
+              (click)="changeFilter('all')">
+        <i class="fas fa-th-large"></i> الكل
+      </button>
+      <button [class.active]="activeFilter() === 'following'"
+              (click)="changeFilter('following')">
+        <i class="fas fa-user-check"></i> أتابعهم
+      </button>
+    </div>
+
+    <!-- Category Chips -->
+    @if (!isLoadingCategories() && categories().length > 0) {
+      <div class="category-chips">
+        @for (cat of categories(); track cat.id) {
+          <button class="cat-chip"
+                  [class.active]="selectedCategoryIds().includes(cat.id)"
+                  (click)="toggleCategory(cat.id)">
+            {{ cat.name }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- ══ CONTENT ══ -->
+  <div class="stores-content">
+
+    @if (isLoading()) {
+      <div class="stores-grid">
+        @for (i of [1,2,3,4,5,6]; track i) {
+          <div class="store-card skeleton-card">
+            <div class="skeleton store-card-banner"></div>
+            <div class="store-card-body">
+              <div class="skeleton skeleton-text w60"></div>
+              <div class="skeleton skeleton-text w40"></div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else if (filteredShops().length === 0) {
+      <div class="empty-state">
+        <i class="fas fa-store-slash"></i>
+        <h3>لا توجد متاجر</h3>
+        <p>جرّب تغيير التصفية أو البحث</p>
+      </div>
+    } @else {
+      <div class="stores-grid">
+        @for (shop of filteredShops(); track shop.id) {
+          <div class="store-card" (click)="router.navigate(['/stores', shop.id])">
+
+            <!-- Banner -->
+            <div class="store-card-banner">
+              @if (shop.banner_url) {
+                <img [src]="getImageUrl(shop.banner_url)"
+                     [alt]="shop.name" class="banner-img" />
+              } @else {
+                <div class="banner-gradient"></div>
+              }
+              <div class="banner-overlay"></div>
+            </div>
+
+            <!-- Logo -->
+            <div class="store-card-logo">
+              @if (shop.logo_url) {
+                <img [src]="getImageUrl(shop.logo_url)" [alt]="shop.name" />
+              } @else {
+                <i class="fas fa-store"></i>
+              }
+            </div>
+
+            <!-- Body -->
+            <div class="store-card-body">
+              <div class="store-card-header">
+                <div>
+                  <h3 class="store-name">{{ shop.name }}</h3>
+                  <p class="store-desc">{{ shop.description }}</p>
+                </div>
+                <button class="follow-btn"
+                        [class.following]="isFollowing(shop)"
+                        [disabled]="followingId() === shop.id"
+                        (click)="toggleFollow(shop); $event.stopPropagation()">
+                  @if (followingId() === shop.id) {
+                    <i class="fas fa-spinner fa-spin"></i>
+                  } @else if (isFollowing(shop)) {
+                    <i class="fas fa-user-check"></i>
+                  } @else {
+                    <i class="fas fa-user-plus"></i>
+                  }
+                </button>
+              </div>
+
+              <div class="store-meta">
+                <span>
+                  <i class="fas fa-users"></i>
+                  {{ shop.followers_count }}
+                </span>
+                <span>
+                  <i class="fas fa-box"></i>
+                  {{ shop.products_count }}
+                </span>
+                @if (shop.rating > 0) {
+                  <span class="rating-meta">
+                    <i class="fas fa-star"></i>
+                    {{ shop.rating }}
+                  </span>
+                }
+                @if (shop.business_address) {
+                  <span>
+                    <i class="fas fa-map-marker-alt"></i>
+                    {{ shop.business_address }}
+                  </span>
+                }
+              </div>
+
+              <!-- Badges -->
+              <div class="store-badges">
+                @if (shop.accepts_returns) {
+                  <span class="badge">
+                    <i class="fas fa-undo"></i> إرجاع
+                  </span>
+                }
+                @if (shop.accepts_card_payment) {
+                  <span class="badge">
+                    <i class="fas fa-credit-card"></i> بطاقة
+                  </span>
+                }
+              </div>
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+
+</div>

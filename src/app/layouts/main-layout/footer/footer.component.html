@@ -1,62 +1,44 @@
-<footer>
-  <!-- القسم العلوي -->
-  <div class="footer-top">
+@if (!authService.isLoggedIn() || authService.role() === 'buyer') {
 
-    <!-- العمود 1: عن المنصة -->
-    <div>
-      <i class="fas fa-store"></i>
-      <h3>السوق الليبي</h3>
-      <p>منصة ذكية للتجارة الإلكترونية تدعم المشاريع الصغيرة في ليبيا</p>
-      <div class="social-links">
-        <a href="#"><i class="fab fa-instagram"></i></a>
-        <a href="#"><i class="fab fa-facebook"></i></a>
-        <a href="#"><i class="fab fa-tiktok"></i></a>
-        <a href="#"><i class="fab fa-whatsapp"></i></a>
+  <footer class="footer">
+    <div class="footer-container">
+
+      <!-- يمين: Logo + وصف -->
+      <div class="footer-brand">
+        <a routerLink="/" class="footer-logo-link">
+          <img src="assets/logo.png"
+               alt="مأب"
+               class="logo-footer" />
+        </a>
+        <p>مساحة تجمع المشاريع الصغيرة والصُنّاع المحليين في ليبيا.</p>
+        <p class="footer-made">
+          صُنع بـ <i class="fas fa-heart"></i> في ليبيا
+        </p>
       </div>
+
+      <!-- وسط: روابط -->
+      <div class="footer-links">
+        <a routerLink="/">الرئيسية</a>
+        <a routerLink="/products">المنتجات</a>
+        <a routerLink="/stores">المتاجر</a>
+        <a routerLink="/terms">الشروط والأحكام</a>
+        <a routerLink="/support">الدعم الفني</a>
+        <a routerLink="/support">FAQ</a>
+      </div>
+
+      <!-- يسار: سوشيال -->
+      <div class="footer-social">
+        <a href="#" aria-label="واتساب"><i class="fab fa-whatsapp"></i></a>
+        <a href="#" aria-label="تيك توك"><i class="fab fa-tiktok"></i></a>
+        <a href="#" aria-label="فيسبوك"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" aria-label="انستغرام"><i class="fab fa-instagram"></i></a>
+      </div>
+
     </div>
 
-    <!-- العمود 2: روابط سريعة -->
-    <div>
-      <h4>روابط سريعة</h4>
-      <ul>
-        <li><a routerLink="/">الرئيسية</a></li>
-        <li><a routerLink="/auth/register">إنشاء حساب</a></li>
-        <li><a routerLink="/auth/login">تسجيل الدخول</a></li>
-        <li><a routerLink="/auth/merchant-apply">انضم كتاجر</a></li>
-      </ul>
+    <div class="footer-bottom">
+      <span>© 2026 مأب — جميع الحقوق محفوظة</span>
     </div>
+  </footer>
 
-    <!-- العمود 3: التصنيفات -->
-    <div>
-      <h4>التصنيفات</h4>
-      <ul>
-        <li><i class="fas fa-spa"></i> جمال وعناية</li>
-        <li><i class="fas fa-utensils"></i> الأطعمة والمأكولات</li>
-        <li><i class="fas fa-hands"></i> الأشغال اليدوية</li>
-        <li><i class="fas fa-tshirt"></i> الأزياء والموضة</li>
-      </ul>
-    </div>
-
-    <!-- العمود 4: تواصل معنا -->
-    <div>
-      <h4>تواصل معنا</h4>
-      <ul>
-        <li><i class="fas fa-envelope"></i> info@libyanmarket.ly</li>
-        <li><i class="fas fa-phone"></i> 0911000000</li>
-        <li><i class="fas fa-map-marker-alt"></i> طرابلس، ليبيا</li>
-      </ul>
-    </div>
-
-  </div>
-
-  <!-- الخط الفاصل -->
-  <hr />
-
-  <!-- القسم السفلي -->
-  <div class="footer-bottom">
-    <span>© 2026 السوق الليبي — جميع الحقوق محفوظة</span>
-    <div>
-      <span>صُنع بـ <i class="fas fa-heart"></i> في ليبيا</span>
-    </div>
-  </div>
-</footer>
+}

@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>دليل إداره الرفيو — للفرونت إند</title>
+<style>
+  :root{
+    --bg:#F7F6F2;
+    --card-bg:#FFFFFF;
+    --border:#E4E2D8;
+    --border-strong:#CFCDC0;
+    --text-primary:#242320;
+    --text-secondary:#5F5E58;
+    --text-muted:#8B897F;
+    --teal:#0F6E56;
+    --teal-light:#E1F5EE;
+    --teal-border:#9FE1CB;
+    --teal-dark:#085041;
+    --coral:#993C1D;
+    --coral-light:#FAECE7;
+    --coral-border:#F0997B;
+    --coral-dark:#4A1B0C;
+    --purple:#534AB7;
+    --purple-light:#EEEDFE;
+    --purple-border:#AFA9EC;
+    --gray-fill:#F1EFE8;
+    --gray-border:#D3D1C7;
+    --blue:#185FA5;
+    --blue-light:#E6F1FB;
+    --code-bg:#242320;
+    --code-text:#F1EFE8;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text-primary);
+    font-family:"Segoe UI",Tahoma,Arial,sans-serif;
+    line-height:1.8;
+    display:flex;
+    min-height:100vh;
+  }
+  code, .mono{
+    font-family:"Consolas","Courier New",monospace;
+    direction:ltr;
+    unicode-bidi:embed;
+  }
+  a{color:var(--teal);}
+
+  /* ===== Sidebar ===== */
+  nav.side{
+    position:sticky;
+    top:0;
+    align-self:flex-start;
+    width:250px;
+    min-width:250px;
+    height:100vh;
+    overflow-y:auto;
+    background:var(--card-bg);
+    border-left:1px solid var(--border);
+    padding:24px 18px;
+  }
+  nav.side .brand{
+    font-size:14px;
+    font-weight:700;
+    color:var(--teal-dark);
+    margin-bottom:24px;
+  }
+  nav.side .grp-title{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    color:var(--text-muted);
+    margin:20px 0 8px;
+  }
+  nav.side a{
+    display:block;
+    font-size:13.5px;
+    color:var(--text-secondary);
+    text-decoration:none;
+    padding:6px 8px;
+    border-radius:6px;
+    margin-bottom:2px;
+  }
+  nav.side a:hover{background:var(--teal-light);color:var(--teal-dark);}
+
+  /* ===== Main ===== */
+  main{flex:1;padding:36px 48px 80px;max-width:980px;}
+  .eyebrow{
+    font-size:12px;
+    font-weight:700;
+    color:var(--teal);
+    text-transform:uppercase;
+    letter-spacing:.6px;
+    margin-bottom:8px;
+  }
+  h1{font-size:30px;margin:0 0 10px;}
+  header p.desc{color:var(--text-secondary);font-size:15.5px;max-width:760px;}
+  header{margin-bottom:36px;padding-bottom:24px;border-bottom:1px solid var(--border);}
+
+  h2{
+    font-size:21px;
+    margin:44px 0 14px;
+    padding-top:8px;
+    scroll-margin-top:20px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  h3{font-size:16px;margin:22px 0 8px;}
+
+  .card{
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:20px 24px;
+    margin-bottom:18px;
+  }
+
+  table{width:100%;border-collapse:collapse;margin:12px 0 20px;font-size:13.5px;}
+  th,td{border:1px solid var(--border);padding:9px 12px;text-align:right;vertical-align:top;}
+  th{background:var(--teal-light);color:var(--teal-dark);font-weight:700;}
+  tr:nth-child(even) td{background:#FBFAF7;}
+
+  .badge-row{display:flex;align-items:center;gap:10px;margin:10px 0 14px;}
+  .pill{
+    font-family:"Consolas","Courier New",monospace;
+    direction:ltr;
+    font-size:12.5px;
+    font-weight:700;
+    padding:4px 10px;
+    border-radius:999px;
+  }
+  .pill-get{background:var(--blue-light);color:var(--blue);}
+  .pill-post{background:var(--teal-light);color:var(--teal-dark);}
+  .pill-delete{background:var(--coral-light);color:var(--coral);}
+  .path{font-family:"Consolas","Courier New",monospace;direction:ltr;font-size:13.5px;color:var(--text-primary);}
+
+  pre{
+    background:var(--code-bg);
+    color:var(--code-text);
+    padding:14px 16px;
+    border-radius:8px;
+    overflow-x:auto;
+    direction:ltr;
+    text-align:left;
+    font-size:12.8px;
+    font-family:"Consolas","Courier New",monospace;
+    margin:8px 0 16px;
+  }
+  .code-label{font-size:12px;color:var(--text-muted);margin:14px 0 -4px;font-weight:700;}
+
+  .callout{
+    border-radius:8px;
+    padding:12px 16px;
+    margin:12px 0;
+    font-size:13.8px;
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+  }
+  .callout .ic{font-weight:700;font-size:15px;flex-shrink:0;}
+  .callout.warn{background:var(--coral-light);border:1px solid var(--coral-border);color:var(--coral-dark);}
+  .callout.warn .ic{color:var(--coral);}
+  .callout.tip{background:var(--teal-light);border:1px solid var(--teal-border);color:var(--teal-dark);}
+  .callout.tip .ic{color:var(--teal);}
+
+  /* ===== Flow diagram ===== */
+  .flow{display:flex;flex-direction:column;align-items:center;gap:4px;margin:24px 0;padding:24px 10px;background:#FBFAF7;border:1px dashed var(--border-strong);border-radius:12px;}
+  .fbox{
+    border-radius:10px;
+    padding:10px 18px;
+    text-align:center;
+    font-size:13.5px;
+    min-width:220px;
+    border:1px solid;
+  }
+  .fbox .t1{font-weight:700;margin-bottom:2px;}
+  .fbox .t2{font-size:12px;font-family:"Consolas","Courier New",monospace;direction:ltr;opacity:.85;}
+  .fbox.api{background:var(--purple-light);border-color:var(--purple-border);color:#26215C;}
+  .fbox.decision{background:var(--gray-fill);border-color:var(--gray-border);color:var(--text-primary);border-radius:999px;}
+  .fbox.ok{background:var(--teal-light);border-color:var(--teal-border);color:var(--teal-dark);}
+  .fbox.err{background:var(--coral-light);border-color:var(--coral-border);color:var(--coral-dark);}
+  .arrow-down{font-size:18px;color:var(--text-muted);}
+  .branch{display:flex;gap:40px;align-items:flex-start;justify-content:center;width:100%;}
+  .branch .col{display:flex;flex-direction:column;align-items:center;gap:4px;}
+  .branch .label{font-size:11.5px;color:var(--text-muted);font-weight:700;}
+
+  /* ===== Mockups ===== */
+  .mockup-row{display:flex;gap:26px;flex-wrap:wrap;justify-content:center;margin:20px 0 6px;}
+  .phone{
+    width:250px;
+    background:#EFEDE4;
+    border-radius:26px;
+    padding:14px;
+    border:1px solid var(--border-strong);
+  }
+  .screen{
+    background:#FFFFFF;
+    border-radius:16px;
+    padding:14px;
+    min-height:280px;
+  }
+  .screen .stitle{font-size:13.5px;font-weight:700;margin-bottom:2px;}
+  .screen .ssub{font-size:11px;color:var(--text-muted);margin-bottom:10px;font-family:"Consolas","Courier New",monospace;direction:ltr;}
+  .row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+  .stars{color:var(--text-muted);font-size:15px;letter-spacing:2px;}
+  .stars.on{color:#BA7517;}
+  .disabled-box{
+    background:var(--gray-fill);
+    border:1px dashed var(--border-strong);
+    border-radius:8px;
+    padding:10px;
+    font-size:11.5px;
+    color:var(--text-muted);
+    margin-top:8px;
+  }
+  .enabled-box{
+    background:#FBFAF7;
+    border:1px solid var(--teal-border);
+    border-radius:8px;
+    padding:10px;
+    font-size:11.5px;
+    color:var(--text-primary);
+    margin-top:8px;
+  }
+  .lockbox{
+    background:var(--coral-light);
+    border:1px solid var(--coral-border);
+    border-radius:8px;
+    padding:12px;
+    font-size:12px;
+    color:var(--coral-dark);
+    text-align:center;
+  }
+  .badge-endpoint{
+    display:inline-block;
+    margin-top:10px;
+    font-family:"Consolas","Courier New",monospace;
+    direction:ltr;
+    font-size:11px;
+    background:var(--purple-light);
+    color:#26215C;
+    padding:4px 10px;
+    border-radius:999px;
+    text-align:center;
+  }
+  .mockup-col{display:flex;flex-direction:column;align-items:center;}
+
+  /* ===== Tree ===== */
+  .tnode{
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:8px 12px;
+    font-size:12.5px;
+    margin-bottom:6px;
+  }
+
+  footer{
+    margin-top:60px;
+    padding-top:20px;
+    border-top:1px solid var(--border);
+    font-size:12.5px;
+    color:var(--text-muted);
+    text-align:center;
+  }
+
+  .num-list{padding-right:20px;}
+  .num-list li{margin-bottom:10px;font-size:14px;}
+
+  @media(max-width:900px){
+    nav.side{display:none;}
+    main{padding:24px;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="side">
+  <div class="brand">دليل إداره الرفيو</div>
+
+  <div class="grp-title">تصفح المستخدم</div>
+  <a href="#overview">نظرة عامة واختيار الأداة</a>
+  <a href="#user-review">حالة المستخدم (user-review)</a>
+  <a href="#comments">قائمة التعليقات</a>
+  <a href="#rates">قائمة كل التقييمات</a>
+
+  <div class="grp-title">إرسال التقييم والتعليق</div>
+  <a href="#rate">إرسال تقييم بالنجوم</a>
+  <a href="#comment">إرسال / تعديل تعليق</a>
+  <a href="#delete">حذف التعليق</a>
+  <a href="#flow">مخطط التدفق الكامل</a>
+  <a href="#mockups">نماذج الشاشات</a>
+
+  <div class="grp-title">مرجع سريع</div>
+  <a href="#errors">جدول كل الأخطاء</a>
+  <a href="#tips">نصائح عملية</a>
+  <a href="#backend-note">ملاحظة لفريق الباك إند</a>
+</nav>
+
+<main>
+  <header>
+    <div class="eyebrow">توثيق فرونت إند</div>
+    <h1>دليل إداره الرفيو</h1>
+    <p class="desc">
+      شرح كامل لكل الـ Endpoints الخاصة بتقييم المنتجات والتعليق عليها، مع كل شكل
+      طلب واستجابة، وكل فخ برمجي يجب الانتباه له قبل البدء بالتنفيذ. هذا الدليل
+      موجّه لمن يبني الفرونت إند لأول مرة على هذا الـ API.
+    </p>
+  </header>
+
+  <h2 id="overview">نظرة عامة واختيار الأداة</h2>
+  <table>
+    <tr><th>الميزة</th><th>الأداة المقترحة</th><th>السبب</th></tr>
+    <tr>
+      <td>شاشة تصفح تعليقات/تقييمات المنتج (Scroll + Pagination)</td>
+      <td>Flutter</td>
+      <td>قائمة طويلة قابلة للتمرير داخل تطبيق المشتري على الموبايل، تحتاج تحميل تدريجي (per_page)</td>
+    </tr>
+    <tr>
+      <td>شاشة تقييم بالنجوم + كتابة تعليق (تدفق متسلسل مع شروط تفعيل)</td>
+      <td>Flutter</td>
+      <td>تفاعل تسلسلي بسيط (نجوم ثم نص) داخل تطبيق موبايل، وليس جدول بيانات معقد يحتاج لوحة تحكم</td>
+    </tr>
+    <tr>
+      <td>حذف/تعديل تعليق المستخدم نفسه (can_manage)</td>
+      <td>Flutter</td>
+      <td>إجراء سريع (زر/قائمة منسدلة) داخل نفس شاشة العرض على الموبايل، لا يحتاج واجهة إدارية منفصلة</td>
+    </tr>
+  </table>
+  <div class="callout tip">
+    <span class="ic">i</span>
+    <span>كل المسارات هنا مخصّصة للمشتري (Buyer) داخل تطبيق الموبايل، لذلك لا يوجد سبب لاستخدام Angular/React
+    هنا؛ هذه الأدوات تناسب أكثر لوحات تحكم التاجر أو الإدارة التي لا تظهر في هذه المجموعة من المسارات.</span>
+  </div>
+
+  <h2 id="user-review">حالة المستخدم لمنتج معيّن</h2>
+  <div class="badge-row">
+    <span class="pill pill-get">GET</span>
+    <span class="path">/Buyer/review/products/{product}/user-review</span>
+  </div>
+  <p>
+    هذا هو أول Endpoint يجب استدعاؤه عند فتح شاشة التقييم، لأنه يخبرك بكل الحالات
+    التي تحتاجها لبناء الواجهة الصحيحة قبل أن يبدأ المستخدم بأي تفاعل.
+  </p>
+
+  <div class="code-label">مثال الاستجابة (مستخدم اشترى ولم يقيّم بعد)</div>
+  <pre>{
+  "message": "تم جلب حالة تقييم المستخدم بنجاح.",
+  "has_purchased": true,
+  "has_reviewed": false,
+  "has_commented": false,
+  "review": null
+}</pre>
+
+  <div class="code-label">مثال الاستجابة (مستخدم قيّم وعلّق بالفعل)</div>
+  <pre>{
+  "message": "تم جلب حالة تقييم المستخدم بنجاح.",
+  "has_purchased": true,
+  "has_reviewed": true,
+  "has_commented": true,
+  "review": {
+    "id": "uuid",
+    "rating": 4,
+    "comment": "منتج ممتاز",
+    "created_at_human": "منذ ساعتين",
+    "created_at": "2026-07-30 10:12:00",
+    "updated_at_human": "منذ ساعتين",
+    "updated_at": "2026-07-30 10:12:00",
+    "is_edited": false,
+    "buyer": { "id": "uuid", "name": "أحمد", "avatar": null },
+    "purchased_variants": [
+      { "product_name": "قميص قطني", "color": "أزرق", "size": "L" }
+    ],
+    "can_manage": true
+  }
+}</pre>
+
+  <table>
+    <tr><th>الحقل</th><th>ماذا يعني للفرونت</th></tr>
+    <tr><td><code>has_purchased</code></td><td>إن كانت false: لا تعرض واجهة التقييم إطلاقاً، اعرض رسالة "اشترِ المنتج أولاً"</td></tr>
+    <tr><td><code>has_reviewed</code></td><td>إن كانت false: اعرض نجوم التقييم فقط، وحقل التعليق يكون معطّلاً (disabled)</td></tr>
+    <tr><td><code>has_commented</code></td><td>true فقط إذا كان نص التعليق غير فارغ فعلياً (وليس مجرد وجود تقييم)</td></tr>
+    <tr><td><code>review</code></td><td>null إن لم يوجد تقييم بعد، وإلا كائن كامل بنفس شكل عناصر القوائم</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>هذا المسار يتطلب تسجيل الدخول دائماً (موضوع ضمن مجموعة مسارات محمية بـ
+    <code>auth:sanctum</code>). لم يعد الكود يحتوي أي معالجة خاصة لحالة "زائر غير مسجّل دخول" — أي
+    طلب بدون توكن صالح سيُرفض مباشرة بخطأ 401 قبل الوصول للدالة أصلاً. لا تستدعِ هذا المسار من شاشة
+    عامة يمكن للزوار فتحها بدون تسجيل دخول، وتعامل معه كمسار يتطلب مستخدماً مسجلاً دائماً.</span>
+  </div>
+
+  <h2 id="comments">قائمة التعليقات النصية للمنتج</h2>
+  <div class="badge-row">
+    <span class="pill pill-get">GET</span>
+    <span class="path">/Buyer/review/products/comments/{product}?per_page=10</span>
+  </div>
+  <p>يعيد فقط التقييمات التي تحتوي على <code>comment</code> نصي غير فارغ (تجاهل التقييمات بالنجوم فقط بدون نص).</p>
+
+  <div class="code-label">مثال الاستجابة (مختصر — الشكل الكامل paginated)</div>
+  <pre>{
+  "message": "تم جلب التعليقات بنجاح.",
+  "data": [
+    {
+      "id": "uuid",
+      "rating": 5,
+      "comment": "جودة ممتازة وسريع",
+      "created_at_human": "منذ يوم",
+      "created_at": "2026-07-30 08:00:00",
+      "updated_at_human": "منذ ساعة",
+      "updated_at": "2026-07-31 09:00:00",
+      "is_edited": true,
+      "buyer": { "id": "uuid", "name": "سارة", "avatar": "https://..." },
+      "purchased_variants": [
+        { "product_name": "حذاء رياضي", "color": "أسود", "size": "42" }
+      ],
+      "can_manage": false
+    }
+  ],
+  "links": { "first": "...", "last": "...", "prev": null, "next": "..." },
+  "meta": { "current_page": 1, "last_page": 3, "per_page": 10, "total": 25 }
+}</pre>
+
+  <div class="callout tip">
+    <span class="ic">✓</span>
+    <span>حقل جديد <code>is_edited</code> يخبرك مباشرة إن كان المستخدم قد عدّل تعليقه بعد إنشائه لأول
+    مرة (يقارن <code>created_at</code> مع <code>updated_at</code> في الباك إند)، بدل أن تقارنهما
+    بنفسك من الفرونت. استخدمه لعرض شارة صغيرة "(معدَّل)" بجانب التعليق، واستخدم
+    <code>updated_at_human</code> لعرض وقت آخر تعديل بدل وقت الإنشاء عند الحاجة.</span>
+  </div>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span><code>purchased_variants</code> لا يمثل كل مشتريات هذا العميل من هذا المنتج عبر كل الطلبات
+    التاريخية، بل فقط عناصر <b>أحدث طلب مكتمل</b> ارتبط به التقييم. إذا اشترى نفس المستخدم المنتج
+    مرة أخرى بلون/مقاس مختلف لاحقاً، سيتغيّر محتوى هذا الحقل تلقائياً في المرة القادمة التي يُحدَّث
+    فيها التقييم، حتى لو بقي نص التعليق نفسه. لا تفترض ثباته كتأريخ كامل للشراء.</span>
+  </div>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>هذا المسار ومسار "كل التقييمات" أدناه يعيدان نفس شكل الكائن بالضبط (نفس بنية JSON)، لكنهما
+    مصدران منفصلان تماماً في الباك إند: هذا يعرض التعليقات فقط، والآخر يعرض كل التقييمات (بتعليق أو
+    بدونه). <b>لا تشارك نتائج الكاش بينهما</b> — تعامل معهما كقائمتين مختلفتين تماماً حتى لو تشابه الشكل.</span>
+  </div>
+
+  <h2 id="rates">قائمة كل التقييمات (بالنجوم مع أو بدون تعليق)</h2>
+  <div class="badge-row">
+    <span class="pill pill-get">GET</span>
+    <span class="path">/Buyer/review/products/rates/{product}?per_page=10</span>
+  </div>
+  <p>نفس شكل استجابة قائمة التعليقات تماماً، لكن دون فلترة — أي يشمل كل من قيّم المنتج بالنجوم سواء كتب تعليقاً أم لا. أصبحت الاستجابة الآن تحتوي أيضاً حقل <code>summary</code> إضافي مع الإحصائيات الجاهزة.</p>
+
+  <div class="code-label">مثال الاستجابة (مختصر)</div>
+  <pre>{
+  "message": "تم جلب التقييمات بنجاح.",
+  "summary": {
+    "average_rating": 4.2,
+    "total_reviews": 128,
+    "rating_distribution": {
+      "5": 70,
+      "4": 30,
+      "3": 15,
+      "2": 8,
+      "1": 5
+    }
+  },
+  "data": [ "... نفس شكل عناصر ReviewResource كما في قائمة التعليقات أعلاه ..." ],
+  "links": { "...": "..." },
+  "meta": { "current_page": 1, "last_page": 13, "per_page": 10, "total": 128 }
+}</pre>
+
+  <table>
+    <tr><th>الحقل</th><th>ماذا يعني للفرونت</th></tr>
+    <tr><td><code>summary.average_rating</code></td><td>رقم عشري بخانة عشرية واحدة (مثال 4.2) — جاهز للعرض مباشرة دون حساب يدوي</td></tr>
+    <tr><td><code>summary.total_reviews</code></td><td>إجمالي كل من قيّم المنتج بالنجوم (بتعليق أو بدونه) — نفس معنى <code>meta.total</code> في هذا المسار تحديداً</td></tr>
+    <tr><td><code>summary.rating_distribution</code></td><td>عدد التقييمات لكل نجمة من 1 إلى 5 — استخدمه مباشرة لرسم أشرطة التوزيع (Bar لكل نجمة) دون تجميع يدوي</td></tr>
+  </table>
+
+  <div class="callout tip">
+    <span class="ic">✓</span>
+    <span>حقل <code>summary</code> يُحسب مرة واحدة لكامل المنتج بغض النظر عن رقم الصفحة الحالية —
+    اعرضه مرة واحدة أعلى الشاشة (متوسط + توزيع)، ولا تُعِد حسابه أو تغييره عند التنقل بين الصفحات
+    (Pagination) لأن قيمته ثابتة لكل صفحات نفس المنتج.</span>
+  </div>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span><code>summary</code> يظهر فقط في هذا المسار (<code>rates/{product}</code>) — لا يظهر في
+    مسار التعليقات (<code>comments/{product}</code>) ولا في <code>user-review</code>. إن احتجت عرض
+    متوسط التقييم في أي شاشة أخرى غير شاشة "كل التقييمات"، يجب استدعاء هذا المسار تحديداً للحصول
+    عليه، ولا تفترض وجوده تلقائياً في استجابات المسارات الأخرى.</span>
+  </div>
+
+  <h2 id="rate">إرسال تقييم بالنجوم (إنشاء أو تحديث)</h2>
+  <div class="badge-row">
+    <span class="pill pill-post">POST</span>
+    <span class="path">/Buyer/review/products/{product}/rate</span>
+  </div>
+
+  <div class="code-label">الطلب (Request Body)</div>
+  <pre>{
+  "rating": 4
+}</pre>
+
+  <table>
+    <tr><th>الحقل</th><th>القاعدة</th></tr>
+    <tr><td><code>rating</code></td><td>مطلوب، رقم صحيح، بين 1 و 5</td></tr>
+  </table>
+
+  <div class="code-label">استجابة النجاح — 200</div>
+  <pre>{
+  "message": "تم حفظ التقييم بنجاح.",
+  "data": {
+    "id": "uuid",
+    "product_id": "uuid",
+    "buyer_id": "uuid",
+    "rating": 4,
+    "comment": null,
+    "order_item_id": "uuid",
+    "created_at": "2026-08-01T10:00:00.000000Z",
+    "updated_at": "2026-08-01T10:00:00.000000Z"
+  }
+}</pre>
+
+  <div class="code-label">استجابة الخطأ — 403 (المستخدم هو صاحب المنتج)</div>
+  <pre>{
+  "error_code": "OWN_PRODUCT_REVIEW_FORBIDDEN",
+  "error": "عملية غير مصرح بها: لا يمكنك تقييم منتج تابع لمتجرك."
+}</pre>
+
+  <div class="code-label">استجابة الخطأ — 403 (لا يوجد شراء مكتمل)</div>
+  <pre>{
+  "error_code": "PURCHASE_REQUIRED",
+  "error": "عفواً، يجب عليك شراء وتجربة هذا المنتج أولاً لتتمكن من إعطاء رأيك فيه."
+}</pre>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>لاحظ أن شكل <code>data</code> هنا يختلف تماماً عن شكله في قوائم التعليقات/التقييمات أو في
+    <code>user-review</code>. هنا هو الكائن الخام من قاعدة البيانات (بدون <code>buyer</code>، بدون
+    <code>purchased_variants</code>، بدون <code>can_manage</code>، وبدون <code>created_at_human</code>،
+    <code>updated_at_human</code>، أو <code>is_edited</code> الجديدين). كل الحقول المحسوبة الموجودة
+    في <code>ReviewResource</code> غير موجودة هنا لأنها تُبنى فقط داخل الـ Resource وليست جزءاً من
+    الكائن الخام. لا تحاول استخدام نفس دالة العرض (Parsing) على استجابة هذا المسار كما تفعل مع
+    القوائم — ستحصل على حقول ناقصة. الأفضل عملياً: بعد نجاح الطلب، أعد استدعاء <code>user-review</code>
+    لتحديث الشاشة بالشكل الكامل والموحّد.</span>
+  </div>
+
+  <div class="callout tip">
+    <span class="ic">✓</span>
+    <span>هذا المسار هو Upsert: نفس الطلب يعمل لإنشاء تقييم جديد أو لتعديل تقييم قديم لنفس المنتج —
+    لا يوجد مسار منفصل للتعديل، فقط أرسل نفس الطلب مرة أخرى بقيمة نجوم جديدة.</span>
+  </div>
+
+  <h2 id="comment">إرسال أو تعديل التعليق النصي</h2>
+  <div class="badge-row">
+    <span class="pill pill-post">POST</span>
+    <span class="path">/Buyer/review/products/{product}/comment</span>
+  </div>
+
+  <div class="code-label">الطلب (Request Body)</div>
+  <pre>{
+  "comment": "منتج رائع وسريع التوصيل"
+}</pre>
+
+  <table>
+    <tr><th>الحقل</th><th>القاعدة</th></tr>
+    <tr><td><code>comment</code></td><td>اختياري (nullable)، نص، بحد أقصى 500 حرف — إرسال null يمسح التعليق</td></tr>
+  </table>
+
+  <div class="code-label">استجابة النجاح — 200</div>
+  <pre>{
+  "message": "تم حفظ التعليق بنجاح.",
+  "data": { "id": "uuid", "rating": 4, "comment": "منتج رائع وسريع التوصيل", "...": "نفس شكل data في POST rate" }
+}</pre>
+
+  <div class="code-label">استجابة الخطأ — 422 (لا يوجد تقييم مسبق)</div>
+  <pre>{
+  "error": "يجب تقييم المنتج بالنجوم أولاً قبل كتابة تعليق."
+}</pre>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>هذا هو الشرط الذي يفرض ترتيب الخطوات: <b>لا يمكن إرسال تعليق قبل إرسال تقييم بالنجوم أولاً</b>
+    (لأن حقل rating في قاعدة البيانات لا يقبل قيمة فارغة). لذلك يجب أن يعتمد الفرونت على حقل
+    <code>has_reviewed</code> القادم من <code>user-review</code> لتعطيل صندوق كتابة التعليق تماماً
+    حتى يُنجز المستخدم خطوة النجوم أولاً، بدل أن يعتمد على محاولة الإرسال ثم عرض رسالة خطأ 422.</span>
+  </div>
+
+  <h2 id="delete">حذف التعليق فقط (مع الاحتفاظ بالتقييم)</h2>
+  <div class="badge-row">
+    <span class="pill pill-delete">DELETE</span>
+    <span class="path">/Buyer/review/products/{product}/delete-comment</span>
+  </div>
+  <p>لا يحتاج جسم طلب (Body). يمسح نص التعليق فقط ويُبقي على تقييم النجوم كما هو.</p>
+
+  <div class="code-label">استجابة النجاح — 200</div>
+  <pre>{
+  "message": "تم مسح التعليق بنجاح والاحتفاظ بالتقييم."
+}</pre>
+
+  <div class="code-label">استجابة الخطأ — 404 (لا يوجد تعليق لحذفه)</div>
+  <pre>{
+  "error": "لا يوجد تعليق مسبق لحذفه."
+}</pre>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>استجابة النجاح هنا <b>لا تحتوي حقل <code>data</code> إطلاقاً</b> — فقط رسالة نصية. الباك إند
+    لن يرسل لك الكائن المحدَّث، لذلك على الفرونت تحديث الحالة محلياً بنفسه (اجعل قيمة comment تساوي
+    null في الواجهة مباشرة بعد نجاح الطلب) بدل انتظار بيانات من الاستجابة.</span>
+  </div>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>هذا الإجراء <b>غير قابل للتراجع</b> — بمجرد حذف نص التعليق يُفقد نهائياً، ولا توجد نسخة
+    محفوظة يمكن استرجاعها. اعرض تأكيداً واضحاً للمستخدم (Dialog "هل أنت متأكد؟") قبل استدعاء هذا
+    المسار، ولا تربطه بزر عادي بلا تأكيد.</span>
+  </div>
+
+  <h2 id="flow">مخطط التدفق الكامل لعملية التقييم والتعليق</h2>
+  <p>هذا هو التسلسل الكامل الذي يجب أن تتبعه شاشة التقييم من فتحها وحتى إتمام العملية:</p>
+  <div class="flow">
+    <div class="fbox api"><div class="t1">جلب حالة المستخدم</div><div class="t2">GET user-review</div></div>
+    <div class="arrow-down">↓</div>
+    <div class="fbox decision">has_purchased؟</div>
+    <div class="branch">
+      <div class="col">
+        <div class="label">لا</div>
+        <div class="fbox err"><div class="t1">إخفاء واجهة التقييم</div><div class="t2">اعرض رسالة "اشترِ المنتج أولاً"</div></div>
+      </div>
+      <div class="col">
+        <div class="label">نعم</div>
+        <div class="fbox decision">has_reviewed؟</div>
+      </div>
+    </div>
+    <div class="branch" style="margin-top:-4px">
+      <div class="col" style="visibility:hidden"><div class="fbox err">.</div></div>
+      <div class="col">
+        <div class="arrow-down">↓ (نعم/لا)</div>
+        <div class="fbox api"><div class="t1">إرسال التقييم بالنجوم</div><div class="t2">POST rate</div></div>
+        <div class="arrow-down">↓</div>
+        <div class="fbox decision">نجاح؟</div>
+      </div>
+    </div>
+    <div class="branch">
+      <div class="col">
+        <div class="label">لا (403 / 422)</div>
+        <div class="fbox err"><div class="t1">عرض رسالة الخطأ</div><div class="t2">حسب error_code</div></div>
+      </div>
+      <div class="col">
+        <div class="label">نعم</div>
+        <div class="fbox api"><div class="t1">تفعيل حقل التعليق</div><div class="t2">POST comment</div></div>
+      </div>
+    </div>
+    <div class="arrow-down">↓</div>
+    <div class="fbox ok"><div class="t1">اكتمال التقييم والتعليق</div><div class="t2">تحديث الشاشة محلياً</div></div>
+    <div class="arrow-down">↓ (اختياري)</div>
+    <div class="fbox err"><div class="t1">حذف التعليق فقط</div><div class="t2">DELETE delete-comment</div></div>
+  </div>
+
+  <h2 id="mockups">نماذج الشاشات الرئيسية</h2>
+  <h3>شاشة استغلال الحقول الشرطية (rate قبل comment)</h3>
+  <p>
+    هذه هي النقطة التي طُلب توضيحها تحديداً: كيف تُستخدم حقول <code>has_purchased</code> و
+    <code>has_reviewed</code> و <code>has_commented</code> القادمة من <code>user-review</code>
+    للتحكم بما يظهر ويُفعَّل في الشاشة.
+  </p>
+  <div class="mockup-row">
+
+    <div class="mockup-col">
+      <div class="phone"><div class="screen">
+        <div class="stitle">قيّم هذا المنتج</div>
+        <div class="ssub">has_purchased: false</div>
+        <div class="lockbox">🔒 يجب شراء المنتج واستلامه<br>قبل أن تتمكن من تقييمه</div>
+      </div></div>
+      <div class="badge-endpoint">GET user-review</div>
+    </div>
+
+    <div class="mockup-col">
+      <div class="phone"><div class="screen">
+        <div class="stitle">قيّم هذا المنتج</div>
+        <div class="ssub">has_purchased: true, has_reviewed: false</div>
+        <div class="stars">★★★★★</div>
+        <div class="disabled-box">
+          مربع التعليق معطّل (رمادي) حتى تنجح عملية POST rate — لا يمكن الكتابة فيه الآن.
+        </div>
+      </div></div>
+      <div class="badge-endpoint">POST rate</div>
+    </div>
+
+    <div class="mockup-col">
+      <div class="phone"><div class="screen">
+        <div class="stitle">قيّم هذا المنتج</div>
+        <div class="ssub">has_reviewed: true, has_commented: false</div>
+        <div class="stars on">★★★★☆</div>
+        <div class="enabled-box">
+          مربع التعليق أصبح مفعّلاً الآن — يمكن كتابة النص وإرساله.
+        </div>
+      </div></div>
+      <div class="badge-endpoint">POST comment</div>
+    </div>
+
+  </div>
+  <div class="callout tip">
+    <span class="ic">✓</span>
+    <span>القاعدة العملية: اجعل تفعيل/تعطيل حقل التعليق في الواجهة يعتمد فقط على قيمة
+    <code>has_reviewed</code>، وليس على محاولة الإرسال ثم قراءة رسالة الخطأ 422. هذا يمنع تجربة
+    استخدام مربكة (مربع نشط لكن يرفضه السيرفر).</span>
+  </div>
+
+  <h3>شاشة تصفح التعليقات (Tabs بين "الكل" و"مع تعليق")</h3>
+  <div class="mockup-row">
+    <div class="mockup-col">
+      <div class="phone"><div class="screen">
+        <div class="stitle">تقييمات المنتج</div>
+        <div class="ssub">GET rates/{product}</div>
+        <div class="row"><span>سارة — ★★★★★</span><span style="color:var(--text-muted)">منذ يوم</span></div>
+        <div class="row"><span>أحمد — ★★★☆☆</span><span style="color:var(--text-muted)">منذ 3 أيام</span></div>
+        <div class="row" style="border-bottom:none"><span>ليلى — ★★★★★ (بدون تعليق)</span><span style="color:var(--text-muted)">منذ أسبوع</span></div>
+      </div></div>
+      <div class="badge-endpoint">GET rates/{product}</div>
+    </div>
+    <div class="mockup-col">
+      <div class="phone"><div class="screen">
+        <div class="stitle">التعليقات فقط</div>
+        <div class="ssub">GET comments/{product}</div>
+        <div class="row"><span>سارة — "جودة ممتازة"</span><span style="color:var(--text-muted)">✎</span></div>
+        <div class="row" style="border-bottom:none"><span>أحمد — "توصيل سريع"</span><span></span></div>
+        <div class="disabled-box">قائمة منفصلة تماماً عن التبويب الأول رغم تشابه الشكل — لا تُشارك الكاش بينهما.</div>
+      </div></div>
+      <div class="badge-endpoint">GET comments/{product}</div>
+    </div>
+  </div>
+
+  <h2 id="errors">جدول ملخّص لكل الأخطاء المتوقعة</h2>
+  <table>
+    <tr><th>الكود</th><th>يظهر في</th><th>المعنى</th><th>ماذا يفعل الفرونت</th></tr>
+    <tr>
+      <td>401</td>
+      <td>كل المسارات</td>
+      <td>لا يوجد توكن صالح للمستخدم</td>
+      <td>أعد المستخدم لشاشة تسجيل الدخول</td>
+    </tr>
+    <tr>
+      <td>403 — OWN_PRODUCT_REVIEW_FORBIDDEN</td>
+      <td>POST rate</td>
+      <td>المستخدم هو صاحب المتجر لهذا المنتج</td>
+      <td>أخفِ زر التقييم كلياً لهذه الحالة إن أمكن معرفتها مسبقاً، أو اعرض الرسالة كما هي</td>
+    </tr>
+    <tr>
+      <td>403 — PURCHASE_REQUIRED</td>
+      <td>POST rate</td>
+      <td>لا يوجد طلب مكتمل لهذا المنتج</td>
+      <td>اعرض رسالة "اشترِ المنتج أولاً" — ويفضَّل منعها مسبقاً عبر has_purchased</td>
+    </tr>
+    <tr>
+      <td>422 (تحقق Laravel القياسي)</td>
+      <td>POST rate / POST comment</td>
+      <td>rating خارج نطاق 1-5، أو comment أطول من 500 حرف</td>
+      <td>اعرض رسالة تحقق تحت الحقل المعني مباشرة قبل الإرسال إن أمكن (تحقق محلي مسبق)</td>
+    </tr>
+    <tr>
+      <td>422 (رسالة مخصصة)</td>
+      <td>POST comment</td>
+      <td>لا يوجد تقييم مسبق للمستخدم على هذا المنتج</td>
+      <td>لا يجب أن يحدث إن اعتمدت على has_reviewed لتعطيل الحقل — اعتبره حماية إضافية فقط</td>
+    </tr>
+    <tr>
+      <td>404</td>
+      <td>DELETE delete-comment</td>
+      <td>لا يوجد تعليق نصي لحذفه أصلاً</td>
+      <td>عطّل زر الحذف إن كان has_commented يساوي false</td>
+    </tr>
+    <tr>
+      <td>404 (Route Model Binding)</td>
+      <td>كل المسارات المحتوية على {product}</td>
+      <td>رقم المنتج غير موجود</td>
+      <td>اعرض شاشة "المنتج غير موجود" العامة</td>
+    </tr>
+  </table>
+
+  <h2 id="tips">نصائح عملية لتفادي الاحتكاك مع الباك إند</h2>
+  <div class="card">
+    <ol class="num-list">
+      <li>استدعِ <code>user-review</code> دائماً عند فتح شاشة التقييم أولاً، واستخدم حقوله الثلاثة
+      (<code>has_purchased</code>, <code>has_reviewed</code>, <code>has_commented</code>) للتحكم
+      بالحالة المرئية للشاشة، بدلاً من الاعتماد على أخطاء 403/422 كوسيلة للتحقق.</li>
+      <li>لا تعتمد على شكل <code>data</code> في استجابة <code>POST rate</code> أو <code>POST comment</code>
+      لعرض بيانات كاملة (اسم المشتري، الصورة، المتغيرات المشتراة) — أعد جلب <code>user-review</code>
+      بعد كل عملية ناجحة للحصول على الشكل الكامل والموحّد.</li>
+      <li>عامل قائمتي "التعليقات" و"كل التقييمات" كمصدرين منفصلين تماماً من ناحية التخزين المؤقت
+      (Cache/State) رغم تطابق شكل عناصرهما.</li>
+      <li>اعرض المتوسط وتوزيع النجوم من حقل <code>summary</code> الجاهز داخل استجابة
+      <code>rates/{product}</code> مباشرة — لا داعي لحسابهما يدوياً بجلب كل الصفحات، لكن تذكّر أن
+      هذا الحقل موجود في هذا المسار فقط.</li>
+      <li>اعرض تأكيداً صريحاً قبل استدعاء حذف التعليق لأنه إجراء نهائي لا يمكن التراجع عنه.</li>
+      <li>بعد نجاح حذف التعليق، حدّث حالة الشاشة محلياً (اجعل comment = null) لأن الاستجابة لا تُعيد
+      بيانات التقييم المحدّثة.</li>
+      <li>راقب دائماً حقل <code>can_manage</code> ضمن كل عنصر تقييم في القوائم لتحديد إظهار أزرار
+      التعديل/الحذف بجانب تعليقات المستخدم الحالي فقط.</li>
+    </ol>
+  </div>
+
+  <h2 id="backend-note">ملاحظة مقترحة لفريق الباك إند</h2>
+
+  <div class="callout tip">
+    <span class="ic">✓</span>
+    <span>
+      تم فعلاً إضافة حقل <code>summary</code> (المتوسط، الإجمالي، توزيع النجوم) في
+      <code>GET rates/{product}</code>، وتم حذف الفرع الميت الخاص بحالة "زائر غير مسجّل دخول" من
+      <code>userReview</code> بعد أن كان غير قابل للوصول أصلاً. النقطتان اللتان ذُكرتا سابقاً في هذا
+      القسم أصبحتا محلولتين، وما تبقى أدناه ملاحظة جديدة تستحق المراجعة.
+    </span>
+  </div>
+
+  <div class="callout warn">
+    <span class="ic">⚠</span>
+    <span>
+      داخل <code>rateindex</code>، استعلام حساب <code>summary</code> يستخدم
+      <code class="mono">DB::table('product_reviews')</code> بدون بادئة السكيما
+      <code class="mono">app.</code>، بينما كل الاستعلامات الأخرى في نفس الملف (وموديل
+      <code>ProductReview</code> نفسه عبر <code>protected $table = 'app.product_reviews'</code>)
+      تلتزم دائماً بتحديد <code class="mono">app.</code> صراحةً (مثل
+      <code class="mono">app.order_items</code> و<code class="mono">app.orders</code>). إن لم يكن
+      <code class="mono">search_path</code> الافتراضي لقاعدة البيانات يتضمن سكيما <code>app</code>،
+      فقد يعيد هذا الاستعلام صفراً في كل حقول <code>summary</code> بصمت (بدون خطأ ظاهر) بدل القيم
+      الصحيحة، أو يفشل إن لم يوجد جدول بنفس الاسم في سكيما أخرى. يُنصح بتوحيدها لتصبح
+      <code class="mono">DB::table('app.product_reviews')</code> مثل بقية الاستعلامات، أو تأكيد أن
+      إعداد الاتصال بقاعدة البيانات يضبط <code class="mono">search_path</code> تلقائياً على
+      <code>app</code>.
+    </span>
+  </div>
+
+  <footer>
+    دليل إداره الرفيو — تم إعداده لفريق الفرونت إند · ملف HTML مستقل بدون اتصال إنترنت
+  </footer>
+</main>
+
+</body>
+</html>

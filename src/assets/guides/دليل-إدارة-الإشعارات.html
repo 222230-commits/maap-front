@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>دليل ربط الفرونت إند — إدارة الإشعارات</title>
+<style>
+  :root{
+    --bg:#F7F6F2; --card:#FFFFFF; --border:#E4E2D8; --text:#2B2A26; --text-muted:#6B6A62;
+    --teal:#0F6E56; --teal-light:#E1F5EE; --teal-mid:#5DCAA5;
+    --coral:#993C1D; --coral-light:#FAECE7; --coral-mid:#D85A30;
+    --purple:#3C3489; --purple-light:#EEEDFE; --purple-mid:#7F77DD;
+    --gray:#5F5E5A; --gray-light:#F1EFE8;
+    --red:#791F1F; --red-light:#FCEBEB;
+    --code-bg:#22261F; --code-text:#E9E7DD;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI",Tahoma,Arial,sans-serif;line-height:1.7}
+  code, .mono{font-family:"Consolas","Courier New",monospace;direction:ltr;unicode-bidi:embed}
+  a{color:var(--teal)}
+  .layout{display:flex;min-height:100vh}
+  nav.side{width:250px;flex:none;background:var(--card);border-left:1px solid var(--border);
+    position:sticky;top:0;height:100vh;overflow-y:auto;padding:20px 16px}
+  nav.side h4{font-size:12px;color:var(--text-muted);text-transform:uppercase;margin:18px 0 6px;letter-spacing:.03em}
+  nav.side a{display:block;padding:6px 8px;border-radius:6px;color:var(--text);text-decoration:none;font-size:14px}
+  nav.side a:hover{background:var(--teal-light);color:var(--teal)}
+  main{flex:1;padding:36px 48px;max-width:980px}
+  .eyebrow{color:var(--teal);font-size:13px;font-weight:bold;letter-spacing:.04em}
+  h1{font-size:28px;margin:6px 0 10px}
+  .lead{color:var(--text-muted);font-size:15px;max-width:720px}
+  h2{font-size:21px;border-bottom:2px solid var(--border);padding-bottom:8px;margin-top:46px}
+  h3{font-size:16px;margin-top:26px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin:14px 0}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th,td{border:1px solid var(--border);padding:8px 10px;text-align:right;vertical-align:top}
+  th{background:var(--teal-light);color:var(--teal)}
+  .pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:bold;font-family:monospace;direction:ltr}
+  .pill-get{background:#E6F1FB;color:#0C447C}
+  .pill-post{background:var(--teal-light);color:var(--teal)}
+  .pill-patch{background:var(--purple-light);color:var(--purple)}
+  .pill-delete{background:var(--red-light);color:var(--red)}
+  .route-line{display:flex;align-items:center;gap:10px;margin:10px 0}
+  .route-line code{font-size:14px}
+  pre{background:var(--code-bg);color:var(--code-text);padding:14px 16px;border-radius:8px;overflow-x:auto;font-size:13px;direction:ltr;text-align:left}
+  .callout{border-radius:8px;padding:12px 14px;margin:12px 0;font-size:13.5px}
+  .callout.warn{background:var(--coral-light);border-right:4px solid var(--coral-mid);color:#5c2810}
+  .callout.tip{background:var(--teal-light);border-right:4px solid var(--teal-mid);color:#0a4a3a}
+  .flow{display:flex;flex-direction:column;align-items:center;gap:6px;margin:22px 0}
+  .fbox{border-radius:8px;padding:10px 18px;font-size:13.5px;text-align:center;min-width:230px;border:1px solid transparent}
+  .fbox.api{background:var(--purple-light);color:var(--purple);border-color:#CECBF6}
+  .fbox.manual{background:var(--gray-light);color:var(--gray);border-color:#D3D1C7}
+  .fbox.dead{background:var(--gray-light);color:var(--text-muted);border:1px dashed #B4B2A9}
+  .arrow{color:var(--text-muted);font-size:18px}
+  .branch{font-size:12px;color:var(--text-muted)}
+  .phone{width:270px;margin:16px auto;background:#1c1c1a;border-radius:26px;padding:8px}
+  .screen{background:var(--card);border-radius:18px;overflow:hidden}
+  .row{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid var(--border);font-size:12.5px}
+  .row:first-child{border-top:none}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--coral-mid);flex:none}
+  .badge-endpoint{display:inline-block;margin-top:8px;font-size:11px;font-family:monospace;direction:ltr;background:var(--purple-light);color:var(--purple);padding:2px 8px;border-radius:6px}
+  .center{text-align:center}
+  .tree{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;max-width:520px;margin:14px auto}
+  .tnode{display:flex;justify-content:space-between;align-items:center;padding:8px 6px;border-bottom:1px solid var(--border);font-size:13.5px}
+  .tnode:last-child{border-bottom:none}
+  .modal-wrap{background:#00000022;border-radius:10px;padding:34px;display:flex;justify-content:center}
+  .modal{background:var(--card);border-radius:10px;padding:20px 22px;max-width:340px;box-shadow:0 6px 20px #00000022}
+  .modal h4{margin:0 0 8px}
+  .modal p{font-size:13.5px;color:var(--text-muted);margin:0 0 16px}
+  .btn-row{display:flex;gap:8px;justify-content:flex-end}
+  .btn{padding:6px 16px;border-radius:6px;font-size:13px;border:1px solid var(--border);background:var(--gray-light)}
+  .btn.danger{background:var(--red-light);color:var(--red);border-color:#F7C1C1}
+  footer{margin-top:60px;padding:20px 0;border-top:1px solid var(--border);color:var(--text-muted);font-size:12.5px;text-align:center}
+  ol.tips li{margin:8px 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="side">
+  <h4>تصفح المستخدم</h4>
+  <a href="#overview">نظرة عامة واختيار الأداة</a>
+  <a href="#flow">تدفق إرسال الإشعار</a>
+  <a href="#index">قائمة الإشعارات (index)</a>
+  <a href="#unread">عدد غير المقروء</a>
+  <a href="#markread">تحديد كمقروء</a>
+
+  <h4>إدارة الطرف الآخر</h4>
+  <a href="#markall">تحديد الكل كمقروء</a>
+  <a href="#destroy">حذف إشعار</a>
+  <a href="#clearall">مسح الكل</a>
+
+  <h4>مرجع سريع</h4>
+  <a href="#mockups">نماذج الشاشات</a>
+  <a href="#errors">جدول الأخطاء</a>
+  <a href="#tips">نصائح عملية</a>
+  <a href="#backend-note">ملاحظة للباك إند</a>
+</nav>
+
+<main>
+  <div class="eyebrow">دليل تكامل الفرونت إند</div>
+  <h1>وحدة إدارة الإشعارات (Notifications)</h1>
+  <p class="lead">توثيق شامل لربط مسارات الإشعارات بتطبيق Flutter (تجربة المستخدم النهائي) ولوحة Angular (إدارة/عرض داخلي)، مبني على قراءة فعلية لكود <code>NotificationController</code> و<code>NotificationService</code> و<code>FirebaseService</code> وأوامر الجدولة المرتبطة.</p>
+
+  <h2 id="overview">1. نظرة عامة واختيار الأداة</h2>
+  <table>
+    <tr><th>الميزة</th><th>الأداة المناسبة</th><th>السبب</th></tr>
+    <tr><td>شاشة إشعارات المستخدم (قائمة، Pull-to-refresh، سحب للحذف)</td><td>Flutter</td><td>تجربة موبايل تفاعلية متسلسلة، اعتماد أساسي على polling دوري بدل Push حالياً</td></tr>
+    <tr><td>عداد غير المقروء في شريط التنقل السفلي</td><td>Flutter</td><td>استعلام خفيف متكرر يحتاج تحديث فوري لعنصر UI صغير</td></tr>
+    <tr><td>لوحة مراقبة/سجل إشعارات للمشرف</td><td>Angular</td><td>جدول بيانات مع ترقيم صفحات وإجراءات جماعية (تحديد الكل/مسح الكل) — سيناريو كلاسيكي للوحات تحكم</td></tr>
+    <tr><td>مودال تأكيد "مسح الكل"</td><td>Angular</td><td>عملية غير قابلة للتراجع تحتاج تأكيد صريح ضمن سياق لوحة إدارية</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <b>فخ حرج يؤثر على كل الأدوات:</b> <code>NotificationService::sendToUser</code> يحتوي سطر <code>return;</code> فور الحفظ في قاعدة البيانات، قبل الوصول لكود جلب التوكنز وإرسال Firebase. عملياً: <b>لا يوجد Push Notification فعلي حالياً</b>، فقط سجل في <code>app.notifications</code>. أي واجهة تعتمد فقط على استقبال Push ستفوّتها.
+  </div>
+
+  <h2 id="flow">2. تدفق إرسال الإشعار الحالي (متعدد الخطوات)</h2>
+  <p>هذا التدفق يوضح ما يحدث فعلياً عند تشغيل <code>orders:auto-complete</code> أو <code>orders:remind-awaiting</code>، وأين ينقطع التدفق قبل الوصول لـ Firebase.</p>
+  <div class="flow">
+    <div class="fbox manual">حدث مجدول (Command): طلب مكتمل تلقائياً / تذكير</div>
+    <div class="arrow">↓</div>
+    <div class="fbox api">NotificationService::sendToUser</div>
+    <div class="arrow">↓</div>
+    <div class="fbox api">إدراج سجل في app.notifications (نجاح دائماً)</div>
+    <div class="arrow">↓</div>
+    <div class="fbox manual" style="border:1px dashed var(--coral-mid);color:var(--coral)">return; — نهاية التنفيذ الفعلية هنا</div>
+    <div class="branch">↓ الكود التالي كود ميت (dead code) لا يُنفَّذ أبداً بالوضع الحالي</div>
+    <div class="fbox dead">جلب fcm_token عبر app.get_user_active_tokens</div>
+    <div class="arrow" style="opacity:.4">↓</div>
+    <div class="fbox dead">FirebaseService::sendMultiple → Push</div>
+  </div>
+  <div class="callout tip">
+    <b>توصية تصميم:</b> في Flutter، لا تعتمد الشاشة الرئيسية على <code>FirebaseMessaging.onMessage</code> وحده لتحديث العداد. استخدم polling كل 30-60 ثانية على <code>/unread-count</code> بالإضافة إلى Pull-to-refresh على قائمة الإشعارات، وتحديث فوري عند فتح التطبيق من الخلفية (<code>AppLifecycleState.resumed</code>).
+  </div>
+
+  <h2 id="index">3. قائمة إشعارات المستخدم</h2>
+  <div class="route-line"><span class="pill pill-get">GET</span><code>/notifications?per_page=15</code></div>
+  <p>لا يوجد Body للطلب. Query param اختياري: <code>per_page</code> (افتراضي 15، الحد الأقصى 50، أي قيمة ≤0 تُستبدل بـ 15).</p>
+  <h3>مثال استجابة النجاح</h3>
+  <pre>{
+  "success": true,
+  "pagination": {
+    "total": 42,
+    "current_page": 1,
+    "last_page": 3
+  },
+  "data": [
+    {
+      "id": "...",
+      "type": "order_reminder",
+      "notifiable_type": "user",
+      "notifiable_id": "...",
+      "order_id": "1042",
+      "data": { "title": "تذكير بتأكيد استلام الطلب", "body": "طلبك رقم #1042 جاهز للاستلام..." },
+      "locale": "ar",
+      "read_at": null,
+      "created_at": "...",
+      "updated_at": "..."
+    }
+  ]
+}</pre>
+  <table>
+    <tr><th>الحقل</th><th>ملاحظة</th></tr>
+    <tr><td><code>data.title</code> / <code>data.body</code></td><td>نص الإشعار الفعلي — لا يوجد حقل title/body top-level منفصل</td></tr>
+    <tr><td><code>order_id</code></td><td>حقل top-level منفصل، غير مكرر داخل data</td></tr>
+    <tr><td><code>read_at</code></td><td><code>null</code> يعني غير مقروء — استخدمه لتحديد الحالة، لا يوجد حقل <code>is_read</code> منفصل</td></tr>
+  </table>
+  <div class="callout warn">
+    <b>فخ:</b> استجابة <code>pagination</code> لا تُرجع <code>per_page</code> المُستخدم فعلياً ولا روابط next/prev. الفرونت يجب أن يحتفظ بقيمة per_page التي أرسلها بنفسه لحساب الصفحة التالية بدقة.
+  </div>
+  <div class="callout warn">
+    <b>فخ:</b> حقل <code>type</code> نص حر مفتوح (القيم المعروفة حالياً: <code>order_reminder</code>, <code>order_auto_completed</code>) وقد يُضاف له قيم جديدة من الباك إند مستقبلاً دون تنسيق مسبق. اجعل أيقونة/تصنيف افتراضي (fallback) لأي <code>type</code> غير معروف بدل الاعتماد على قائمة ثابتة.
+  </div>
+
+  <h2 id="unread">4. عدد الإشعارات غير المقروءة</h2>
+  <div class="route-line"><span class="pill pill-get">GET</span><code>/notifications/unread-count</code></div>
+  <pre>{ "success": true, "unread_count": 5 }</pre>
+  <div class="callout warn">
+    <b>فخ دقيق:</b> هذا المسار وحده لا يُطابق <code>notifiable_type = 'user'</code>، بعكس باقي المسارات. لا تأثير حالياً لأن النوع الوحيد المستخدم هو <code>user</code>، لكن إن أضاف الباك إند لاحقاً إشعارات لأنواع أخرى (متجر/مشرف) فقد يظهر عدد غير دقيق دون سابق إنذار — راقب هذا السلوك.
+  </div>
+
+  <h2 id="markread">5. تحديد إشعار واحد كمقروء</h2>
+  <div class="route-line"><span class="pill pill-patch">PATCH</span><code>/notifications/{id}/read</code></div>
+  <pre>// نجاح 200
+{ "success": true, "message": "تم تحديد الإشعار كمقروء." }
+
+// فشل 404 — غير موجود أو ليس ملكاً للمستخدم
+{ "success": false, "message": "الإشعار غير موجود." }</pre>
+  <div class="callout warn"><b>فخ:</b> لا تُعاد بيانات السجل المُحدَّث. حدّث الحالة محلياً (optimistic update) في الواجهة فور نجاح الطلب بدل انتظار كائن من الاستجابة.</div>
+
+  <h2 id="markall">6. تحديد كل الإشعارات كمقروءة</h2>
+  <div class="route-line"><span class="pill pill-post">POST</span><code>/notifications/mark-all-read</code></div>
+  <pre>{ "success": true, "message": "تم تحديد جميع الإشعارات كمقروءة." }</pre>
+  <div class="callout warn"><b>فخ:</b> الاستجابة نجاح دائماً حتى لو لم يوجد أي إشعار غير مقروء أصلاً — لا يُرجَع عدد السجلات المتأثرة، فلا تعتمد على هذا الرقم لأي منطق عرض.</div>
+
+  <h2 id="destroy">7. حذف إشعار محدد</h2>
+  <div class="route-line"><span class="pill pill-delete">DELETE</span><code>/notifications/{id}/delete</code></div>
+  <pre>// نجاح 200
+{ "success": true, "message": "تم حذف الإشعار بنجاح." }
+
+// فشل 404
+{ "success": false, "message": "الإشعار غير موجود أو لا تملك صلاحية حذفه." }</pre>
+  <div class="callout warn"><b>عملية غير قابلة للتراجع:</b> حذف نهائي (hard delete) من قاعدة البيانات، لا يوجد Soft Delete أو سلة محذوفات.</div>
+
+  <h2 id="clearall">8. مسح جميع الإشعارات</h2>
+  <div class="route-line"><span class="pill pill-delete">DELETE</span><code>/notifications/clear-all</code></div>
+  <pre>{ "success": true, "message": "تم مسح جميع الإشعارات بنجاح." }</pre>
+  <div class="callout warn"><b>عملية غير قابلة للتراجع وجماعية:</b> تحذف كل إشعارات المستخدم دفعة واحدة بلا تأكيد من الباك إند. التأكيد يجب أن يحدث بالكامل على مستوى الفرونت إند (مودال تأكيد إلزامي) قبل استدعاء هذا المسار.</div>
+
+  <h2 id="mockups">9. نماذج الشاشات</h2>
+
+  <h3>شاشة إشعارات Flutter (المستخدم النهائي)</h3>
+  <div class="phone"><div class="screen">
+    <div class="row" style="justify-content:space-between;background:var(--teal-light)">
+      <span style="color:var(--teal)">تحديد الكل كمقروء</span><b>الإشعارات</b><span>⋮</span>
+    </div>
+    <div class="row"><span class="dot"></span><div><b>تذكير بتأكيد استلام الطلب</b><br><span style="color:var(--text-muted)">طلبك رقم #1042 جاهز للاستلام...</span></div></div>
+    <div class="row" style="opacity:.65"><span style="width:7px"></span><div>تم إكمال الطلب<br><span style="color:var(--text-muted)">طلبك رقم #1038 أصبح مكتمل...</span></div></div>
+    <div class="row center" style="justify-content:center;color:var(--text-muted)">اسحب للتحديث — لا يوجد Push فعلي حالياً</div>
+  </div></div>
+  <p class="center"><span class="badge-endpoint">GET /notifications · GET /unread-count · PATCH /{id}/read · DELETE /{id}/delete</span></p>
+  <p style="font-size:13.5px;color:var(--text-muted)">النقطة الملونة (<span class="dot" style="display:inline-block"></span>) تعتمد على <code>read_at === null</code>. السحب لليسار على العنصر يستدعي <code>DELETE /{id}/delete</code> مباشرة — أضف تأكيد بسيط (Snackbar بخيار تراجع) لأن الحذف نهائي فوراً في الباك إند.</p>
+
+  <h3>لوحة إشعارات Angular</h3>
+  <div class="tree">
+    <div class="tnode" style="font-weight:bold"><span>النوع / الرسالة</span><span>إجراء</span></div>
+    <div class="tnode"><span>order_reminder — طلبك رقم #1042 جاهز للاستلام</span><span>🗑</span></div>
+    <div class="tnode" style="opacity:.6"><span>order_auto_completed — طلبك رقم #1038 مكتمل</span><span>🗑</span></div>
+  </div>
+  <p class="center"><span class="badge-endpoint">GET /notifications?per_page=15</span></p>
+
+  <h3>مودال تأكيد "مسح الكل"</h3>
+  <div class="modal-wrap"><div class="modal">
+    <h4>مسح جميع الإشعارات؟</h4>
+    <p>سيتم حذف كل الإشعارات نهائياً ولا يمكن التراجع عن هذا الإجراء.</p>
+    <div class="btn-row"><button class="btn">إلغاء</button><button class="btn danger">مسح الكل</button></div>
+  </div></div>
+  <p class="center"><span class="badge-endpoint">DELETE /notifications/clear-all</span></p>
+  <p style="font-size:13.5px;color:var(--text-muted)">زر "مسح الكل" في اللوحة يفتح هذا المودال أولاً؛ الاستدعاء الفعلي لـ API يحدث فقط بعد ضغط تأكيد صريح داخل المودال، لأن الباك إند لا يطلب أي تأكيد بنفسه.</p>
+
+  <h2 id="errors">10. جدول ملخص الأخطاء المتوقعة</h2>
+  <table>
+    <tr><th>الكود</th><th>يظهر في</th><th>المعنى</th><th>ماذا يفعل الفرونت</th></tr>
+    <tr><td>200</td><td>كل المسارات (نجاح)</td><td>تم تنفيذ العملية</td><td>تحديث الحالة محلياً حسب المسار</td></tr>
+    <tr><td>404</td><td>markAsRead، destroy</td><td>السجل غير موجود أو لا يملكه المستخدم</td><td>عرض رسالة الخطأ المُعادة مباشرة من <code>message</code>، إزالة العنصر من الواجهة إن كان معروضاً بالفعل</td></tr>
+    <tr><td>401/419 (Sanctum)</td><td>كل المسارات</td><td>الجلسة/التوكن غير صالح</td><td>إعادة توجيه لتسجيل الدخول</td></tr>
+  </table>
+
+  <h2 id="tips">11. نصائح عملية لتفادي الاحتكاك مع الباك إند</h2>
+  <div class="card">
+    <ol class="tips">
+      <li>لا تبني أي منطق على وصول Push فعلي حالياً — اعتمد على polling/refresh حتى يُعدَّل <code>sendToUser</code>.</li>
+      <li>اقرأ نص الإشعار دائماً من <code>data.title</code>/<code>data.body</code>، و<code>order_id</code> من الحقل top-level المنفصل.</li>
+      <li>عامل حذف الإشعار الفردي والجماعي كعمليات نهائية — أضف تأكيداً في الفرونت حتى لو بدت العملية بسيطة.</li>
+      <li>حدّث القوائم محلياً بعد mark-as-read / mark-all-read، فلا تنتظر كائناً محدَّثاً من الاستجابة.</li>
+      <li>تعامل مع <code>type</code> كقيمة مفتوحة قابلة للتوسع — لا تفترض قائمة ثابتة من الأنواع.</li>
+      <li>احتفظ بقيمة <code>per_page</code> التي أرسلتها بنفسك لحساب الصفحات، فالاستجابة لا تعيدها.</li>
+    </ol>
+  </div>
+
+  <h2 id="backend-note">12. ملاحظة مقترحة لفريق الباك إند</h2>
+  <div class="callout warn">
+    <b>1. تفعيل الإرسال الفعلي عبر Firebase:</b> إزالة أو نقل سطر <code>return;</code> في <code>NotificationService::sendToUser</code> بعد الحفظ في قاعدة البيانات، حتى يصل فعلياً كود جلب التوكنز واستدعاء <code>FirebaseService::sendMultiple</code>.
+  </div>
+  <div class="callout warn">
+    <b>2. لا يوجد مسار لتسجيل FCM Token:</b> النظام يعتمد على جدول <code>app.user_device_tokens</code> ودالة <code>app.get_user_active_tokens</code>، لكن لا يوجد Route مُرسَل ضمن هذه المجموعة لاستقبال/تحديث توكن الجهاز من التطبيق (عادة عند تسجيل الدخول أو فتح التطبيق لأول مرة). بدون هذا المسار لن تُملأ الجداول أصلاً حتى بعد إصلاح النقطة الأولى.
+  </div>
+  <div class="callout warn">
+    <b>3. توحيد فلترة notifiable_type:</b> <code>unreadCount()</code> لا تُطابق <code>notifiable_type = 'user'</code> بعكس باقي الدوال في نفس الكلاس — يُفضّل التوحيد تحسباً لإضافة أنواع مستقبلية.
+  </div>
+
+  <footer>دليل تقني داخلي — تم إنشاؤه من تحليل مباشر لكود NotificationController وNotificationService وFirebaseService وأوامر الجدولة المرتبطة.</footer>
+</main>
+</div>
+</body>
+</html>

@@ -1,207 +1,299 @@
 <div class="profile-page">
 
-  <!-- Header البروفايل -->
-  <div class="profile-header">
-    <div class="avatar">
-      <i class="fas fa-user-circle"></i>
+  @if (isLoading()) {
+    <div class="profile-loading">
+      <i class="fas fa-circle-notch fa-spin"></i>
     </div>
-    <div class="user-info">
-      <h2>{{ currentUser()?.name }}</h2>
-      <p>{{ currentUser()?.email }}</p>
-      <span class="role-badge">
-        @if (role() === 'admin') {
-          <i class="fas fa-shield-alt"></i> مدير النظام
-        } @else if (role() === 'merchant') {
-          <i class="fas fa-store"></i> تاجر
-        } @else {
-          <i class="fas fa-user"></i> مشتري
-        }
-      </span>
+  }
+
+  @if (!isLoading() && profile()) {
+
+    <!-- ══ HERO HEADER ══ -->
+    <div class="profile-hero">
+      <div class="hero-gradient"></div>
+      <div class="hero-content">
+
+        <!-- Avatar -->
+        <div class="avatar-wrapper">
+          <div class="avatar-ring">
+            @if (profile()!.avatar_url) {
+              <img [src]="profile()!.avatar_url"
+                   [alt]="profile()!.full_name"
+                   class="avatar-img" />
+            } @else {
+              <div class="avatar-placeholder">
+                <i class="fas fa-user"></i>
+              </div>
+            }
+          </div>
+          <label class="avatar-upload-btn"
+                 [class.uploading]="isUploadingAvatar()"
+                 title="تغيير الصورة">
+            @if (isUploadingAvatar()) {
+              <i class="fas fa-spinner fa-spin"></i>
+            } @else {
+              <i class="fas fa-camera"></i>
+            }
+            <input type="file" accept="image/*" hidden
+                   [disabled]="isUploadingAvatar()"
+                   (change)="onAvatarChange($event)" />
+          </label>
+        </div>
+
+        <!-- Name + Role -->
+        <div class="hero-info">
+          <h1>{{ profile()!.full_name }}</h1>
+          <span class="role-chip" [class.merchant-role]="isMerchant()">
+            @if (isMerchant()) {
+              <i class="fas fa-store"></i>
+              تاجر
+            } @else {
+              <i class="fas fa-shopping-bag"></i>
+              مشتري
+            }
+          </span>
+        </div>
+
+        <p class="hero-email">{{ profile()!.email }}</p>
+      </div>
     </div>
-    <button class="logout-btn" (click)="logout()">
-      <i class="fas fa-sign-out-alt"></i> خروج
-    </button>
-  </div>
 
-  <!-- تبويبات -->
-  <div class="profile-tabs">
-    <button [class.active]="activeTab() === 'profile'"
-            (click)="activeTab.set('profile')">
-      <i class="fas fa-user"></i> بياناتي
-    </button>
-    <button [class.active]="activeTab() === 'wishlist'"
-            (click)="activeTab.set('wishlist')">
-      <i class="fas fa-heart"></i>
-      المفضلة ({{ wishlist().length }})
-    </button>
-    <button [class.active]="activeTab() === 'orders'"
-            (click)="activeTab.set('orders')">
-      <i class="fas fa-shopping-bag"></i>
-      طلباتي ({{ orders().length }})
-    </button>
-    <button [class.active]="activeTab() === 'settings'"
-            (click)="activeTab.set('settings')">
-      <i class="fas fa-cog"></i> الإعدادات
-    </button>
-  </div>
-
-  <!-- محتوى التبويبات -->
-  <div class="profile-content">
-
-    <!-- بياناتي -->
-    @if (activeTab() === 'profile') {
-      <div class="info-section">
-        <h3><i class="fas fa-user"></i> المعلومات الشخصية</h3>
-        @if (!editMode()) {
-          <div class="info-item">
-            <i class="fas fa-signature"></i>
-            <span>الاسم:</span>
-            <strong>{{ currentUser()?.name }}</strong>
-          </div>
-          <div class="info-item">
-            <i class="fas fa-envelope"></i>
-            <span>الإيميل:</span>
-            <strong>{{ currentUser()?.email }}</strong>
-          </div>
-          <div class="info-item">
-            <i class="fas fa-calendar"></i>
-            <span>تاريخ التسجيل:</span>
-            <strong>{{ currentUser()?.createdAt | date:'yyyy/MM/dd' }}</strong>
-          </div>
-          <button class="edit-btn" (click)="startEdit()">
-            <i class="fas fa-pen"></i> تعديل البيانات
-          </button>
-        } @else {
-          <div class="edit-form">
-            <label>الاسم الكامل</label>
-            <input type="text"
-                   [value]="editName()"
-                   (input)="updateEditName($any($event.target).value)" />
-            <div class="edit-actions">
-              <button class="save-btn" (click)="saveEdit()">
-                <i class="fas fa-check"></i> حفظ
-              </button>
-              <button class="cancel-btn" (click)="editMode.set(false)">
-                <i class="fas fa-times"></i> إلغاء
-              </button>
-            </div>
-          </div>
+    <!-- ══ QUICK STATS ══ -->
+    <div class="quick-stats">
+      <div class="stat-pill" (click)="router.navigate(['/cart'])">
+        <i class="fas fa-shopping-cart" style="color: #2563EB;"></i>
+        <div>
+          <span class="stat-num">السلة</span>
+        </div>
+        @if (cartService.totalItems() > 0) {
+          <span class="stat-badge">{{ cartService.totalItems() }}</span>
         }
+        <i class="fas fa-chevron-left stat-arrow"></i>
+      </div>
+      <div class="stat-pill" (click)="router.navigate(['/orders'])">
+        <i class="fas fa-shopping-bag"></i>
+        <div>
+          <span class="stat-num">طلباتي</span>
+        </div>
+        <i class="fas fa-chevron-left stat-arrow"></i>
+      </div>
+      <div class="stat-pill" (click)="router.navigate(['/wishlist'])">
+        <i class="fas fa-heart"></i>
+        <div>
+          <span class="stat-num">المفضلة</span>
+        </div>
+        <i class="fas fa-chevron-left stat-arrow"></i>
+      </div>
+    </div>
+
+    @if (editSuccess()) {
+      <div class="toast-success">
+        <i class="fas fa-check-circle"></i>
+        {{ editSuccess() }}
       </div>
     }
 
-    <!-- المفضلة -->
-    @if (activeTab() === 'wishlist') {
-      @if (wishlist().length === 0) {
-        <div class="empty-state">
-          <i class="fas fa-heart-broken"></i>
-          <p>لا توجد منتجات في المفضلة</p>
-        </div>
-      } @else {
-        <div class="wishlist-grid">
-          @for (product of wishlist(); track product.id) {
-            <div class="wishlist-card">
-              <div class="wishlist-image">
-                <i class="fas fa-image"></i>
-              </div>
-              <div class="wishlist-info">
-                <h4 (click)="goToProduct(product.id)">{{ product.name }}</h4>
-                <p>{{ product.shopName }}</p>
-                <div class="wishlist-price">
-                  @if (product.discountPrice) {
-                    <span class="price">{{ product.discountPrice }} د.ل</span>
-                    <span class="old-price">{{ product.price }} د.ل</span>
-                  } @else {
-                    <span class="price">{{ product.price }} د.ل</span>
-                  }
-                </div>
-              </div>
-              <button class="remove-btn"
-                      (click)="removeFromWishlist(product.id)">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
+    @if (editError()) {
+      <div class="toast-error">
+        <i class="fas fa-exclamation-circle"></i>
+        {{ editError() }}
+      </div>
+    }
+
+    <!-- ══ INFO SECTION ══ -->
+    <div class="profile-section">
+      <div class="section-card">
+        <div class="section-card-header">
+          <h3>
+            <i class="fas fa-user-circle"></i>
+            المعلومات الشخصية
+          </h3>
+          @if (!isEditing()) {
+            <button class="btn-edit" (click)="startEdit()">
+              <i class="fas fa-pen"></i>
+              تعديل
+            </button>
           }
         </div>
-      }
-    }
 
-    <!-- طلباتي -->
-    @if (activeTab() === 'orders') {
-      <div class="orders-tabs">
-        <button [class.active]="ordersTab() === 'all'"
-                (click)="ordersTab.set('all')">الكل</button>
-        <button [class.active]="ordersTab() === 'pending'"
-                (click)="ordersTab.set('pending')">
-          معلقة ({{ pendingOrders().length }})
-        </button>
-        <button [class.active]="ordersTab() === 'completed'"
-                (click)="ordersTab.set('completed')">
-          مكتملة ({{ completedOrders().length }})
-        </button>
-        <button [class.active]="ordersTab() === 'cancelled'"
-                (click)="ordersTab.set('cancelled')">
-          ملغاة ({{ cancelledOrders().length }})
-        </button>
-      </div>
-
-      @for (order of currentOrders(); track order.id) {
-        <div class="order-card">
-          <div class="order-info">
-            <h4>{{ order.productName }}</h4>
-            <p><i class="fas fa-store"></i> {{ order.shopName }}</p>
-            <p><i class="fas fa-calendar"></i> {{ order.date }}</p>
+        @if (!isEditing()) {
+          <div class="info-list">
+            <div class="info-row">
+              <div class="info-icon"><i class="fas fa-user"></i></div>
+              <div class="info-content">
+                <span class="info-label">الاسم الكامل</span>
+                <span class="info-value">{{ profile()!.full_name }}</span>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="info-icon"><i class="fas fa-envelope"></i></div>
+              <div class="info-content">
+                <span class="info-label">البريد الإلكتروني</span>
+                <span class="info-value">{{ profile()!.email }}</span>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="info-icon"><i class="fas fa-phone"></i></div>
+              <div class="info-content">
+                <span class="info-label">رقم الهاتف</span>
+                <span class="info-value">{{ profile()!.phone_number || '—' }}</span>
+              </div>
+            </div>
+            <div class="info-row no-border">
+              <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+              <div class="info-content">
+                <span class="info-label">المدينة</span>
+                <span class="info-value">{{ profile()!.address || '—' }}</span>
+              </div>
+            </div>
           </div>
-          <div class="order-right">
-            <span class="order-price">{{ order.price }} د.ل</span>
-            <span class="order-status"
-                  [class.pending]="order.status === 'pending'"
-                  [class.completed]="order.status === 'completed'"
-                  [class.cancelled]="order.status === 'cancelled'">
-              @if (order.status === 'pending') { معلق }
-              @else if (order.status === 'completed') { مكتمل }
-              @else { ملغي }
-            </span>
-          </div>
-        </div>
-      }
-    }
-
-    <!-- الإعدادات -->
-    @if (activeTab() === 'settings') {
-      <div class="settings-section">
-        <h3><i class="fas fa-paint-brush"></i> المظهر</h3>
-        <div class="theme-options">
-          <button (click)="themeService.toggle()">
-            @if (themeService.currentTheme() === 'light') {
-              <i class="fas fa-moon"></i> تفعيل الوضع الداكن
-            } @else {
-              <i class="fas fa-sun"></i> تفعيل الوضع الفاتح
-            }
-          </button>
-        </div>
-
-        @if (role() === 'buyer') {
-          <div class="upgrade-section">
-            <h3><i class="fas fa-rocket"></i> ترقية الحساب</h3>
-            <p>هل تريد فتح متجرك الخاص؟</p>
-            <button class="upgrade-btn"
-                    (click)="router.navigate(['/auth/merchant-apply'])">
-              <i class="fas fa-store"></i>
-              اطلب فتح متجر
-            </button>
+        } @else {
+          <div class="edit-form">
+            <div class="form-field">
+              <label>الاسم الكامل</label>
+              <input type="text"
+                     [value]="editForm.full_name()"
+                     (input)="editForm.full_name.set($any($event.target).value)" />
+            </div>
+            <div class="form-field">
+              <label>رقم الهاتف</label>
+              <input type="tel" dir="ltr"
+                     [value]="editForm.phone_number()"
+                     (input)="editForm.phone_number.set($any($event.target).value)" />
+            </div>
+            <div class="form-field">
+              <label>المدينة</label>
+              <select [value]="editForm.address()"
+                      (change)="editForm.address.set($any($event.target).value)">
+                <option value="">اختر مدينتك</option>
+                <option value="طرابلس">طرابلس</option>
+                <option value="بنغازي">بنغازي</option>
+                <option value="مصراتة">مصراتة</option>
+                <option value="سبها">سبها</option>
+                <option value="صبراتة">صبراتة</option>
+                <option value="الخمس">الخمس</option>
+                <option value="الجبل الغربي">الجبل الغربي</option>
+              </select>
+            </div>
+            <div class="edit-actions">
+              <button class="btn-save-edit" (click)="saveProfile()" [disabled]="isSaving()">
+                @if (isSaving()) {
+                  <i class="fas fa-spinner fa-spin"></i> جاري الحفظ...
+                } @else {
+                  <i class="fas fa-check"></i> حفظ التغييرات
+                }
+              </button>
+              <button class="btn-cancel-edit" (click)="cancelEdit()">إلغاء</button>
+            </div>
           </div>
         }
+      </div>
+    </div>
 
-        <div class="danger-zone">
-          <h3><i class="fas fa-exclamation-triangle"></i> منطقة الخطر</h3>
-          <button class="logout-danger" (click)="logout()">
-            <i class="fas fa-sign-out-alt"></i>
-            تسجيل الخروج
-          </button>
+    <!-- ══ INTERESTS ══ -->
+    @if (profile()!.interests.length > 0) {
+      <div class="profile-section">
+        <div class="section-card">
+          <div class="section-card-header">
+            <h3><i class="fas fa-heart"></i> اهتماماتي</h3>
+          </div>
+          <div class="interests-chips">
+            @for (interest of profile()!.interests; track interest.id) {
+              <span class="interest-chip">{{ interest.name }}</span>
+            }
+          </div>
         </div>
       </div>
     }
 
-  </div>
+    <!-- ══ ACTIONS ══ -->
+    <div class="profile-section">
+      <div class="actions-list">
+        <button class="action-row" (click)="router.navigate(['/cart'])">
+          <div class="action-icon blue"><i class="fas fa-shopping-cart"></i></div>
+          <span>سلة التسوق</span>
+          @if (cartService.totalItems() > 0) {
+            <span class="action-badge">{{ cartService.totalItems() }}</span>
+          }
+          <i class="fas fa-chevron-left action-chevron"></i>
+        </button>
+        <button class="action-row" (click)="router.navigate(['/orders'])">
+          <div class="action-icon purple"><i class="fas fa-shopping-bag"></i></div>
+          <span>طلباتي</span>
+          <i class="fas fa-chevron-left action-chevron"></i>
+        </button>
+        <button class="action-row" (click)="router.navigate(['/wishlist'])">
+          <div class="action-icon red"><i class="fas fa-heart"></i></div>
+          <span>المفضلة</span>
+          <i class="fas fa-chevron-left action-chevron"></i>
+        </button>
+        @if (authService.role() !== 'admin') {
+          <button class="action-row"
+                  (click)="goToMerchantOrUpgrade()">
+            <div class="action-icon green">
+              @if (isMerchant()) {
+                <i class="fas fa-store"></i>
+              } @else {
+                <i class="fas fa-arrow-up"></i>
+              }
+            </div>
+            @if (isMerchant()) {
+              <span>لوحة تحكم التاجر</span>
+            } @else {
+              <span>الترقية إلى تاجر</span>
+            }
+            <i class="fas fa-chevron-left action-chevron"></i>
+          </button>
+        }
+        <button class="action-row" (click)="router.navigate(['/auth/change-password'])">
+          <div class="action-icon blue"><i class="fas fa-lock"></i></div>
+          <span>تغيير كلمة المرور</span>
+          <i class="fas fa-chevron-left action-chevron"></i>
+        </button>
+        <button class="action-row"
+                (click)="router.navigate(['/support'])">
+          <div class="action-icon teal">
+            <i class="fas fa-headset"></i>
+          </div>
+          <span>المساعدة والدعم</span>
+          <i class="fas fa-chevron-left action-chevron"></i>
+        </button>
+        <button class="action-row"
+                (click)="router.navigate(['/terms'])">
+          <div class="action-icon gray">
+            <i class="fas fa-file-contract"></i>
+          </div>
+          <span>الشروط والأحكام</span>
+          <i class="fas fa-chevron-left action-chevron"></i>
+        </button>
+        <button class="action-row danger" (click)="logout()">
+          <div class="action-icon danger-icon"><i class="fas fa-sign-out-alt"></i></div>
+          <span>تسجيل الخروج</span>
+          <i class="fas fa-chevron-left action-chevron"></i>
+        </button>
+      </div>
+    </div>
+
+    <p class="join-date">انضممت في {{ formatDate(profile()!.created_at) }}</p>
+
+  }
+
+  @if (!isLoading() && !profile()) {
+    <div class="profile-error-card">
+      <div class="error-icon">
+        <i class="fas fa-user-slash"></i>
+      </div>
+      <h3>تعذر تحميل بيانات الحساب</h3>
+      <p>{{ error() || 'تعذر جلب تفاصيل ملفك الشخصي. قد تكون الجلسة منتهية أو تم تعديل صلاحيات حسابك.' }}</p>
+      <div class="error-actions">
+        <button type="button" class="btn-retry" (click)="loadProfile()">
+          <i class="fas fa-sync-alt"></i> إعادة المحاولة
+        </button>
+        <button type="button" class="btn-logout-fallback" (click)="logout()">
+          <i class="fas fa-sign-out-alt"></i> تسجيل الدخول من جديد
+        </button>
+      </div>
+    </div>
+  }
+
 </div>

@@ -1,208 +1,378 @@
-@if (product()) {
-<div class="product-details">
+<div class="product-details-page">
 
-  <!-- breadcrumb -->
-  <div class="breadcrumb">
-    <a routerLink="/">الرئيسية</a>
-    <i class="fas fa-chevron-left"></i>
-    <span>{{ getCategoryName(product()!.categoryId) }}</span>
-    <i class="fas fa-chevron-left"></i>
-    <span>{{ product()!.name }}</span>
-  </div>
-
-  <!-- القسم الرئيسي -->
-  <div class="main-section">
-
-    <!-- صورة المنتج -->
-    <div class="product-image-section">
-      @if (product()!.image) {
-        <img [src]="product()!.image" [alt]="product()!.name" />
-      } @else {
-        <div class="image-placeholder">
-          <i class="fas fa-image text-6xl"></i>
-        </div>
-      }
-      <!-- badges -->
-      <div class="badges">
-        @if (product()!.isNew) {
-          <span class="badge-new">
-            <i class="fas fa-star"></i> جديد
-          </span>
-        }
-        @if (product()!.isTrending) {
-          <span class="badge-trending">
-            <i class="fas fa-fire"></i> رائج
-          </span>
-        }
-      </div>
-    </div>
-
-    <!-- معلومات المنتج -->
-    <div class="product-info-section">
-
-      <!-- اسم المتجر -->
-      <div class="shop-name">
-        <i class="fas fa-store"></i>
-        {{ product()!.shopName }}
-      </div>
-
-      <!-- اسم المنتج -->
-      <h1>{{ product()!.name }}</h1>
-
-      <!-- التقييم -->
-      <div class="rating">
-        @for (star of getStars(); track star) {
-          <i class="fas fa-star"
-             [class.filled]="star <= averageRating()"></i>
-        }
-        <span>{{ averageRating() | number:'1.1-1' }}</span>
-        <span>({{ reviews().length }} تقييم)</span>
-        <span>
-          <i class="fas fa-shopping-bag"></i>
-          {{ product()!.ordersCount }} طلب
-        </span>
-      </div>
-
-      <!-- السعر -->
-      <div class="price-section">
-        @if (product()!.discountPrice) {
-          <span class="price-new">{{ product()!.discountPrice }} د.ل</span>
-          <span class="price-old">{{ product()!.price }} د.ل</span>
-          <span class="discount-badge">
-            خصم {{ ((product()!.price - product()!.discountPrice!) / product()!.price * 100) | number:'1.0-0' }}%
-          </span>
-        } @else {
-          <span class="price-new">{{ product()!.price }} د.ل</span>
-        }
-      </div>
-
-      <!-- الوصف -->
-      <div class="description">
-        <h3>وصف المنتج</h3>
-        <p>{{ product()!.description }}</p>
-      </div>
-
-      <!-- أزرار الطلب والمفضلة -->
-      <div class="action-buttons">
-        <button class="btn-order" (click)="order()">
-          <i class="fas fa-shopping-bag"></i>
-          اطلب الآن
-        </button>
-        <button class="btn-wishlist"
-                (click)="toggleWishlist()"
-                [class.active]="product()!.inWishlist">
-          <i [class]="product()!.inWishlist ? 'fas fa-heart' : 'far fa-heart'"></i>
-        </button>
-      </div>
-
-      <!-- بيانات المتجر وطرق التواصل -->
-      @if (shop()) {
-        <div class="shop-contact">
-          <h3>تواصل مع التاجر</h3>
-          <div class="contact-links">
-            @if (shop()!.socialLinks.whatsapp) {
-              <a [href]="'https://wa.me/' + shop()!.socialLinks.whatsapp"
-                 target="_blank" class="contact-whatsapp">
-                <i class="fab fa-whatsapp"></i>
-                واتساب
-              </a>
-            }
-            @if (shop()!.socialLinks.instagram) {
-              <a [href]="'https://instagram.com/' + shop()!.socialLinks.instagram"
-                 target="_blank" class="contact-instagram">
-                <i class="fab fa-instagram"></i>
-                انستقرام
-              </a>
-            }
-            @if (shop()!.socialLinks.facebook) {
-              <a [href]="'https://facebook.com/' + shop()!.socialLinks.facebook"
-                 target="_blank" class="contact-facebook">
-                <i class="fab fa-facebook"></i>
-                فيسبوك
-              </a>
-            }
-            @if (shop()!.socialLinks.tiktok) {
-              <a [href]="'https://tiktok.com/@' + shop()!.socialLinks.tiktok"
-                 target="_blank" class="contact-tiktok">
-                <i class="fab fa-tiktok"></i>
-                تيك توك
-              </a>
-            }
-            @if (shop()!.socialLinks.snapchat) {
-              <a [href]="'https://snapchat.com/add/' + shop()!.socialLinks.snapchat"
-                 target="_blank" class="contact-snapchat">
-                <i class="fab fa-snapchat"></i>
-                سناب
-              </a>
-            }
-          </div>
-        </div>
-      }
-
-    </div>
-  </div>
-
-  <!-- قسم التقييمات -->
-  <div class="reviews-section">
-    <h2>
-      <i class="fas fa-star"></i>
-      التقييمات والمراجعات
-    </h2>
-
-    @for (review of reviews(); track review.id) {
-      <div class="review-card">
-        <div class="review-header">
-          <i class="fas fa-user-circle text-3xl"></i>
-          <div>
-            <div class="reviewer-name">{{ review.buyerName }}</div>
-            <div class="review-date">{{ review.date }}</div>
-          </div>
-          @if (review.verified) {
-            <span class="verified-badge">
-              <i class="fas fa-check-circle"></i>
-              مشتري موثّق
-            </span>
-          }
-        </div>
-        <div class="review-rating">
-          @for (star of getStars(); track star) {
-            <i class="fas fa-star"
-               [class.filled]="star <= review.rating"></i>
-          }
-        </div>
-        <p class="review-comment">{{ review.comment }}</p>
-      </div>
-    }
-  </div>
-
-  <!-- منتجات مشابهة -->
-  @if (similarProducts().length > 0) {
-    <div class="similar-section">
-      <h2>
-        <i class="fas fa-th-large"></i>
-        منتجات مشابهة
-      </h2>
-      <div class="products-grid">
-        @for (product of similarProducts(); track product.id) {
-          <app-product-card
-            [product]="product"
-            (productClick)="goToProduct($event)"
-            (loginRequired)="showLoginPrompt.set(true)" />
-        }
+  @if (isLoading()) {
+    <div class="page-loading">
+      <div class="loading-spinner">
+        <i class="fas fa-circle-notch fa-spin"></i>
       </div>
     </div>
   }
 
-  <!-- Login Prompt Modal -->
-  <app-login-prompt
-    [isVisible]="showLoginPrompt()"
-    (closed)="showLoginPrompt.set(false)" />
+  @if (error()) {
+    <div class="page-error">
+      <i class="fas fa-exclamation-circle"></i>
+      <p>{{ error() }}</p>
+      <button (click)="router.navigate(['/products'])">
+        <i class="fas fa-arrow-right"></i>
+        العودة للمنتجات
+      </button>
+    </div>
+  }
+
+  @if (!isLoading() && !error() && product()) {
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-bar">
+      <div class="breadcrumb-container">
+        <a routerLink="/">الرئيسية</a>
+        <i class="fas fa-chevron-left"></i>
+        <a routerLink="/products">المنتجات</a>
+        <i class="fas fa-chevron-left"></i>
+        <span>{{ product()!.title }}</span>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="product-main">
+      <div class="product-container">
+
+        <!-- Gallery يمين -->
+        <div class="product-gallery">
+          <div class="gallery-main">
+            @if (getProductImage()) {
+              <img [src]="getProductImage()"
+                   [alt]="product()!.title"
+                   class="gallery-main-img" />
+            } @else {
+              <div class="gallery-placeholder">
+                <i class="fas fa-image"></i>
+              </div>
+            }
+
+            @if (!isAdmin()) {
+              <button class="gallery-wishlist"
+                      [class.active]="isInWishlist()"
+                      (click)="toggleWishlist()"
+                      [disabled]="isTogglingWishlist()"
+                      aria-label="أضف للمفضلة">
+                @if (isTogglingWishlist()) {
+                  <i class="fas fa-spinner fa-spin"></i>
+                } @else {
+                  <i [class]="isInWishlist() ? 'fas fa-heart' : 'far fa-heart'"></i>
+                }
+              </button>
+            }
+
+            <button class="gallery-report"
+                    type="button"
+                    (click)="openReport()"
+                    title="الإبلاغ عن المنتج">
+              <i class="fas fa-flag"></i>
+            </button>
+
+            @if (product()!.compare_at_price > product()!.price) {
+              <div class="gallery-discount">
+                خصم {{ ((product()!.compare_at_price - product()!.price) / product()!.compare_at_price * 100) | number:'1.0-0' }}%
+              </div>
+            }
+          </div>
+
+          @if (getImagesList().length > 1) {
+            <div class="gallery-thumbs">
+              @for (img of getImagesList(); track img.id || $index) {
+                <div class="thumb"
+                     [class.active]="getProductImage() === resolveImageUrl(img)"
+                     (click)="activeImage.set(resolveImageUrl(img))">
+                  <img [src]="resolveImageUrl(img)" alt="" />
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Info يسار -->
+        <div class="product-info">
+
+          @if (product()!.shop || product()!['_shop']) {
+            <a class="product-store-link"
+               [routerLink]="['/stores', (product()!.shop?.id || product()!['_shop']?.id)]">
+              <i class="fas fa-store"></i>
+              {{ product()!.shop?.name || product()!['_shop']?.name }}
+            </a>
+          }
+
+          <h1 class="product-title">{{ product()!.title }}</h1>
+
+          @if (reviewCount() > 0) {
+            <div class="product-rating">
+              @for (i of [1,2,3,4,5]; track i) {
+                <i class="fas fa-star" [class.active]="i <= getAverageRating()"></i>
+              }
+              <span class="rating-count">({{ reviewCount() }} تقييم)</span>
+            </div>
+          }
+
+          <div class="product-price-section">
+            <span class="product-price">{{ product()!.price | number }} د.ل</span>
+            @if (product()!.compare_at_price > product()!.price) {
+              <span class="product-old-price">{{ product()!.compare_at_price | number }} د.ل</span>
+            }
+          </div>
+
+          <div class="product-divider"></div>
+
+          <!-- Colors -->
+          @if (product()!.colors?.length > 0) {
+            <div class="product-option">
+              <label class="option-label">
+                اللون:
+                <span class="option-selected">{{ getSelectedColorName() }}</span>
+              </label>
+              <div class="colors-row">
+                @for (color of product()!.colors; track color.id) {
+                  <button class="color-swatch"
+                          [class.selected]="selectedColorId() === color.id"
+                          [style.background]="color.hex_code"
+                          [title]="color.name"
+                          (click)="selectColor(color.id)">
+                    @if (selectedColorId() === color.id) {
+                      <i class="fas fa-check"
+                         [style.color]="isLightColor(color.hex_code) ? '#1A0A2E' : 'white'"></i>
+                    }
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Sizes -->
+          @if (product()!.sizes?.length > 0) {
+            <div class="product-option">
+              <label class="option-label">المقاس</label>
+              <div class="sizes-row">
+                @for (size of product()!.sizes; track size.id) {
+                  <button class="size-btn"
+                          [class.selected]="selectedSizeId() === size.id"
+                          (click)="selectSize(size.id)">
+                    {{ size.name }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
+          @if (!isAdmin()) {
+            <!-- Quantity -->
+            <div class="product-option">
+              <label class="option-label">الكمية</label>
+              <div class="qty-row">
+                <div class="qty-control">
+                  <button (click)="decreaseQty()" [disabled]="quantity() <= 1">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <span>{{ quantity() }}</span>
+                  <button (click)="increaseQty()" [disabled]="quantity() >= product()!.stock">
+                    <i class="fas fa-plus"></i>
+                  </button>
+                </div>
+                <span class="stock-label"
+                      [class.low]="product()!.stock < 10"
+                      [class.out]="product()!.stock === 0">
+                  @if (product()!.stock === 0) {
+                    <i class="fas fa-times-circle"></i> نفد المخزون
+                  } @else if (product()!.stock < 10) {
+                    <i class="fas fa-exclamation-circle"></i> باقي {{ product()!.stock }} فقط
+                  } @else {
+                    <i class="fas fa-check-circle"></i> متوفر
+                  }
+                </span>
+              </div>
+            </div>
+
+            <div class="product-divider"></div>
+
+            @if (isProductDisabled()) {
+              <div class="disabled-product-banner">
+                <i class="fas fa-ban"></i>
+                <div>
+                  <strong>المنتج غير متاح حالياً</strong>
+                  <p>تم إيقاف عرض هذا المنتج من قِبل إدارة المنصة لمخالفته الشروط والمعايير.</p>
+                </div>
+              </div>
+            } @else if (product()!.stock > 0) {
+              <button class="btn-add-cart"
+                      (click)="addToCart()"
+                      [disabled]="isAddToCartDisabled()">
+                @if (isAddingToCart()) {
+                  <i class="fas fa-spinner fa-spin"></i> جاري الإضافة...
+                } @else if (addedToCart()) {
+                  <i class="fas fa-check"></i> تمت الإضافة!
+                } @else {
+                  <i class="fas fa-shopping-cart"></i> أضف للسلة
+                }
+              </button>
+            } @else {
+              <button class="btn-add-cart out-of-stock" disabled>
+                <i class="fas fa-times-circle"></i> نفد المخزون
+              </button>
+            }
+          } @else {
+            <div class="admin-preview-box">
+              <div class="admin-preview-icon">
+                <i class="fas fa-shield-alt"></i>
+              </div>
+              <div class="admin-preview-content">
+                <strong>وضع المعاينة الإدارية</strong>
+                <p>أنت تتصفح بصلاحية مسؤول النظام. خيارات الشراء، تحديد الكميات، الإضافة للسلة، والمفضلة معطلة لحسابات الإدارة.</p>
+              </div>
+            </div>
+          }
+
+          <div class="product-badges">
+            @if (product()!.shop?.accepts_returns) {
+              <div class="info-badge">
+                <i class="fas fa-undo"></i>
+                <span>يقبل الإرجاع</span>
+              </div>
+            }
+            @if (product()!.shop?.accepts_card_payment) {
+              <div class="info-badge">
+                <i class="fas fa-credit-card"></i>
+                <span>يقبل البطاقة</span>
+              </div>
+            }
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="product-tabs-section">
+      <div class="product-container">
+
+        <div class="tabs-header">
+          <button [class.active]="activeTab() === 'desc'"
+                  (click)="activeTab.set('desc')">الوصف</button>
+          @if (product()!.features_list?.length > 0) {
+            <button [class.active]="activeTab() === 'features'"
+                    (click)="activeTab.set('features')">الميزات</button>
+          }
+          @if (reviewCount() > 0) {
+            <button [class.active]="activeTab() === 'reviews'"
+                    (click)="activeTab.set('reviews')">
+              التقييمات ({{ reviewCount() }})
+            </button>
+          }
+        </div>
+
+        <div class="tab-content">
+
+          @if (activeTab() === 'desc') {
+            <div class="desc-content">
+              <p>{{ product()!.description || 'لا يوجد وصف للمنتج.' }}</p>
+            </div>
+          }
+
+          @if (activeTab() === 'features' && product()!.features_list?.length > 0) {
+            <div class="features-content">
+              @for (feature of product()!.features_list; track $index) {
+                <div class="feature-row">
+                  <i class="fas fa-check-circle"></i>
+                  <span>{{ feature }}</span>
+                </div>
+              }
+            </div>
+          }
+
+          @if (activeTab() === 'reviews' && reviewCount() > 0) {
+            <div class="reviews-content">
+              <div class="reviews-summary">
+                <div class="rating-big">{{ getAverageRating() }}</div>
+                <div class="rating-stars-big">
+                  @for (i of [1,2,3,4,5]; track i) {
+                    <i class="fas fa-star" [class.active]="i <= getAverageRating()"></i>
+                  }
+                  <span>{{ reviewCount() }} تقييم</span>
+                </div>
+              </div>
+              <div class="reviews-list">
+                @for (review of reviewsList(); track review.id) {
+                  <div class="review-item">
+                    <div class="review-header">
+                      <div class="reviewer-avatar">
+                        <i class="fas fa-user"></i>
+                      </div>
+                      <div class="reviewer-info">
+                        <span class="reviewer-name">{{ review.buyerName || 'مستخدم' }}</span>
+                        <div class="review-stars">
+                          @for (i of [1,2,3,4,5]; track i) {
+                            <i class="fas fa-star" [class.active]="i <= review.rating"></i>
+                          }
+                        </div>
+                      </div>
+                      <span class="review-date">{{ review.date | date:'yyyy/MM/dd' }}</span>
+                    </div>
+                    @if (review.comment) {
+                      <p class="review-text">{{ review.comment }}</p>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════
+           AI SIMILAR PRODUCTS (STEP 10)
+           ════════════════════════════════════════════ -->
+      @if (isLoadingSimilar()) {
+        <div class="similar-loading">
+          <i class="fas fa-circle-notch fa-spin"></i>
+          <span>جاري تحميل منتجات مشابهة...</span>
+        </div>
+      }
+
+      @if (!isLoadingSimilar() && similarProducts().length > 0) {
+        <div class="similar-section">
+          <div class="similar-header">
+            <div class="similar-badge">
+              <i class="fas fa-thumbs-up"></i>
+              موصى به
+            </div>
+            <h3>منتجات مشابهة قد تعجبك</h3>
+          </div>
+          <div class="similar-grid">
+            @for (p of similarProducts(); track p.id) {
+              <div class="similar-card"
+                   (click)="goToSimilarProduct(p.slug || p.id, p)">
+                <div class="similar-img">
+                  @if (getItemImage(p)) {
+                    <img [src]="getItemImage(p)" [alt]="p.title" loading="lazy" />
+                  } @else {
+                    <i class="fas fa-box"></i>
+                  }
+                </div>
+                <div class="similar-info">
+                  <p>{{ p.title }}</p>
+                  <span>{{ p.price | number }} د.ل</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+    </div>
+
+  }
+
+  @if (showLoginPrompt()) {
+    <app-login-prompt (close)="closeLoginPrompt()"></app-login-prompt>
+  }
+
+  <app-report-modal></app-report-modal>
 
 </div>
-} @else {
-  <div class="not-found">
-    <i class="fas fa-box-open text-6xl"></i>
-    <h2>المنتج غير موجود</h2>
-    <a routerLink="/">العودة للرئيسية</a>
-  </div>
-}

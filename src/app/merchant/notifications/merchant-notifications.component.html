@@ -1,0 +1,74 @@
+<div class="notif-page">
+
+  <div class="page-header">
+    <div>
+      <h1><i class="fas fa-bell"></i> الإشعارات</h1>
+      <p>{{ unreadCount() }} غير مقروء</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-mark-all" (click)="markAllRead()" [disabled]="unreadCount() === 0">
+        <i class="fas fa-check-double"></i> قراءة الكل
+      </button>
+      <button class="btn-clear" (click)="showClearConfirm.set(true)" [disabled]="notifications().length === 0">
+        <i class="fas fa-trash"></i> مسح الكل
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <i class="fas fa-circle-notch fa-spin"></i>
+      <p>جاري التحميل...</p>
+    </div>
+  }
+
+  @if (!isLoading()) {
+    @if (notifications().length === 0) {
+      <div class="empty-state">
+        <i class="fas fa-bell-slash"></i>
+        <p>لا توجد إشعارات</p>
+      </div>
+    } @else {
+      <div class="notif-list">
+        @for (n of notifications(); track n.id) {
+          <div class="notif-card" [class.unread]="!n.isRead" (click)="markRead(n.id)">
+            <div class="notif-icon">
+              <i [class]="n.icon"></i>
+            </div>
+            <div class="notif-body">
+              <p class="notif-title">{{ n.title }}</p>
+              <p class="notif-text">{{ n.body }}</p>
+              <span class="notif-date">{{ n.createdAt }}</span>
+            </div>
+            @if (!n.isRead) {
+              <span class="unread-dot"></span>
+            }
+            <button class="notif-delete" (click)="$event.stopPropagation(); deleteOne(n.id)"
+                    title="حذف">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <!-- Clear All Confirm Modal -->
+  @if (showClearConfirm()) {
+    <div class="modal-backdrop" (click)="showClearConfirm.set(false)"></div>
+    <div class="confirm-modal">
+      <div class="confirm-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h3>مسح جميع الإشعارات؟</h3>
+      <p>سيتم حذف كل الإشعارات نهائياً ولا يمكن التراجع عن هذا الإجراء.</p>
+      <div class="confirm-actions">
+        <button class="btn-confirm-delete" (click)="clearAll()">
+          <i class="fas fa-trash"></i> مسح الكل
+        </button>
+        <button class="btn-cancel" (click)="showClearConfirm.set(false)">إلغاء</button>
+      </div>
+    </div>
+  }
+
+</div>

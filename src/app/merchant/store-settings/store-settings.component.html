@@ -1,136 +1,305 @@
-<div class="flex flex-col gap-6 relative">
-  <!-- Header -->
-  <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-    <div>
-      <h2 class="text-2xl font-bold mb-1">بيانات المتجر</h2>
-      <p class="text-gray-600 font-medium">قم بتحديث بيانات متجرك ومعلومات التواصل</p>
-    </div>
-    
-    <!-- Shop Status Action -->
-    <div class="flex items-center gap-3">
-      @if (isOpen()) {
-        <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-bold shadow-sm">
-          مفتوح <i class="fas fa-check-circle mr-1"></i>
-        </span>
-        <button (click)="toggleShop()" class="border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg font-bold transition-colors text-sm shadow-sm">
-          إغلاق مؤقت <i class="fas fa-lock mr-1"></i>
-        </button>
-      } @else {
-        <div class="flex flex-col items-end gap-1">
-          <span class="bg-red-100 text-red-800 px-4 py-1.5 rounded-full text-sm font-bold shadow-sm">
-            مغلق <i class="fas fa-times-circle mr-1"></i>
-          </span>
-          <span class="text-xs text-gray-500 font-medium">السبب: {{ shopInfo().closeReason }} | حتى: {{ shopInfo().closedUntil }}</span>
-        </div>
-        <button (click)="toggleShop()" class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-lg font-bold transition-colors text-sm shadow-sm">
-          فتح المتجر <i class="fas fa-door-open mr-1"></i>
-        </button>
-      }
-    </div>
-  </div>
+<div class="store-settings">
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Main Info Form -->
-    <div class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-      <h3 class="text-xl font-bold mb-6 border-b border-gray-100 pb-3">المعلومات الأساسية</h3>
-      
-      <div class="flex flex-col gap-5">
-        <div>
-          <label class="block text-sm font-bold mb-2 text-gray-700">اسم المتجر <span class="text-red-500">*</span></label>
-          <input type="text" [ngModel]="formData().businessName" (ngModelChange)="updateField('businessName', $event)" class="w-full border border-gray-300 rounded-lg p-3 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
-        </div>
-        
-        <div>
-          <label class="block text-sm font-bold mb-2 text-gray-700">وصف المتجر</label>
-          <textarea [ngModel]="formData().description" (ngModelChange)="updateField('description', $event)" class="w-full border border-gray-300 rounded-lg p-3 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all h-28 resize-none"></textarea>
-        </div>
+  @if (isLoading()) {
+    <div class="loading-state">
+      <i class="fas fa-circle-notch fa-spin"></i>
+      <p>جاري تحميل بيانات المتجر...</p>
+    </div>
+  }
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label class="block text-sm font-bold mb-2 text-gray-700">رقم الهاتف</label>
-            <input type="text" [ngModel]="formData().phone" (ngModelChange)="updateField('phone', $event)" class="w-full border border-gray-300 rounded-lg p-3 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-left" dir="ltr">
-          </div>
-          <div>
-            <label class="block text-sm font-bold mb-2 text-gray-700">البريد الإلكتروني</label>
-            <input type="email" [ngModel]="formData().email" (ngModelChange)="updateField('email', $event)" class="w-full border border-gray-300 rounded-lg p-3 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-left" dir="ltr">
-          </div>
-        </div>
+  @if (!isLoading()) {
+
+    <div class="page-header">
+      <h1><i class="fas fa-cog"></i> إعدادات المتجر</h1>
+    </div>
+
+    @if (successMessage()) {
+      <div class="alert-success">
+        <i class="fas fa-check-circle"></i>
+        {{ successMessage() }}
       </div>
-    </div>
-
-    <!-- Social Links Form -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 flex flex-col">
-      <h3 class="text-xl font-bold mb-6 border-b border-gray-100 pb-3">وسائل التواصل</h3>
-      
-      <div class="flex flex-col gap-4 flex-1">
-        <div>
-          <label class="block text-sm font-bold mb-1.5 text-gray-700"><i class="fab fa-whatsapp text-green-500 w-5 text-center"></i> واتساب</label>
-          <input type="text" [ngModel]="formData().socialLinks.whatsapp" (ngModelChange)="updateSocialLink('whatsapp', $event)" class="w-full border border-gray-300 rounded-lg p-2.5 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-left" dir="ltr">
-        </div>
-        <div>
-          <label class="block text-sm font-bold mb-1.5 text-gray-700"><i class="fab fa-instagram text-pink-500 w-5 text-center"></i> انستقرام</label>
-          <input type="text" [ngModel]="formData().socialLinks.instagram" (ngModelChange)="updateSocialLink('instagram', $event)" class="w-full border border-gray-300 rounded-lg p-2.5 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-left" dir="ltr">
-        </div>
-        <div>
-          <label class="block text-sm font-bold mb-1.5 text-gray-700"><i class="fab fa-facebook text-blue-600 w-5 text-center"></i> فيسبوك</label>
-          <input type="text" [ngModel]="formData().socialLinks.facebook" (ngModelChange)="updateSocialLink('facebook', $event)" class="w-full border border-gray-300 rounded-lg p-2.5 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-left" dir="ltr">
-        </div>
-        <div>
-          <label class="block text-sm font-bold mb-1.5 text-gray-700"><i class="fab fa-tiktok text-black w-5 text-center"></i> تيك توك</label>
-          <input type="text" [ngModel]="formData().socialLinks.tiktok" (ngModelChange)="updateSocialLink('tiktok', $event)" class="w-full border border-gray-300 rounded-lg p-2.5 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-left" dir="ltr">
-        </div>
-        <div>
-          <label class="block text-sm font-bold mb-1.5 text-gray-700"><i class="fab fa-snapchat-ghost text-yellow-500 w-5 text-center"></i> سناب شات</label>
-          <input type="text" [ngModel]="formData().socialLinks.snapchat" (ngModelChange)="updateSocialLink('snapchat', $event)" class="w-full border border-gray-300 rounded-lg p-2.5 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-left" dir="ltr">
-        </div>
-      </div>
-
-      @if (socialError()) {
-        <div class="mt-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm font-bold border border-red-100 flex items-center gap-2">
-          <i class="fas fa-exclamation-circle"></i> يجب إدخال وسيلة تواصل واحدة على الأقل
-        </div>
-      }
-    </div>
-  </div>
-
-  <!-- Save Button -->
-  <div class="flex items-center gap-4 mt-2">
-    <button (click)="saveSettings()" [disabled]="!formData().businessName.trim()" class="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-primary-dark transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2">
-      حفظ التغييرات <i class="fas fa-save"></i>
-    </button>
-    
-    @if (saved()) {
-      <span class="text-green-600 font-bold bg-green-50 px-4 py-2 rounded-lg border border-green-100 flex items-center gap-2">
-        <i class="fas fa-check-circle"></i> تم حفظ التغييرات بنجاح
-      </span>
     }
-  </div>
-
-  <!-- Close Shop Modal -->
-  @if (showCloseModal()) {
-    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
-        <h3 class="text-xl font-bold mb-4 border-b border-gray-100 pb-3 text-red-600">
-          <i class="fas fa-lock mr-2"></i> إغلاق المتجر مؤقتاً
-        </h3>
-        <p class="text-gray-600 text-sm mb-5 font-medium">لن يتمكن الزوار من طلب منتجاتك أثناء إغلاق المتجر، لكن يمكنك الاستمرار في إدارة الطلبات الحالية.</p>
-        
-        <div class="flex flex-col gap-4">
-          <div>
-            <label class="block text-sm font-bold mb-1.5 text-gray-700">سبب الإغلاق <span class="text-red-500">*</span></label>
-            <input type="text" [ngModel]="closeReason()" (ngModelChange)="closeReason.set($event)" class="w-full border border-gray-300 rounded-lg p-2.5 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="مثال: جرد المخزون، إجازة...">
-          </div>
-          <div>
-            <label class="block text-sm font-bold mb-1.5 text-gray-700">موعد الفتح المتوقع <span class="text-red-500">*</span></label>
-            <input type="date" [ngModel]="closedUntil()" (ngModelChange)="closedUntil.set($event)" class="w-full border border-gray-300 rounded-lg p-2.5 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-left" dir="ltr">
-          </div>
-        </div>
-
-        <div class="flex justify-end gap-3 mt-8 pt-4 border-t border-gray-100">
-          <button (click)="cancelClose()" class="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-bold transition-colors">إلغاء</button>
-          <button (click)="confirmClose()" [disabled]="!closeReason().trim() || !closedUntil().trim()" class="px-5 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 font-bold transition-colors shadow-sm disabled:opacity-50">تأكيد الإغلاق</button>
-        </div>
+    @if (error()) {
+      <div class="alert-error">
+        <i class="fas fa-exclamation-circle"></i>
+        {{ error() }}
       </div>
+    }
+
+    <div class="tabs-bar">
+      <button [class.active]="activeTab() === 'info'"
+              (click)="activeTab.set('info')">
+        <i class="fas fa-info-circle"></i> المعلومات
+      </button>
+      <button [class.active]="activeTab() === 'images'"
+              (click)="activeTab.set('images')">
+        <i class="fas fa-image"></i> الصور
+      </button>
+      <button [class.active]="activeTab() === 'email'"
+              (click)="activeTab.set('email')">
+        <i class="fas fa-envelope"></i> البريد
+      </button>
+      <button [class.active]="activeTab() === 'categories'"
+              (click)="activeTab.set('categories'); loadAllCategories()">
+        <i class="fas fa-layer-group"></i> التصنيفات
+      </button>
     </div>
+
+    @if (activeTab() === 'info') {
+      <div class="settings-card">
+
+        <div class="form-group">
+          <label><i class="fas fa-store"></i> اسم المتجر</label>
+          <input type="text"
+                 [value]="name()"
+                 (input)="name.set($any($event.target).value)" />
+        </div>
+
+        <div class="form-group">
+          <label><i class="fas fa-align-right"></i> وصف المتجر</label>
+          <textarea rows="3"
+                    [value]="description()"
+                    (input)="description.set($any($event.target).value)">
+          </textarea>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fas fa-phone"></i> رقم الهاتف</label>
+          <input type="tel" dir="ltr"
+                 [value]="business_phone()"
+                 (input)="business_phone.set($any($event.target).value)" />
+        </div>
+
+        <div class="form-group">
+          <label><i class="fab fa-instagram"></i> انستغرام</label>
+          <input type="url" dir="ltr"
+                 placeholder="https://instagram.com/..."
+                 [value]="instagram()"
+                 (input)="instagram.set($any($event.target).value)" />
+        </div>
+
+        <div class="form-group">
+          <label><i class="fab fa-facebook"></i> فيسبوك</label>
+          <input type="url" dir="ltr"
+                 placeholder="https://facebook.com/..."
+                 [value]="facebook()"
+                 (input)="facebook.set($any($event.target).value)" />
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <span class="toggle-label">
+              <i class="fas fa-undo"></i> يقبل الإرجاع
+            </span>
+            <span class="toggle-desc">
+              السماح للمشترين بإرجاع المنتجات
+            </span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox"
+                   [checked]="accepts_returns()"
+                   (change)="accepts_returns.set($any($event.target).checked)" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <span class="toggle-label">
+              <i class="fas fa-credit-card"></i> يقبل الدفع بالبطاقة
+            </span>
+            <span class="toggle-desc">قبول الدفع الإلكتروني</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox"
+                   [checked]="accepts_card_payment()"
+                   (change)="accepts_card_payment.set($any($event.target).checked)" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fas fa-file-alt"></i> سياسة الإرجاع</label>
+          <textarea rows="3"
+                    placeholder="اكتب شروط الإرجاع..."
+                    [value]="policy_description()"
+                    (input)="policy_description.set($any($event.target).value)">
+          </textarea>
+        </div>
+
+        <button class="btn-save" (click)="saveInfo()"
+                [disabled]="isSaving()">
+          @if (isSaving()) {
+            <i class="fas fa-spinner fa-spin"></i> جاري الحفظ...
+          } @else {
+            <i class="fas fa-save"></i> حفظ التغييرات
+          }
+        </button>
+
+      </div>
+    }
+
+    @if (activeTab() === 'images') {
+      <div class="settings-card">
+
+        <div class="image-section">
+          <h3><i class="fas fa-store"></i> شعار المتجر</h3>
+          <p class="image-note">
+            <i class="fas fa-info-circle"></i>
+            الصورة تُرفع فور اختيارها مباشرة
+          </p>
+          <div class="image-preview logo">
+            @if (store()?.logo_url) {
+              <img [src]="store()!.logo_url" alt="شعار المتجر" />
+            } @else {
+              <div class="no-image">
+                <i class="fas fa-store"></i>
+                <span>لا يوجد شعار</span>
+              </div>
+            }
+          </div>
+          <label class="upload-btn"
+                 [class.uploading]="isUploadingLogo()">
+            @if (isUploadingLogo()) {
+              <i class="fas fa-spinner fa-spin"></i>
+              جاري الرفع...
+            } @else {
+              <i class="fas fa-upload"></i>
+              اختر شعار جديد
+            }
+            <input type="file" accept="image/*" hidden
+                   [disabled]="isUploadingLogo()"
+                   (change)="onLogoChange($event)" />
+          </label>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="image-section">
+          <h3><i class="fas fa-panorama"></i> بانر المتجر</h3>
+          <p class="image-note">
+            <i class="fas fa-info-circle"></i>
+            الصورة تُرفع فور اختيارها مباشرة
+          </p>
+          <div class="image-preview banner">
+            @if (store()?.banner_url) {
+              <img [src]="store()!.banner_url" alt="بانر المتجر" />
+            } @else {
+              <div class="no-image">
+                <i class="fas fa-image"></i>
+                <span>لا يوجد بانر</span>
+              </div>
+            }
+          </div>
+          <label class="upload-btn"
+                 [class.uploading]="isUploadingBanner()">
+            @if (isUploadingBanner()) {
+              <i class="fas fa-spinner fa-spin"></i>
+              جاري الرفع...
+            } @else {
+              <i class="fas fa-upload"></i>
+              اختر بانر جديد
+            }
+            <input type="file" accept="image/*" hidden
+                   [disabled]="isUploadingBanner()"
+                   (change)="onBannerChange($event)" />
+          </label>
+        </div>
+
+      </div>
+    }
+
+    @if (activeTab() === 'email') {
+      <div class="settings-card">
+        <div class="email-info">
+          <i class="fas fa-envelope-open-text"></i>
+          <div>
+            <p class="email-label">البريد الحالي للمتجر</p>
+            <p class="email-value">
+              {{ store()?.email ?? 'غير محدد' }}
+            </p>
+          </div>
+        </div>
+        <p class="email-note">
+          <i class="fas fa-info-circle"></i>
+          سيتم إرسال رمز تحقق للبريد الجديد قبل تأكيد التغيير.
+        </p>
+        <button class="btn-change-email"
+                (click)="activeTab.set('change-email-form')">
+          <i class="fas fa-edit"></i>
+          تغيير البريد الإلكتروني
+        </button>
+      </div>
+    }
+
+    @if (activeTab() === 'categories') {
+      <div class="settings-card">
+
+        <div class="section-header">
+          <i class="fas fa-layer-group"></i>
+          <div>
+            <h3>تصنيفات المتجر</h3>
+            <p>اختر التصنيفات التي ينتمي إليها متجرك — يمكن اختيار أكثر من تصنيف</p>
+          </div>
+        </div>
+
+        @if (categorySuccess()) {
+          <div class="alert-success">
+            <i class="fas fa-check-circle"></i>
+            {{ categorySuccess() }}
+          </div>
+        }
+        @if (categoryError()) {
+          <div class="alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ categoryError() }}
+          </div>
+        }
+
+        @if (isLoadingCategories()) {
+          <div class="loading-state" style="min-height: 120px">
+            <i class="fas fa-circle-notch fa-spin"></i>
+            <p>جاري تحميل التصنيفات...</p>
+          </div>
+        } @else {
+          <div class="categories-grid">
+            @for (cat of allCategories(); track cat.id) {
+              <button
+                class="category-chip"
+                [class.selected]="selectedCategoryIds().includes(cat.id)"
+                (click)="toggleCategorySelection(cat.id)">
+                @if (selectedCategoryIds().includes(cat.id)) {
+                  <i class="fas fa-check"></i>
+                }
+                {{ cat.name }}
+              </button>
+            }
+          </div>
+
+          @if (allCategories().length === 0) {
+            <div class="empty-state">
+              <i class="fas fa-folder-open"></i>
+              <p>لا توجد تصنيفات متاحة</p>
+            </div>
+          }
+
+          <div class="selected-count">
+            <i class="fas fa-tag"></i>
+            {{ selectedCategoryIds().length }} تصنيف محدد
+          </div>
+
+          <button class="btn-save" (click)="saveCategories()"
+                  [disabled]="isSavingCategories()">
+            @if (isSavingCategories()) {
+              <i class="fas fa-spinner fa-spin"></i> جاري الحفظ...
+            } @else {
+              <i class="fas fa-save"></i> حفظ التصنيفات
+            }
+          </button>
+        }
+
+      </div>
+    }
+
   }
 </div>

@@ -1,0 +1,106 @@
+<div class="auth-page">
+
+  <div class="auth-hero">
+    <div class="auth-hero-content">
+      <div class="auth-logo">
+        <img src="assets/logo.png" alt="مأب"
+             onerror="this.style.display='none';
+             this.nextElementSibling.style.display='block'" />
+        <span style="display:none">مأب</span>
+      </div>
+      <h2>تحقق من بريدك</h2>
+      <p>أرسلنا لك رمزاً للتحقق من بريدك الإلكتروني وتفعيل حسابك.</p>
+      <div class="auth-hero-features">
+        <div class="hero-feature">
+          <i class="fas fa-envelope-open-text"></i>
+          <span>تحقق من صندوق الوارد</span>
+        </div>
+        <div class="hero-feature">
+          <i class="fas fa-exclamation-circle"></i>
+          <span>تحقق من مجلد السبام</span>
+        </div>
+        <div class="hero-feature">
+          <i class="fas fa-redo"></i>
+          <span>يمكنك إعادة الإرسال بعد دقيقتين</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-form-side">
+    <div class="auth-form-container" style="max-width:400px">
+
+      <div class="form-header">
+        <div class="form-icon-circle purple">
+          <i class="fas fa-envelope-open-text"></i>
+        </div>
+        <h1>تحقق من بريدك الإلكتروني</h1>
+        <p>أرسلنا رمز التحقق إلى
+          <strong style="color:var(--primary)">{{ email() }}</strong>
+        </p>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="form-alert error">
+          <i class="fas fa-exclamation-circle"></i>
+          {{ errorMessage() }}
+        </div>
+      }
+
+      @if (successMessage()) {
+        <div class="form-alert success">
+          <i class="fas fa-check-circle"></i>
+          {{ successMessage() }}
+        </div>
+      }
+
+      <div class="otp-input-section">
+        <input type="text" maxlength="6"
+               placeholder="000000"
+               class="otp-big-input"
+               inputmode="numeric"
+               [value]="otpCode()"
+               (input)="updateOtp($any($event.target).value)" />
+      </div>
+
+      <button class="btn-submit"
+              (click)="onVerify()"
+              [disabled]="isLoading() || otpCode().length < 4">
+        @if (isLoading()) {
+          <i class="fas fa-spinner fa-spin"></i> جاري التحقق...
+        } @else {
+          <i class="fas fa-check"></i> تحقق من الرمز
+        }
+      </button>
+
+      <div class="resend-section">
+        @if (resendCooldown() > 0) {
+          <p class="cooldown-text">
+            <i class="fas fa-clock"></i>
+            إعادة الإرسال بعد {{ resendCooldown() }} ثانية
+          </p>
+        } @else {
+          <p>لم يصلك الرمز؟</p>
+          <button class="btn-resend"
+                  (click)="onResend()"
+                  [disabled]="isResending()">
+            @if (isResending()) {
+              <i class="fas fa-spinner fa-spin"></i>
+            } @else {
+              <i class="fas fa-redo"></i>
+            }
+            إعادة الإرسال
+          </button>
+        }
+      </div>
+
+      <div class="form-footer">
+        <a (click)="router.navigate(['/auth/register'])" style="cursor:pointer">
+          <i class="fas fa-arrow-right"></i> تغيير البريد الإلكتروني
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+</div>

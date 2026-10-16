@@ -3,9 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-login-prompt',
-  standalone: true,
-  imports: [CommonModule],
+  selector: 'app-login-prompt',  imports: [CommonModule],
   templateUrl: './login-prompt.component.html',
   styleUrl: './login-prompt.component.scss'
 })

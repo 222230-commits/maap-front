@@ -1,157 +1,225 @@
 <div class="cart-page">
 
-  @if (cartItems().length === 0) {
-    <!-- سلة فارغة -->
-    <div class="empty-cart">
-      <i class="fas fa-shopping-cart"></i>
-      <h2>سلتك فارغة</h2>
-      <p>أضف منتجات لسلتك وتواصل مع التجار لإتمام طلبك</p>
-      <button (click)="router.navigate(['/products'])">
-        <i class="fas fa-box-open"></i>
+  <!-- Header -->
+  <div class="page-header">
+    <button class="btn-back" (click)="router.navigate(['/'])">
+      <i class="fas fa-arrow-right"></i>
+    </button>
+    <div>
+      <h1>السلة</h1>
+      @if (totalItems() > 0) {
+        <p>{{ totalItems() }} منتج</p>
+      }
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="cart-skeleton-layout">
+      @for (i of [1, 2]; track i) {
+        <div class="cart-skeleton-group">
+          <div class="csg-header shimmer"></div>
+          <div class="csg-item">
+            <div class="csg-thumb shimmer"></div>
+            <div class="csg-info">
+              <div class="csg-line-md shimmer"></div>
+              <div class="csg-line-sm shimmer"></div>
+            </div>
+          </div>
+          <div class="csg-footer shimmer"></div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (!isLoading() && totalItems() === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-shopping-cart"></i>
+      </div>
+      <h2>السلة فارغة</h2>
+      <p>أضف منتجات لتبدأ التسوق</p>
+      <button class="btn-browse" (click)="router.navigate(['/products'])">
+        <i class="fas fa-shopping-bag"></i>
         تصفح المنتجات
       </button>
     </div>
+  }
 
-  } @else {
-
+  @if (!isLoading() && totalItems() > 0) {
     <div class="cart-layout">
 
       <!-- قائمة المنتجات -->
       <div class="cart-items">
 
-        <div class="cart-header">
-          <h1>
-            <i class="fas fa-shopping-cart"></i>
-            سلة التسوق
-            <span class="items-count">{{ totalItems() }} منتج</span>
-          </h1>
-          <button class="clear-btn" (click)="clearCart()">
-            <i class="fas fa-trash"></i>
-            مسح الكل
-          </button>
-        </div>
+        @if (shops().length > 1) {
+          <div class="multishop-notice-banner">
+            <div class="notice-icon">
+              <i class="fas fa-store-alt"></i>
+            </div>
+            <div class="notice-text">
+              <strong>سلتك تضم منتجات من {{ shops().length }} متاجر مختلفة</strong>
+              <p>يتم تأكيد طلب كل متجر على حدة لضمان أسرع تجهيز وتوصيل مباشر من التاجر.</p>
+            </div>
+          </div>
+        }
 
-        <!-- مجموعة حسب المتجر -->
-        @for (shopId of shopKeys(); track shopId) {
+        @for (shop of shops(); track shop.shop_id) {
           <div class="shop-group">
 
             <!-- اسم المتجر -->
-            <div class="shop-header">
-              <i class="fas fa-store"></i>
-              <span>{{ shopNames()[shopId] }}</span>
+            <div class="shop-group-header">
+              <div class="shop-group-logo">
+                @if (shop.shop_logo_url) {
+                  <img [src]="shop.shop_logo_url" [alt]="shop.shop_name" />
+                } @else {
+                  <i class="fas fa-store"></i>
+                }
+              </div>
+              <span class="shop-name">{{ shop.shop_name }}</span>
+              <span class="shop-count" style="margin-right: auto; font-size: 0.85rem; color: var(--text-soft); font-weight: 500;">
+                ({{ shop.items_count }} {{ shop.items_count === 1 ? 'منتج' : 'منتجات' }})
+              </span>
             </div>
 
             <!-- منتجات المتجر -->
-            @for (item of getShopItems(shopId); track item.id) {
-              <div class="cart-item">
+            @for (item of shop.items; track item.cart_item_id) {
+              <div class="cart-item" [class.unavailable]="!item.is_available">
 
-                <!-- صورة -->
                 <div class="item-image">
-                  @if (item.image) {
-                    <img [src]="item.image" [alt]="item.name" />
+                  @if (item.image_url) {
+                    <img [src]="item.image_url" [alt]="item.title" />
                   } @else {
-                    <i class="fas fa-image"></i>
+                    <div class="no-img"><i class="fas fa-box"></i></div>
+                  }
+                  @if (!item.is_available) {
+                    <div class="unavailable-overlay"><span>غير متوفر</span></div>
                   }
                 </div>
 
-                <!-- معلومات -->
-                <div class="item-info">
-                  <h3>{{ item.name }}</h3>
-                  <p>{{ item.shopName }}</p>
-                  <div class="item-price">
-                    @if (item.discountPrice) {
-                      <span class="price">{{ item.discountPrice }} د.ل</span>
-                      <span class="old-price">{{ item.price }} د.ل</span>
-                    } @else {
-                      <span class="price">{{ item.price }} د.ل</span>
+                <div class="item-details">
+                  <h4>{{ item.title }}</h4>
+                  <div class="item-variants">
+                    @if (item.color_name) {
+                      <span><i class="fas fa-circle"></i> {{ item.color_name }}</span>
                     }
+                    @if (item.size_name) {
+                      <span><i class="fas fa-ruler"></i> {{ item.size_name }}</span>
+                    }
+                  </div>
+                  <div class="item-price-row">
+                    <span class="item-unit-price">{{ item.price | number }} د.ل</span>
+                    <span class="item-total-price">
+                      الإجمالي: {{ item.total_price | number }} د.ل
+                    </span>
                   </div>
                 </div>
 
-                <!-- الكمية -->
-                <div class="quantity-control">
-                  <button (click)="updateQty(item.id, item.quantity - 1)">
-                    <i class="fas fa-minus"></i>
-                  </button>
-                  <span>{{ item.quantity }}</span>
-                  <button (click)="updateQty(item.id, item.quantity + 1)">
-                    <i class="fas fa-plus"></i>
+                <div class="item-actions">
+                  <div class="qty-control">
+                    <button (click)="decreaseQty(item)"
+                            [disabled]="updatingId() === item.cart_item_id"
+                            title="تقليل الكمية"
+                            aria-label="تقليل الكمية">
+                      <i class="fas fa-minus"></i>
+                    </button>
+                    <span>{{ item.quantity }}</span>
+                    <button (click)="increaseQty(item)"
+                            [disabled]="updatingId() === item.cart_item_id || (item.stock > 0 && item.quantity >= item.stock)"
+                            title="زيادة الكمية"
+                            aria-label="زيادة الكمية">
+                      <i class="fas fa-plus"></i>
+                    </button>
+                  </div>
+                  <button class="btn-delete"
+                          [disabled]="removingId() === item.cart_item_id"
+                          (click)="removeItem(item.cart_item_id)"
+                          title="حذف المنتج من السلة">
+                    @if (removingId() === item.cart_item_id) {
+                      <i class="fas fa-spinner fa-spin"></i>
+                    } @else {
+                      <i class="fas fa-trash"></i>
+                    }
                   </button>
                 </div>
-
-                <!-- الإجمالي -->
-                <div class="item-total">
-                  {{ (item.discountPrice ?? item.price) * item.quantity }} د.ل
-                </div>
-
-                <!-- حذف -->
-                <button class="remove-btn" (click)="removeItem(item.id)">
-                  <i class="fas fa-trash"></i>
-                </button>
 
               </div>
             }
 
-            <!-- تواصل مع هذا المتجر -->
+            <!-- Checkout per shop -->
             <div class="shop-footer">
               <div class="shop-total">
-                إجمالي {{ shopNames()[shopId] }}:
-                <strong>{{ getShopTotal(shopId) }} د.ل</strong>
+                الإجمالي: <strong>{{ shop.subtotal | number }} د.ل</strong>
               </div>
-              <button class="contact-btn" (click)="contactShop(shopId)">
-                <i class="fab fa-whatsapp"></i>
-                تواصل مع التاجر لإتمام الطلب
+              <button class="btn-shop-checkout"
+                      [disabled]="hasUnavailableItems(shop)"
+                      (click)="router.navigate(['/checkout', shop.shop_id])">
+                @if (hasUnavailableItems(shop)) {
+                  <i class="fas fa-exclamation-circle"></i> يوجد منتجات غير متوفرة
+                } @else {
+                  <i class="fas fa-lock"></i> إتمام الطلب
+                }
               </button>
             </div>
 
           </div>
         }
-      </div>
 
-      <!-- ملخص السلة -->
-      <div class="cart-summary">
-        <h2>
-          <i class="fas fa-receipt"></i>
-          ملخص الطلب
-        </h2>
-
-        <div class="summary-row">
-          <span>عدد المنتجات</span>
-          <span>{{ totalItems() }}</span>
-        </div>
-
-        <div class="summary-row">
-          <span>عدد المتاجر</span>
-          <span>{{ shopKeys().length }}</span>
-        </div>
-
-        <hr />
-
-        <div class="summary-total">
-          <span>الإجمالي التقريبي</span>
-          <strong>{{ totalPrice() }} د.ل</strong>
-        </div>
-
-        <div class="summary-note">
-          <i class="fas fa-info-circle"></i>
-          السعر النهائي والتوصيل يُحدد مع كل تاجر على حدة
-        </div>
-
-        <!-- تواصل مع كل التجار -->
-        @for (shopId of shopKeys(); track shopId) {
-          <button class="contact-all-btn" (click)="contactShop(shopId)">
-            <i class="fab fa-whatsapp"></i>
-            {{ shopNames()[shopId] }}
-          </button>
-        }
-
-        <button class="continue-btn"
-                (click)="router.navigate(['/products'])">
-          <i class="fas fa-plus"></i>
-          إضافة المزيد
+        <!-- Clear Cart -->
+        <button class="btn-clear-cart" (click)="askClearCart()" [disabled]="isClearing()">
+          @if (isClearing()) {
+            <i class="fas fa-spinner fa-spin"></i> جاري التفريغ...
+          } @else {
+            <i class="fas fa-trash"></i> تفريغ السلة
+          }
         </button>
 
       </div>
+
+      <!-- ملخص الطلب -->
+      <div class="cart-summary">
+        <div class="summary-card">
+          <h3><i class="fas fa-receipt"></i> ملخص الطلب</h3>
+          <div class="summary-rows">
+            <div class="summary-row">
+              <span>عدد المنتجات</span>
+              <span>{{ totalItems() }}</span>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-row total">
+              <span>الإجمالي</span>
+              <span class="total-price">{{ grandTotal() | number }} د.ل</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   }
+
+  <!-- Confirm Clear Cart Dialog -->
+  <app-confirm-dialog
+    [isOpen]="showClearModal()"
+    [isLoading]="isClearing()"
+    title="تفريغ السلة بالكامل"
+    message="هل أنت متأكد من رغبتك في حذف جميع المنتجات من سلة التسوق؟ لا يمكن التراجع عن هذه الخطوة."
+    confirmText="نعم، تفريغ السلة"
+    cancelText="إلغاء"
+    icon="fas fa-trash-alt"
+    (confirmed)="doClearCart()"
+    (cancelled)="showClearModal.set(false)">
+  </app-confirm-dialog>
+
+  <!-- Confirm Remove Single Item Dialog -->
+  <app-confirm-dialog
+    [isOpen]="!!itemToDelete()"
+    [isLoading]="removingId() === itemToDelete()?.id"
+    title="حذف المنتج من السلة"
+    [message]="'هل تريد بالتأكيد إزالة ' + (itemToDelete()?.title || 'هذا المنتج') + ' من سلة مشترياتك؟'"
+    confirmText="نعم، حذف المنتج"
+    cancelText="تراجع"
+    icon="fas fa-trash-alt"
+    (confirmed)="doRemoveItem()"
+    (cancelled)="itemToDelete.set(null)">
+  </app-confirm-dialog>
+
 </div>

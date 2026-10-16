@@ -1,0 +1,160 @@
+<div class="admin-products-page">
+  <div class="page-header">
+    <div class="header-title-wrap">
+      <h1><i class="fas fa-box"></i> إدارة المنتجات</h1>
+      <p>{{ filteredProducts().length }} منتج</p>
+    </div>
+    <button class="btn-sync-ai" 
+            [disabled]="isSyncingSearchEngine()" 
+            (click)="syncSearchEngine()"
+            title="مزامنة وتوليد متجهات المنتجات النشطة بالكامل في محرك البحث">
+      @if (isSyncingSearchEngine()) {
+        <i class="fas fa-circle-notch fa-spin"></i>
+        <span>جاري الإرسال...</span>
+      } @else {
+        <i class="fas fa-wand-magic-sparkles"></i>
+        <span>مزامنة محرك البحث الدلالي</span>
+      }
+    </button>
+  </div>
+
+  @if (syncResult()) {
+    <div class="sync-status-card" [class.success]="syncResult()?.status === 'dispatched' || syncResult()?.status === 'empty'" [class.error]="syncResult()?.status === 'error'">
+      <div class="sync-status-content">
+        <div class="sync-icon">
+          @if (syncResult()?.status === 'dispatched') {
+            <i class="fas fa-check-circle"></i>
+          } @else if (syncResult()?.status === 'empty') {
+            <i class="fas fa-info-circle"></i>
+          } @else {
+            <i class="fas fa-exclamation-triangle"></i>
+          }
+        </div>
+        <div class="sync-text">
+          <h4>{{ syncResult()?.message }}</h4>
+          @if (syncResult()?.batch_id) {
+            <p class="batch-hint">
+              <strong>رقم الدفعة (Batch ID):</strong>
+              <code>{{ syncResult()?.batch_id }}</code>
+              <span>— جاري المعالجة وتوليد المتجهات في الخلفية على السيرفر.</span>
+            </p>
+          }
+        </div>
+      </div>
+      <button class="btn-close-sync" (click)="dismissSyncResult()" title="إغلاق">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  }
+
+  <!-- فلاتر -->
+  <div class="filters">
+    <div class="search-bar">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="ابحث عن منتج..."
+             [value]="searchQuery()"
+             (input)="updateSearch($any($event.target).value)" />
+    </div>
+    <div class="category-filters">
+      <button [class.active]="selectedCategory() === null"
+              (click)="selectedCategory.set(null)">الكل</button>
+      @for (cat of categories(); track cat.id) {
+        <button [class.active]="selectedCategory() === cat.id"
+                (click)="selectedCategory.set(cat.id)">
+          <i [class]="cat.icon"></i> {{ cat.nameAr }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- تحميل -->
+  @if (isLoading()) {
+    <div class="loading-row">
+      <i class="fas fa-circle-notch fa-spin"></i> جاري التحميل...
+    </div>
+  }
+
+  <!-- خطأ -->
+  @if (!isLoading() && error()) {
+    <div class="error-row">
+      <i class="fas fa-exclamation-circle"></i> {{ error() }}
+      <button (click)="loadProducts()">إعادة المحاولة</button>
+    </div>
+  }
+
+  <!-- جدول المنتجات -->
+  @if (!isLoading() && !error()) {
+    <div class="products-table">
+      <div class="table-header">
+        <span>المنتج</span>
+        <span>المتجر</span>
+        <span>التصنيف</span>
+        <span>السعر</span>
+        <span>الطلبات</span>
+        <span>التقييم</span>
+        <span>إجراءات</span>
+      </div>
+
+      @if (filteredProducts().length === 0) {
+        <div class="empty-row">
+          <i class="fas fa-inbox"></i>
+          <p>لا توجد منتجات</p>
+        </div>
+      }
+
+      @for (product of filteredProducts(); track product.id) {
+        <div class="table-row">
+          <div class="product-cell">
+            @if (product.image || product.thumbnail) {
+              <img [src]="product.image ?? product.thumbnail" class="product-thumb" alt="" />
+            } @else {
+              <div class="product-img"><i class="fas fa-image"></i></div>
+            }
+            <span>{{ getProductName(product) }}</span>
+          </div>
+          <span class="shop-cell">
+            <i class="fas fa-store"></i>
+            {{ getShopName(product) }}
+          </span>
+          <span>{{ getCategoryName(product) }}</span>
+          <div class="price-cell">
+            @if (getDiscountPrice(product)) {
+              <span class="new-price">{{ getDiscountPrice(product) }}</span>
+              <span class="old-price">{{ getPrice(product) }}</span>
+            } @else {
+              <span>{{ getPrice(product) }}</span>
+            }
+          </div>
+          <span class="orders-cell">
+            <i class="fas fa-shopping-bag"></i>
+            {{ product.orders_count ?? product.ordersCount ?? '—' }}
+          </span>
+          <span class="rating-cell">
+            <i class="fas fa-star"></i>
+            {{ product.rating ?? product.average_rating ?? '—' }}
+          </span>
+          <div class="actions-cell">
+            <!-- حذف: يظهر كـ placeholder حتى يتوفر endpoint من الباك إند -->
+            <button class="view-btn" title="حذف (قريباً)"
+                    (click)="confirmDelete(product.id)">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- مودال حذف — placeholder حتى يتوفر endpoint -->
+  @if (showDeleteConfirm()) {
+    <div class="modal-backdrop" (click)="cancelDelete()"></div>
+    <div class="confirm-modal">
+      <i class="fas fa-clock text-3xl" style="color:#f59e0b"></i>
+      <h3>ميزة قيد التطوير</h3>
+      <p>حذف المنتجات من لوحة الإدارة سيكون متاحاً قريباً بعد إضافة الـ endpoint من الباك إند.</p>
+      <div class="modal-actions">
+        <button class="cancel-btn" (click)="cancelDelete()">حسناً</button>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دليل إدارة المنتجات — Backend Integration Guide</title>
+<style>
+  :root{
+    --bg:#FAF8F4;
+    --ink:#1C2420;
+    --ink-soft:#5B6B62;
+    --surface:#FFFFFF;
+    --border:#E6E1D6;
+    --primary:#0E6B62;
+    --primary-dark:#0A4F49;
+    --primary-soft:#E3F1EE;
+    --coral:#C1473A;
+    --coral-soft:#FBEAE8;
+    --amber:#E0972F;
+    --amber-soft:#FBEFDC;
+    --purple:#6B4FA0;
+    --purple-soft:#ECE7F5;
+    --gray-step:#7A7A72;
+    --gray-step-soft:#EFEDE6;
+    --success:#2E7D5B;
+    --code-bg:#1E2620;
+    --code-ink:#DCE8E2;
+    --radius:14px;
+    --shadow: 0 1px 2px rgba(28,36,32,.04), 0 8px 24px -12px rgba(28,36,32,.12);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI", Tahoma, Arial, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  code, .mono{ font-family:Consolas, "Courier New", monospace; }
+  h1,h2,h3{ font-weight:800; margin:0; }
+  a{ color:var(--primary-dark); }
+
+  /* ---------- layout ---------- */
+  .layout{ display:flex; max-width:1280px; margin:0 auto; align-items:flex-start; }
+  nav.side{
+    width:230px; flex-shrink:0; position:sticky; top:0; height:100vh; overflow-y:auto;
+    background:var(--surface); border-left:1px solid var(--border); padding:22px 16px;
+  }
+  nav.side .brand{ font-size:14px; font-weight:800; margin-bottom:18px; color:var(--primary-dark); }
+  nav.side .grp{ font-size:11px; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em; margin:18px 0 8px; }
+  nav.side .grp:first-of-type{ margin-top:0; }
+  nav.side a{
+    display:block; font-size:13px; color:var(--ink); text-decoration:none; padding:6px 10px; border-radius:8px; margin-bottom:2px;
+  }
+  nav.side a:hover{ background:var(--primary-soft); color:var(--primary-dark); }
+  main{ flex:1; min-width:0; padding:32px 40px 100px; }
+
+  .eyebrow{ font-size:12px; letter-spacing:.05em; color:var(--ink-soft); margin:0 0 6px; text-transform:uppercase; }
+  header h1{ font-size:26px; margin-bottom:10px; }
+  header p{ font-size:14.5px; color:var(--ink-soft); max-width:760px; line-height:1.7; margin:0 0 30px; }
+
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:24px; margin-bottom:26px;
+  }
+  section{ margin-bottom:46px; }
+  section > h2{ font-size:20px; margin-bottom:6px; padding-top:6px; }
+  section > .sub{ font-size:13.5px; color:var(--ink-soft); margin:0 0 16px; }
+
+  table{ width:100%; border-collapse:collapse; font-size:13px; margin-bottom:6px; }
+  th, td{ text-align:right; padding:9px 12px; border-bottom:1px solid var(--border); vertical-align:top; }
+  th{ background:var(--primary-soft); color:var(--primary-dark); font-weight:700; font-size:12.5px; }
+  tr:last-child td{ border-bottom:none; }
+
+  .pill-get{ display:inline-block; font-size:11.5px; font-weight:800; background:#DCEBFA; color:#1A5A96; padding:3px 10px; border-radius:6px; }
+  .pill-post{ display:inline-block; font-size:11.5px; font-weight:800; background:var(--primary-soft); color:var(--primary-dark); padding:3px 10px; border-radius:6px; }
+  .pill-put{ display:inline-block; font-size:11.5px; font-weight:800; background:var(--amber-soft); color:#8A5A0F; padding:3px 10px; border-radius:6px; }
+  .pill-patch{ display:inline-block; font-size:11.5px; font-weight:800; background:var(--purple-soft); color:var(--purple); padding:3px 10px; border-radius:6px; }
+  .pill-delete{ display:inline-block; font-size:11.5px; font-weight:800; background:var(--coral-soft); color:var(--coral); padding:3px 10px; border-radius:6px; }
+
+  .endpoint-head{ display:flex; align-items:center; gap:10px; margin:34px 0 4px; }
+  .endpoint-head h3{ font-size:16px; }
+  .endpoint-path{ font-size:12.5px; background:#F1EEE6; padding:3px 9px; border-radius:6px; direction:ltr; display:inline-block; }
+  .ep-desc{ font-size:13px; color:var(--ink-soft); margin:0 0 12px; }
+
+  pre{
+    background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:14px 16px; font-size:12.5px;
+    overflow-x:auto; direction:ltr; text-align:left; margin:0 0 12px; line-height:1.55;
+  }
+  .code-label{ font-size:11px; font-weight:700; color:var(--ink-soft); margin:0 0 4px; }
+
+  .callout{ border-radius:10px; padding:12px 14px; font-size:13px; line-height:1.7; margin:10px 0; }
+  .callout.warn{ background:var(--coral-soft); border:1px solid #F1C7C1; color:#7A2E24; }
+  .callout.tip{ background:var(--primary-soft); border:1px solid #BFE0DA; color:var(--primary-dark); }
+  .callout b{ display:inline-block; margin-inline-end:4px; }
+
+  /* ---------- flow diagram ---------- */
+  .flow{ display:flex; flex-direction:column; align-items:center; gap:6px; margin:14px 0 20px; }
+  .fbox{ width:100%; max-width:480px; border-radius:10px; padding:10px 16px; font-size:13px; text-align:center; border:1.5px solid; font-weight:700; }
+  .fbox .sub{ display:block; font-size:11.5px; font-weight:400; margin-top:3px; color:inherit; opacity:.85; }
+  .fbox.api{ background:var(--purple-soft); border-color:#CFC3E6; color:var(--purple); }
+  .fbox.decision{ background:var(--gray-step-soft); border-color:#D9D6CC; color:var(--gray-step); max-width:520px; }
+  .fbox.done{ background:var(--primary-soft); border-color:#BFE0DA; color:var(--primary-dark); }
+  .fbox.stop{ background:var(--coral-soft); border-color:#F1C7C1; color:var(--coral); }
+  .arrow{ font-size:16px; color:var(--ink-soft); }
+  .branch{ display:flex; gap:18px; width:100%; max-width:560px; justify-content:center; }
+  .branch .col{ flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .branch .col .tag{ font-size:11px; font-weight:700; color:var(--ink-soft); }
+
+  /* ---------- mockups: phone ---------- */
+  .phone{ width:300px; border:8px solid #232722; border-radius:34px; padding:10px; background:#232722; margin:0 auto; }
+  .screen{ background:#fff; border-radius:22px; padding:14px 12px; min-height:420px; font-size:12.5px; }
+  .screen .s-title{ font-weight:800; font-size:14px; margin-bottom:10px; }
+  .screen .tabs{ display:flex; gap:6px; overflow-x:auto; margin-bottom:10px; }
+  .screen .tab{ font-size:11px; padding:5px 10px; border-radius:999px; background:#F1EEE6; white-space:nowrap; }
+  .screen .tab.on{ background:var(--primary); color:#fff; font-weight:700; }
+  .row{ display:flex; align-items:center; gap:8px; border:1px solid var(--border); border-radius:10px; padding:8px; margin-bottom:8px; }
+  .row .thumb{ width:34px; height:34px; border-radius:8px; background:linear-gradient(135deg,#dfe8e5,#cfded9); flex-shrink:0; }
+  .row .meta{ flex:1; }
+  .row .meta .t{ font-weight:700; font-size:12.5px; }
+  .row .meta .p{ font-size:11px; color:var(--ink-soft); }
+  .status{ font-size:10px; font-weight:700; padding:2px 8px; border-radius:999px; }
+  .status.on{ background:#E1F2E8; color:var(--success); }
+  .status.draft{ background:var(--amber-soft); color:#8A5A0F; }
+  .status.trash{ background:var(--coral-soft); color:var(--coral); }
+  .bulkbar{ display:flex; align-items:center; justify-content:space-between; background:var(--primary-soft); color:var(--primary-dark); border-radius:10px; padding:7px 10px; font-size:11.5px; margin-bottom:8px; font-weight:700; }
+  .bulkbar .acts{ display:flex; gap:6px; }
+  .bulkbar button{ font-size:10.5px; padding:4px 8px; border-radius:6px; border:none; background:#fff; color:var(--primary-dark); font-weight:700; }
+
+  /* ---------- tree (category picker) ---------- */
+  .tree{ border:1px solid var(--border); border-radius:10px; overflow:hidden; max-width:480px; margin:0 auto; }
+  .tcrumb{ font-size:11.5px; color:var(--ink-soft); padding:8px 12px; border-bottom:1px solid var(--border); background:#FCFBF8; }
+  .tnode{ display:flex; align-items:center; justify-content:space-between; padding:10px 14px; font-size:13px; border-bottom:1px solid var(--border); }
+  .tnode:last-child{ border-bottom:none; }
+  .tnode .name{ display:flex; align-items:center; gap:8px; }
+  .tnode .chev{ color:var(--ink-soft); font-size:12px; }
+  .tnode.leaf{ background:var(--primary-soft); }
+  .tnode.leaf .name::before{ content:"◉"; color:var(--primary); font-size:10px; }
+  .tnode:not(.leaf) .name::before{ content:"▢"; color:var(--ink-soft); font-size:10px; }
+  .tnode .pickbtn{ font-size:11px; font-weight:700; background:var(--primary); color:#fff; padding:4px 10px; border-radius:6px; }
+  .tnode .disabled{ font-size:11px; color:var(--ink-soft); }
+
+  /* ---------- modal ---------- */
+  .modal-wrap{ background:#EEECE4; border-radius:14px; padding:34px 20px; display:flex; justify-content:center; }
+  .modal{ background:#fff; border-radius:14px; box-shadow:var(--shadow); width:100%; max-width:440px; padding:20px; }
+  .modal h4{ font-size:15px; margin:0 0 4px; }
+  .modal .m-sub{ font-size:12.5px; color:var(--ink-soft); margin:0 0 16px; }
+  .modal .m-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:16px; }
+  .modal button{ font-size:12.5px; font-weight:700; padding:8px 16px; border-radius:8px; border:none; }
+  .modal .btn-p{ background:var(--primary); color:#fff; }
+  .modal .btn-g{ background:#F1EEE6; color:var(--ink); }
+
+  .badge-endpoint{ display:block; text-align:center; font-size:11.5px; margin-top:10px; color:var(--ink-soft); direction:ltr; }
+  .badge-endpoint b{ color:var(--primary-dark); }
+
+  footer{ border-top:1px solid var(--border); padding-top:20px; font-size:12px; color:var(--ink-soft); text-align:center; }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="side">
+  <div class="brand">دليل إدارة المنتجات</div>
+  <div class="grp">نظرة عامة</div>
+  <a href="#overview">اختيار الأداة</a>
+  <a href="#flows">مخططات التدفق</a>
+  <a href="#mockups">نماذج الشاشات</a>
+
+  <div class="grp">إدارة المنتج</div>
+  <a href="#p-index">عرض القائمة (Index)</a>
+  <a href="#p-show">عرض التفاصيل (Show)</a>
+  <a href="#p-create">إنشاء منتج</a>
+  <a href="#p-update">تعديل منتج</a>
+  <a href="#p-publish">نشر / إخفاء</a>
+  <a href="#p-delete">حذف (فردي وجماعي)</a>
+  <a href="#p-restore">استعادة</a>
+  <a href="#p-move">نقل لقسم آخر</a>
+
+  <div class="grp">صور المنتج</div>
+  <a href="#img-get">جلب الصور</a>
+  <a href="#img-upload">رفع صور ملونة / عامة</a>
+  <a href="#img-primary">تعيين الغلاف</a>
+  <a href="#img-sort">ترتيب الصور</a>
+  <a href="#img-delete">حذف صورة</a>
+
+  <div class="grp">الوسوم والمميزات</div>
+  <a href="#tag-list">القوائم (نظام / تاجر)</a>
+  <a href="#tag-create">إضافة سريعة (نص حر)</a>
+  <a href="#tag-attach">ربط/فك جماعي (IDs)</a>
+  <a href="#tag-manage">تعديل وحذف</a>
+
+  <div class="grp">مرجع سريع</div>
+  <a href="#categories">الأقسام</a>
+  <a href="#colors-sizes">الألوان والمقاسات</a>
+  <a href="#errors">ملخص الأخطاء</a>
+  <a href="#tips">نصائح عملية</a>
+  <a href="#backend-note">ملاحظة لفريق الباك إند</a>
+</nav>
+
+<main>
+<header>
+  <p class="eyebrow">Seller Panel · Product Management</p>
+  <h1>دليل ربط الفرونت إند بإدارة المنتجات</h1>
+  <p>
+    يغطي هذا الدليل كل الـ Endpoints الخاصة بلوحة تحكم التاجر لإدارة منتجاته: من التصفح والإنشاء وحتى الحذف والاستعادة والنقل بين الأقسام،
+    مع الصور والألوان والمقاسات والوسوم والمميزات. الهدف أن يفهم مطور الواجهة كل شكل استجابة ممكن، وكل فخ خفي في منطق العمل قبل أن يصطدم به.
+  </p>
+</header>
+
+<section id="overview">
+  <h2>نظرة عامة واختيار الأداة</h2>
+  <p class="sub">هذه لوحة تاجر (Seller Dashboard) — تعتمد أساساً على جداول، أشجار اختيار، ومودالات؛ لذا فإن Angular أو React أنسب من Flutter لمعظم الشاشات هنا.</p>
+  <div class="card">
+  <table>
+    <tr><th>الميزة</th><th>الأداة المقترحة</th><th>السبب</th></tr>
+    <tr><td>قائمة المنتجات + التبويبات + التحديد الجماعي</td><td>Angular / React (Table)</td><td>فرز، بحث، Checkbox متعدد، وشريط إجراءات ثابت — أنسب للوحة تحكم مكتبية.</td></tr>
+    <tr><td>معالج إنشاء/تعديل منتج متعدد الخطوات</td><td>Angular / React (Stepper)</td><td>حالة نموذج معقدة (ألوان، مقاسات، صور لكل لون) تحتاج إدارة حالة قوية.</td></tr>
+    <tr><td>رفع الصور وربطها بالألوان + الترتيب بالسحب</td><td>Angular / React (Drag & Drop)</td><td>عملية بصرية تفاعلية تحتاج مكتبة سحب وإفلات، أفضل على شاشة كبيرة.</td></tr>
+    <tr><td>اختيار قسم للنقل (شجرة متدرجة)</td><td>Angular / React (Modal + Tree)</td><td>تصفح متسلسل بمودال فوق الجدول، وليس شاشة مستقلة.</td></tr>
+    <tr><td>إدارة الوسوم والمميزات (نظام مقابل تاجر)</td><td>Angular / React (Chips Panel)</td><td>تمييز بصري بين مصدرين للبيانات + بحث فوري.</td></tr>
+  </table>
+  </div>
+</section>
+
+<section id="flows">
+  <h2>مخططات التدفق</h2>
+  <p class="sub">أهم عمليتين فيهما تفرع منطقي حقيقي: رفع الصور والتفعيل التلقائي، وحذف صورة مع إعادة ترقيم الترتيب وترقية الغلاف البديل.</p>
+
+  <div class="card">
+    <h3 style="font-size:14px; margin-bottom:14px;">1. رفع صور المنتج → التفعيل التلقائي للمنتج</h3>
+    <div class="flow">
+      <div class="fbox api">POST <span class="mono">/products/{id}/images</span><span class="sub">أو general-images</span></div>
+      <div class="arrow">↓</div>
+      <div class="fbox decision">فشل رفع أي ملف؟ ← حذف كل الملفات المرفوعة بهذا الطلب فوراً</div>
+      <div class="arrow">↓</div>
+      <div class="fbox decision">أُرسلت is_primary=true لصورة واحدة؟ ← تصفير كل صور المنتج القديمة أولاً</div>
+      <div class="arrow">↓</div>
+      <div class="fbox decision">لا صور سابقة إطلاقاً ولا برايمري مُرسل؟ ← أول صورة في القائمة تصبح الغلاف تلقائياً</div>
+      <div class="arrow">↓</div>
+      <div class="fbox decision">هل كل لون مُختار للمنتج له صورة واحدة على الأقل؟</div>
+      <div class="arrow">↓</div>
+      <div class="branch">
+        <div class="col"><span class="tag">نعم</span><div class="fbox done">is_active = true</div></div>
+        <div class="col"><span class="tag">لا</span><div class="fbox stop">is_active = false (مسودة)</div></div>
+      </div>
+    </div>
+    <div class="callout warn"><b>⚠ فخ:</b> هذا الفحص يعمل تلقائياً وبصمت بعد كل رفع صورة — لا يُرجع الـ Endpoint أي حقل صريح يشرح "لماذا أصبح المنتج مسودة". على الفرونت إند مقارنة <code>color_ids</code> المختارة بالمنتج مع الألوان الموجودة فعلياً في <code>grouped_images</code> إذا أراد عرض رسالة دقيقة للتاجر.</div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:14px; margin-bottom:14px;">2. حذف صورة واحدة (سد الفجوة + ترقية غلاف بديل)</h3>
+    <div class="flow">
+      <div class="fbox api">DELETE <span class="mono">/products/{id}/images/{imageId}/delete</span></div>
+      <div class="arrow">↓</div>
+      <div class="fbox decision">حذف الملف من التخزين + حذف السجل من قاعدة البيانات</div>
+      <div class="arrow">↓</div>
+      <div class="fbox decision">إنقاص sort_order لكل الصور اللاحقة بمقدار 1 (سد الفجوة تلقائياً)</div>
+      <div class="arrow">↓</div>
+      <div class="fbox decision">هل الصورة المحذوفة كانت هي الغلاف (is_primary)؟</div>
+      <div class="arrow">↓</div>
+      <div class="branch">
+        <div class="col"><span class="tag">نعم</span><div class="fbox done">ترقية أول صورة بالترتيب الجديد لتصبح الغلاف</div></div>
+        <div class="col"><span class="tag">لا</span><div class="fbox decision">لا تغيير على الغلاف</div></div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="fbox decision">إعادة فحص تغطية الألوان بالصور وتحديث is_active من جديد</div>
+    </div>
+    <div class="callout tip"><b>💡 توصية:</b> بعد أي عملية حذف/رفع/ترتيب صورة، أعد جلب المنتج كاملاً (Show) بدل تحديث الحالة محلياً في الواجهة — الغلاف والترتيب وحالة is_active قد تتغير جميعها دفعة واحدة دون إشعار مباشر بكل تغيير.</div>
+  </div>
+</section>
+
+<section id="mockups">
+  <h2>نماذج الشاشات الرئيسية</h2>
+
+  <div class="card">
+    <div class="phone"><div class="screen">
+      <div class="s-title">منتجاتي</div>
+      <div class="tabs">
+        <div class="tab on">الكل 24</div><div class="tab">نفدت 3</div><div class="tab">منخفضة 5</div><div class="tab">مسودات 2</div><div class="tab">محذوفات 1</div>
+      </div>
+      <div class="bulkbar"><span>تم تحديد 2</span><div class="acts"><button>نقل</button><button>حذف</button></div></div>
+      <div class="row"><input type="checkbox" checked><div class="thumb"></div><div class="meta"><div class="t">قميص قطني أزرق</div><div class="p">120 د.ل</div></div><span class="status on">نشط</span></div>
+      <div class="row"><input type="checkbox" checked><div class="thumb"></div><div class="meta"><div class="t">حذاء رياضي أسود</div><div class="p">210 د.ل</div></div><span class="status draft">مسودة</span></div>
+      <div class="row"><div class="thumb"></div><div class="meta"><div class="t">حقيبة جلد</div><div class="p">340 د.ل</div></div><span class="status trash">محذوف</span></div>
+    </div></div>
+    <p class="badge-endpoint">مرتبط بـ <b>GET /seller/products</b> — التبويبات والإحصائيات تأتي معاً في استجابة واحدة (stats + products).</p>
+    <div class="callout warn"><b>⚠ فخ:</b> حقل <code>stats</code> يُحسب من كل منتجات المتجر بغض النظر عن فلتر <code>search</code>. لو بحث التاجر عن اسم منتج، أرقام التبويبات لن تتطابق مع عدد نتائج البحث المعروضة — هذا سلوك مقصود وليس خطأ، لكن التاجر قد يظن أن العدّاد خاطئ إن لم يُشرح له.</div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:14px; margin-bottom:14px;">مودال النقل الجماعي لقسم آخر — شجرة أقسام المتجر فقط</h3>
+    <div class="modal-wrap"><div class="modal">
+      <h4>نقل 2 منتج إلى قسم آخر</h4>
+      <p class="m-sub">تظهر فقط الأقسام المفعّلة فعلياً في متجرك، وليس كل كتالوج الأقسام العام.</p>
+      <div class="tree">
+        <div class="tcrumb">الرئيسية / ملابس رجالية</div>
+        <div class="tnode"><span class="name">قمصان</span><span class="chev">›</span></div>
+        <div class="tnode leaf"><span class="name">قمصان كاجوال</span><button class="pickbtn">اختيار</button></div>
+        <div class="tnode"><span class="name">بناطيل</span><span class="disabled">قسم متوسط — لا يمكن الاختيار</span></div>
+      </div>
+      <div class="m-actions"><button class="btn-g">إلغاء</button><button class="btn-p">تأكيد النقل</button></div>
+    </div></div>
+    <p class="badge-endpoint">تعتمد على <b>GET /seller/categories?parent_id=</b> للتصفح، ثم <b>PATCH /seller/products/move</b> للتنفيذ.</p>
+    <div class="callout warn"><b>⚠ فخ:</b> الزر يجب أن يُعطّل تلقائياً على أي قسم ليس "ورقة أخيرة" (Leaf) — الباك إند يرفض الطلب بالكامل (422) لو أُرسل قسم رئيسي أو متوسط، حتى لو كان مفعّلاً في المتجر.</div>
+  </div>
+</section>
+
+<section id="p-index">
+  <div class="endpoint-head"><span class="pill-get">GET</span><h3>عرض قائمة المنتجات</h3></div>
+  <code class="endpoint-path">/seller/products?tab=all&amp;search=...</code>
+  <p class="ep-desc">Controller: <code>SellerProductController@index</code> ← Service: <code>ProductService@listProducts</code></p>
+
+  <div class="code-label">استجابة ناجحة (200)</div>
+  <pre>{
+  "success": true,
+  "data": {
+    "stats": {
+      "all": 24, "out_of_stock": 3, "low_stock": 5,
+      "draft": 2, "trashed": 1
+    },
+    "products": {
+      "data": [ { "id": "...", "title": "...", "price": 120, "stock": 8, "is_active": true } ],
+      "current_page": 1, "last_page": 3, "total": 24
+    }
+  }
+}</pre>
+  <table>
+    <tr><th>tab</th><th>الفلتر المطبق</th></tr>
+    <tr><td>all (افتراضي)</td><td>is_active = true فقط</td></tr>
+    <tr><td>out_of_stock</td><td>stock &lt;= 0 و is_active = true</td></tr>
+    <tr><td>low_stock</td><td>0 &lt; stock &lt;= 5 و is_active = true</td></tr>
+    <tr><td>draft</td><td>is_active = false (غير منشورة بعد)</td></tr>
+    <tr><td>trashed</td><td>onlyTrashed — المحذوفة (Soft Delete) فقط</td></tr>
+  </table>
+  <div class="callout warn"><b>⚠ فخ:</b> stats.all يعني "عدد المنتجات النشطة" وليس "كل المنتجات في كل الحالات" — لا تجمع أرقام التبويبات معاً لعرض إجمالي، فهي غير حصرية (منتج واحد قد يظهر في all و low_stock معاً).</div>
+</section>
+
+<section id="p-show">
+  <div class="endpoint-head"><span class="pill-get">GET</span><h3>عرض تفاصيل منتج</h3></div>
+  <code class="endpoint-path">/seller/products/{id}</code>
+  <p class="ep-desc">يرجع المنتج مع الألوان والمقاسات، والصور <b>مجمعة حسب اللون</b> بدلاً من مصفوفة مسطحة.</p>
+  <div class="code-label">استجابة ناجحة (200)</div>
+  <pre>{
+  "success": true,
+  "data": {
+    "id": "...", "title": "...", "price": 120,
+    "category": { "id": "...", "name": "قمصان كاجوال" },
+    "colors": [ { "id": "c1", "name": "أزرق", "hex_code": "#2255aa" } ],
+    "sizes": [ { "id": "s1", "name": "L" } ],
+    "features_list": ["قطن 100%"],
+    "tags_list": ["صيفي"],
+    "grouped_images": {
+      "c1": [ { "id": "img1", "is_primary": true, "sort_order": 1 } ],
+      "general": [ { "id": "img2", "sort_order": 2 } ]
+    }
+  }
+}</pre>
+  <div class="callout warn"><b>⚠ فخ:</b> الحقل <code>images</code> المسطح غير موجود إطلاقاً في الاستجابة — تم إخفاؤه عمداً (<code>makeHidden</code>) لصالح <code>grouped_images</code> فقط. أي كود فرونت إند يحاول قراءة <code>product.images</code> مباشرة سيفشل بصمت.</div>
+</section>
+
+<section id="p-create">
+  <div class="endpoint-head"><span class="pill-post">POST</span><h3>إنشاء منتج (الخطوة الأساسية)</h3></div>
+  <code class="endpoint-path">/seller/products/create</code>
+  <p class="ep-desc">هذه هي "الخطوة 1" فقط — منتج بدون صور، لذا يُنشأ دائماً بـ <code>is_active: false</code>. الخطوات التالية (صور، وسوم، مميزات) تُستدعى بعده بـ Endpoints منفصلة على نفس معرّف المنتج.</p>
+  <div class="code-label">طلب (Request)</div>
+  <pre>{
+  "category_id": "uuid",
+  "title": "قميص قطني أزرق",
+  "description": "...",
+  "price": 120,
+  "compare_at_price": 150,
+  "stock": 30,
+  "color_ids": ["c1", "c2"],
+  "size_ids": ["s1", "s2"]
+}</pre>
+  <div class="code-label">استجابة ناجحة (201)</div>
+  <pre>{ "success": true, "message": "تم إنشاء المنتج الأساسي بنجاح...", "id": "new-product-uuid" }</pre>
+  <div class="callout warn"><b>⚠ فخ مهم:</b> لا يوجد أي تحقق من أن <code>category_id</code> قسم "ورقة أخيرة" (Leaf) عند الإنشاء أو التعديل — دالة <code>validateAndGetLeafCategory</code> موجودة في <code>CategoryService</code> لكنها <b>غير مستدعاة</b> هنا إطلاقاً، رغم أنها مُطبّقة بصرامة في نقل المنتجات (Move). الفرونت إند هو خط الدفاع الوحيد حالياً: يجب فرض اختيار قسم Leaf فقط في نموذج الإنشاء/التعديل بنفس منطق شجرة النقل.</div>
+</section>
+
+<section id="p-update">
+  <div class="endpoint-head"><span class="pill-put">PUT</span><h3>تعديل بيانات المنتج</h3></div>
+  <code class="endpoint-path">/seller/products/{id}/update</code>
+  <p class="ep-desc">تحديث جزئي — كل الحقول اختيارية، يُرسل فقط ما تغيّر. <code>color_ids</code>/<code>size_ids</code> تُستبدل بالكامل (Sync) إن أُرسلت.</p>
+  <div class="callout tip"><b>💡</b> تغيير العنوان <code>title</code> يولّد <code>slug</code> جديداً عشوائياً في كل مرة — لا تعتمد على ثبات الـ slug القديم في أي رابط محفوظ بالفرونت إند بعد التعديل.</div>
+</section>
+
+<section id="p-publish">
+  <div class="endpoint-head"><span class="pill-post">POST</span><h3>نشر / إخفاء المنتج (تبديل الحالة)</h3></div>
+  <code class="endpoint-path">/seller/products/{id}/publish</code>
+  <p class="ep-desc">يعكس <code>is_active</code>: نشط ↔ مسودة، بشرط توفر صورة واحدة على الأقل عند محاولة النشر.</p>
+  <div class="code-label">خطأ عند محاولة النشر بلا صور (400)</div>
+  <pre>{ "success": false, "message": "لا يمكن نشر المنتج؛ يجب رفع صورة واحدة على الأقل للمنتج أولاً." }</pre>
+  <div class="callout warn"><b>⚠ فخ:</b> هذا الزر لا يُستخدم للإخفاء المؤقت أثناء نفاد التوظيف — النظام يخفي المنتج تلقائياً بنفسه (is_active=false) إذا نقص أي لون صورته أثناء رفع/حذف الصور. زر "نشر/إخفاء" اليدوي منفصل تماماً عن هذا التفعيل التلقائي، وقد يتضاربان: تاجر ينشر المنتج يدوياً ثم يحذف صورة فيتحول تلقائياً لمسودة من جديد دون أي فعل يدوي إضافي.</div>
+</section>
+
+<section id="p-delete">
+  <div class="endpoint-head"><span class="pill-delete">DELETE</span><h3>حذف منتج — فردي وجماعي</h3></div>
+  <table>
+    <tr><th>الحالة</th><th>Endpoint</th><th>ملاحظة</th></tr>
+    <tr><td>حذف فردي</td><td class="mono">DELETE /seller/products/{id}/delete</td><td>Soft Delete — قابل للاستعادة.</td></tr>
+    <tr><td>حذف جماعي / الكل</td><td class="mono">DELETE /seller/products/delete { product_ids: [] }</td><td>نفس منطق Soft Delete، لكن بمصفوفة IDs دفعة واحدة.</td></tr>
+  </table>
+  <div class="callout tip"><b>💡</b> الحذف الجماعي يرجّع <code>success: true</code> حتى لو كانت كل المنتجات المرسلة محذوفة مسبقاً (0 صفوف تأثرت) — هذا سلوك مقصود، لا تعامله كفشل في الواجهة.</div>
+  <div class="callout warn"><b>⚠ فخ:</b> "حذف الكل" ليس Endpoint منفصلاً — الفرونت إند هو من يبني مصفوفة <code>product_ids</code> بجلب كل المعرفات المعروضة حالياً (بعد الفلترة) ثم إرسالها لنفس مسار الحذف الجماعي.</div>
+</section>
+
+<section id="p-restore">
+  <div class="endpoint-head"><span class="pill-post">POST</span><h3>استعادة منتج محذوف</h3></div>
+  <code class="endpoint-path">/seller/products/{productId}/restore</code>
+  <p class="ep-desc">يعمل فقط على منتجات <code>deleted_at IS NOT NULL</code> — محاولة استعادة منتج غير محذوف أصلاً تُرجع 400.</p>
+</section>
+
+<section id="p-move">
+  <div class="endpoint-head"><span class="pill-patch">PATCH</span><h3>نقل منتج/منتجات إلى قسم آخر</h3></div>
+  <code class="endpoint-path">/seller/products/move</code>
+  <div class="code-label">طلب</div>
+  <pre>{ "product_ids": ["p1","p2"], "new_category_id": "uuid" }</pre>
+  <table>
+    <tr><th>Status</th><th>السبب</th></tr>
+    <tr><td>403</td><td>منتج واحد على الأقل لا يخص متجر التاجر الحالي</td></tr>
+    <tr><td>403</td><td>القسم الجديد غير مفعّل في متجر التاجر (لا يظهر ضمن shop_categories)</td></tr>
+    <tr><td>422</td><td>القسم الجديد رئيسي (Root) أو متوسط (له أبناء) — يُقبل فقط Leaf</td></tr>
+  </table>
+  <div class="callout warn"><b>⚠ فخ:</b> هذا هو المسار <b>الوحيد</b> في كامل نظام المنتجات الذي يفرض شرط "القسم الأخير فقط" فعلياً على مستوى الباك إند. نموذج الإنشاء والتعديل لا يفرضانه (انظر تحذير قسم الإنشاء أعلاه) — تناقض يجب أن يعرفه الفرونت إند ويعالجه بنفسه في كل الشاشات الثلاث بنفس الصرامة.</div>
+</section>
+
+<section id="img-get">
+  <div class="endpoint-head"><span class="pill-get">GET</span><h3>جلب صور منتج (مجمعة)</h3></div>
+  <code class="endpoint-path">/seller/products/{id}/product-images</code>
+  <pre>{
+  "success": true,
+  "data": {
+    "total_count": 5,
+    "primary": { "id": "img1", "image_url": "https://.../shop_x/img1.jpg" },
+    "grouped": { "c1": [ {"id":"img1"} ], "general": [ {"id":"img5"} ] }
+  }
+}</pre>
+  <div class="callout tip"><b>💡</b> الروابط تُكمَّل تلقائياً لتصبح رابط Supabase كامل مهما كان الشكل المخزّن في قاعدة البيانات — لا حاجة للفرونت إند لإضافة أي بادئة بنفسه.</div>
+</section>
+
+<section id="img-upload">
+  <div class="endpoint-head"><span class="pill-post">POST</span><h3>رفع صور المنتج — ملونة أو عامة</h3></div>
+  <table>
+    <tr><th>الحالة</th><th>Endpoint</th><th>الفرق</th></tr>
+    <tr><td>صور مرتبطة بلون</td><td class="mono">POST /seller/products/{id}/images</td><td>كل صورة تحمل <code>color_id</code> إلزامي منطقياً لتفعيل المنتج.</td></tr>
+    <tr><td>صور عامة (بدون لون)</td><td class="mono">POST /seller/products/products/{id}/general-images</td><td>لا ترتبط بلون؛ <code>color_id</code> يُجبر دائماً إلى null.</td></tr>
+  </table>
+  <div class="callout warn"><b>⚠ فخ فعلي في تعريف الراوت:</b> مسار الصور العامة معرّف داخل <code>Route::prefix('/products')</code> ثم يضيف <code>/products/{id}/general-images</code> مرة أخرى، فيصبح الناتج الفعلي <code dir="ltr">/seller/products/products/{id}/general-images</code> (كلمة products مكررة). تأكد من نسخ هذا المسار حرفياً من ملف الراوتس الفعلي وليس من التخمين المنطقي، أو أبلغ الباك إند لتصحيحه (انظر ملاحظة الباك إند أسفل الصفحة).</div>
+  <div class="callout warn"><b>⚠ فخ:</b> عند فشل الرفع، الكنترولر يحاول تنظيف الصور المرفوعة عبر متغيّر <code>$uploadedUrls</code> — لكن في دالة <code>uploadImages</code> (الصور الملونة تحديداً) هذا المتغيّر غير معرّف أصلاً قبل الاستدعاء، على عكس <code>uploadGeneralImages</code> التي عرّفته بشكل سليم. عملياً قد لا يتم تنظيف الملفات المرفوعة فعلياً عند فشل الحفظ في مسار الصور الملونة تحديداً — لا تعتمد الواجهة على ضمان "لا ملفات يتيمة" في هذا المسار بالذات.</div>
+</section>
+
+<section id="img-primary">
+  <div class="endpoint-head"><span class="pill-patch">PATCH</span><h3>تعيين صورة كغلاف (Primary)</h3></div>
+  <code class="endpoint-path">/seller/products/{productId}/images/{imageId}/set-primary</code>
+  <div class="callout tip"><b>💡</b> يُصفّر كل صور المنتج الأخرى تلقائياً قبل التعيين — لا حاجة للفرونت إند لإرسال أي شيء غير الصورة الجديدة.</div>
+</section>
+
+<section id="img-sort">
+  <div class="endpoint-head"><span class="pill-patch">PATCH</span><h3>ترتيب صور المنتج</h3></div>
+  <code class="endpoint-path">/seller/products/{productId}/images/sort</code>
+  <pre>{ "image_ids": ["img3","img1","img2"] }</pre>
+  <div class="callout warn"><b>⚠ فخ:</b> الترتيب الجديد = ترتيب العناصر في المصفوفة المُرسلة نفسها (index+1)، وليس أي معرّف ترتيب صريح لكل صورة. أرسل كل معرّفات صور المنتج بالترتيب الكامل المطلوب دفعة واحدة — إرسال جزء منها فقط سيغيّر ترتيب تلك الصور فقط ويترك الباقي كما هو، ما قد ينتج تعارضاً في الأرقام.</div>
+</section>
+
+<section id="img-delete">
+  <div class="endpoint-head"><span class="pill-delete">DELETE</span><h3>حذف صورة واحدة</h3></div>
+  <code class="endpoint-path">/seller/products/{productId}/images/{imageId}/delete</code>
+  <p class="ep-desc">غير قابل للتراجع (حذف فعلي من التخزين وقاعدة البيانات) — راجع مخطط "حذف صورة" أعلاه لتفاصيل سد الفجوة وترقية الغلاف.</p>
+</section>
+
+<section id="tag-list">
+  <h2>الوسوم (Tags) والمميزات (Features)</h2>
+  <p class="sub">نمط الـ Endpoints متطابق تقريباً بين الاثنين، مع فروقات دقيقة في قواعد التحقق — موضّحة أدناه بعمود مقارنة بدل تكرار كل تفصيل مرتين.</p>
+
+  <div class="endpoint-head"><span class="pill-get">GET</span><h3>القوائم المفصولة (نظام مقابل تاجر)</h3></div>
+  <code class="endpoint-path">/seller/tags   و   /seller/features</code>
+  <pre>{
+  "success": true,
+  "data": {
+    "system_tags": [ {"id":"t1","name":"صيفي"} ],
+    "merchant_tags": [ {"id":"t9","name":"تخفيض-نهاية-الموسم"} ]
+  }
+}</pre>
+  <div class="callout warn"><b>⚠ فخ:</b> عناصر <code>system_*</code> (شعار نظام/إدارة) محمية بالكامل من التعديل والحذف من طرف التاجر على مستوى الباك إند — التاجر لا يملك حتى صلاحية محاولة تعديلها (يُرجع الباك إند خطأ "أنها ميزة عامة تملكه الإدارة"). ميّز بصرياً بين المجموعتين ولا تعرض أزرار تعديل/حذف على عناصر system.</div>
+</section>
+
+<section id="tag-create">
+  <div class="endpoint-head"><span class="pill-post">POST</span><h3>إضافة سريعة بنص حر (تُنشئ عنصراً جديداً إن لم يوجد)</h3></div>
+  <table>
+    <tr><th></th><th>Endpoint</th><th>قاعدة التحقق</th></tr>
+    <tr><td>وسم</td><td class="mono">POST /seller/tags/create/{productId}</td><td>يُرفض أي فراغ داخلي — يُستبدل تلقائياً بشرطة (-). حرف/رقم عربي أو لاتيني فقط، حتى 50 حرف.</td></tr>
+    <tr><td>ميزة</td><td class="mono">POST /seller/features/create/{productId}</td><td>نص حر بلا قيود تنسيق ظاهرة، حتى 100 حرف (يسمح بمسافات، مثل "شاشة 15 بوصة").</td></tr>
+  </table>
+  <div class="callout warn"><b>⚠ فخ عدم اتساق:</b> إنشاء الوسم يفرض تحويل المسافات لشرطات فوراً في الكنترولر (Regex صارم)، بينما إنشاء الميزة لا يفرض أي تنسيق مشابه عند الإنشاء — لكن تعديلها لاحقاً عبر <code>update</code> يطبّق فجأة نفس تحويل المسافات إلى شرطات. أي ميزة أُنشئت بمسافات ("شاشة 15 بوصة") ثم عُدّلت لاحقاً ستفقد المسافات وتصبح "شاشة-15-بوصة" دون تحذير مسبق للتاجر.</div>
+  <div class="callout tip"><b>💡</b> هذا المسار يحد الأقصى 10 عناصر لكل منتج، ويُطبَّق ضمن معاملة قاعدة بيانات — إن وصل المنتج للحد الأقصى يُرفض الطلب بالكامل برسالة واضحة بدل قَص المصفوفة صامتاً.</div>
+</section>
+
+<section id="tag-attach">
+  <div class="endpoint-head"><span class="pill-post">POST / DELETE</span><h3>ربط وفك ارتباط جماعي (معرّفات موجودة فقط)</h3></div>
+  <table>
+    <tr><th></th><th>Endpoint</th></tr>
+    <tr><td>ربط وسوم</td><td class="mono">POST /seller/tags/{productId}/attach-tag { tag_ids: [] }</td></tr>
+    <tr><td>فك ربط وسوم</td><td class="mono">DELETE /seller/tags/{productId}/detach-tag { tag_ids: [] }</td></tr>
+    <tr><td>ربط/فك مميزات</td><td class="mono">نفس النمط تحت /seller/features/{productId}/attach-feature و detach-feature</td></tr>
+  </table>
+  <div class="callout warn"><b>⚠ فخ مهم:</b> هذا المسار لا يقبل نصاً جديداً إطلاقاً — فقط IDs موجودة مسبقاً في النظام أو عند التاجر. إن أرسلت نصاً بدل UUID سيفشل التحقق (422) وليس رسالة عمل واضحة. لهذا يوجد Endpoint منفصل تماماً (create) للنص الحر — لا تخلط بين الاثنين في نفس نموذج الواجهة دون تمييز واضح لكل زر.</div>
+  <div class="callout tip"><b>💡</b> الفك والربط الجماعي يتحققان أولاً من عدم وجود تكرار مسبق للربط (عند الربط) أو من وجود الربط أصلاً (عند الفك) — أي محاولة ربط عنصر مرتبط مسبقاً تفشل الطلب كاملاً بدل تجاهله بصمت.</div>
+</section>
+
+<section id="tag-manage">
+  <div class="endpoint-head"><span class="pill-put">PUT</span> / <span class="pill-delete">DELETE</span><h3>تعديل وحذف عنصر تاجر</h3></div>
+  <table>
+    <tr><th></th><th>Endpoint</th></tr>
+    <tr><td>تعديل وسم</td><td class="mono">PUT /seller/tags/update/{id}</td></tr>
+    <tr><td>حذف وسم</td><td class="mono">DELETE /seller/tags/delete/{id}</td></tr>
+    <tr><td>تعديل/حذف ميزة</td><td class="mono">نفس النمط تحت /seller/features/update/{id} و delete/{id}</td></tr>
+  </table>
+  <div class="callout warn"><b>⚠ فخ لا رجعة فيه:</b> الحذف هنا حذف نهائي فعلي من قاعدة البيانات (وليس Soft Delete كالمنتجات) — ويفك تلقائياً كل ارتباطات هذا الوسم/الميزة مع جميع منتجات التاجر دفعة واحدة، دون شاشة استعادة ممكنة لاحقاً. اعرض تأكيداً صريحاً قبل التنفيذ يوضح أن هذا يؤثر على كل المنتجات المرتبطة، وليس منتجاً واحداً فقط.</div>
+</section>
+
+<section id="categories">
+  <h2 style="font-size:20px;">الأقسام — التصفح الديناميكي الخاص بالمتجر</h2>
+  <div class="endpoint-head"><span class="pill-get">GET</span><h3>تصفح أقسام المتجر فقط (وليس كل الكتالوج)</h3></div>
+  <code class="endpoint-path">/seller/categories?parent_id=uuid|فارغ</code>
+  <pre>{
+  "success": true,
+  "current_parent": { "id": "...", "name": "قمصان" },
+  "data": [ { "id": "...", "name": "قمصان كاجوال", "is_leaf": true } ]
+}</pre>
+  <div class="callout warn"><b>⚠ فخ الحقل المزدوج المعنى:</b> اسم <code>is_leaf</code> يظهر على مستويين بمعنيين مختلفين تماماً:
+  <br>1) على مستوى الاستجابة الكلية عند القائمة فارغة (<code>"is_leaf": true</code> في الجذر) يعني "وصلتَ لنهاية الفروع، لا مزيد من التصفح هنا".
+  <br>2) داخل كل عنصر في مصفوفة <code>data</code>، <code>is_leaf</code> يعني "هذا القسم بالذات هو ورقة أخيرة يمكن اختياره كتصنيف نهائي للمنتج".
+  <br>لا تفترض أن معالجة أحدهما تكفي للآخر — هما فحصان منفصلان في نقاط مختلفة من الشجرة.</div>
+  <div class="callout tip"><b>💡</b> هذا المسار يعرض فقط الأقسام التي فعّلها التاجر لمتجره (<code>shop_categories</code>) — مختلف تماماً عن أي كتالوج أقسام عام قد يظهر في لوحة الأدمن.</div>
+</section>
+
+<section id="colors-sizes">
+  <h2 style="font-size:20px;">الألوان والمقاسات — مرجع نظام عام</h2>
+  <table>
+    <tr><th>المورد</th><th>Endpoints</th><th>ملاحظة</th></tr>
+    <tr><td>الألوان</td><td class="mono">GET /seller/colors · GET /seller/colors/{id}</td><td>مُرقّمة صفحات (paginate)، تتضمن <code>hex_code</code> جاهز للعرض المباشر كسواتش.</td></tr>
+    <tr><td>المقاسات</td><td class="mono">GET /seller/sizes · GET /seller/sizes/{id}</td><td>مُرقّمة صفحات، بدون أي حقول لونية — id/name فقط.</td></tr>
+  </table>
+  <div class="callout tip"><b>💡</b> كلاهما مورد نظام عام مشترك بين كل التجّار (وليس خاصاً بالمتجر) — لا حاجة لإعادة جلبه لكل تاجر، يصلح للتخزين المؤقت (Cache) على مستوى التطبيق كاملاً.</div>
+</section>
+
+<section id="errors">
+  <h2>ملخص كل الأخطاء المتوقعة</h2>
+  <table>
+    <tr><th>الكود</th><th>يظهر في</th><th>المعنى</th><th>ماذا يفعل الفرونت</th></tr>
+    <tr><td>400</td><td>معظم عمليات الإنشاء/التعديل/الحذف الفردية</td><td>خطأ عمل عام (رسالة داخل <code>message</code>)</td><td>اعرض الرسالة كما هي — عربية وجاهزة للعرض مباشرة.</td></tr>
+    <tr><td>403</td><td>نقل المنتجات، أي فحص ملكية صريح</td><td>المورد لا يخص متجر التاجر الحالي</td><td>لا تعرض تفاصيل تقنية — رسالة صلاحية عامة تكفي.</td></tr>
+    <tr><td>404</td><td>show / getFeatureById / getTagById / الألوان / المقاسات</td><td>غير موجود أو خارج نطاق التاجر</td><td>عامل 404 كـ "غير موجود" وليس بالضرورة خطأ شبكة.</td></tr>
+    <tr><td>422</td><td>Validation، النقل لقسم غير Leaf، وسوم بصيغة UUID خاطئة</td><td>فشل التحقق الهيكلي من المدخلات</td><td>اعرض <code>errors</code> حقلاً بحقل تحت كل عنصر إدخال.</td></tr>
+    <tr><td>500</td><td>index، move (استثناء غير متوقع)</td><td>خطأ داخلي غير متوقع بالخادم</td><td>رسالة عامة + زر إعادة محاولة، لا تعرض <code>error</code> الخام للمستخدم النهائي.</td></tr>
+  </table>
+</section>
+
+<section id="tips">
+  <h2>نصائح عملية لتفادي الاحتكاك مع الباك إند</h2>
+  <div class="card">
+    <ol style="font-size:13.5px; line-height:2; padding-inline-start:20px; margin:0;">
+      <li>بعد أي عملية على الصور (رفع/حذف/ترتيب/غلاف)، أعد جلب المنتج كاملاً (Show) بدل تحديث الحالة محلياً — is_active والغلاف والترتيب قد تتغيّر معاً دون إشعار صريح بكل تغيير على حدة.</li>
+      <li>افرض قاعدة "قسم Leaf فقط" في شاشتي الإنشاء والتعديل بنفس منطق شجرة النقل، لأن الباك إند لا يفرضها هناك حالياً.</li>
+      <li>ميّز بوضوح بين مسار "الإضافة السريعة بالنص الحر" (create) ومسار "الربط الجماعي بمعرّفات موجودة" (attach) للوسوم والمميزات — هما زران مختلفان لغرضين مختلفين، لا حقل بحث واحد يقرر بينهما.</li>
+      <li>لا تجمع أرقام تبويبات المنتجات (all/out_of_stock/low_stock/draft/trashed) معاً كإجمالي — الفئات غير حصرية والأرقام لا تتأثر بفلتر البحث.</li>
+      <li>اعرض تأكيداً صريحاً قبل حذف وسم/ميزة تاجر (لا رجعة فيه ويؤثر على كل المنتجات)، مقابل حذف منتج (قابل للاستعادة عبر شاشة المحذوفات).</li>
+      <li>عند بناء "تحديد الكل" للحذف/النقل الجماعي، اجمع IDs من القائمة المعروضة بعد الفلترة الحالية فقط — لا يوجد Endpoint مخصص لـ "الكل" فعلياً.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="backend-note">
+  <h2>ملاحظة مقترحة لفريق الباك إند</h2>
+  <div class="card">
+    <ul style="font-size:13.5px; line-height:2; padding-inline-start:20px; margin:0;">
+      <li>مسار رفع الصور العامة معرّف حالياً بمسار مضاعف: <code dir="ltr">/products/products/{id}/general-images</code> بسبب تعريفه داخل <code>Route::prefix('/products')</code> بمقطع <code>/products/</code> إضافي — يُستحسن تصحيحه إلى <code dir="ltr">/{id}/general-images</code> ليطابق نمط باقي مسارات الصور.</li>
+      <li>في <code>SellerProductImageController@uploadImages</code>، متغيّر <code>$uploadedUrls</code> المستخدم في كتلة الـ catch للتنظيف عند الفشل غير معرّف قبل الاستدعاء (على عكس <code>uploadGeneralImages</code> التي عرّفته بشكل سليم) — يُستحسن تهيئته كمصفوفة فارغة قبل استدعاء <code>addProductImages</code>.</li>
+      <li>يوجد صنف <code>App\ProductImagesService</code> منفصل تماماً (خارج namespace <code>App\Services</code>) يكرر منطق <code>addProductImages</code>/<code>addGeneralProductImages</code> الموجود أصلاً في <code>ProductService</code>، ولا يبدو مستخدَماً في أي Controller حالي — يُستحسن حذفه أو توضيح الغرض منه لتفادي التباس مستقبلي حول أي نسخة هي المصدر الحقيقي.</li>
+      <li>دالة <code>validateAndGetLeafCategory</code> في <code>CategoryService</code> موجودة وجاهزة، لكنها غير مستدعاة في <code>createBaseProduct</code> ولا <code>updateProduct</code> — تفعيلها هناك يغلق فجوة حقيقية تسمح حالياً بحفظ منتج على قسم رئيسي أو متوسط عبر الإنشاء/التعديل المباشر.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  دليل داخلي لفريق الفرونت إند — مبني من قراءة مباشرة لأكواد الـ Controllers والـ Services الفعلية. أي تغيير في الباك إند يستدعي مراجعة هذا الدليل.
+</footer>
+
+</main>
+</div>
+</body>
+</html>

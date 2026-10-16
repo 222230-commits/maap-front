@@ -1,0 +1,93 @@
+<div class="interests-page">
+
+  <div class="interests-container">
+
+    <div class="interests-side">
+      <div class="auth-logo">
+        <img src="assets/logo.png" alt="مأب"
+             onerror="this.style.display='none';
+             this.nextElementSibling.style.display='block'" />
+        <span style="display:none">مأب</span>
+      </div>
+      <h1>خصّص تجربتك</h1>
+      <p>اختر ما يهمك ونعرض لك المنتجات والمتاجر الأقرب لاهتماماتك — يمكنك تغييرها لاحقاً.</p>
+      <div class="side-features">
+        <div class="sf-item">
+          <i class="fas fa-check-circle"></i>
+          <span>منتجات مختارة خصيصاً لك</span>
+        </div>
+        <div class="sf-item">
+          <i class="fas fa-check-circle"></i>
+          <span>متاجر في تصنيفاتك المفضلة</span>
+        </div>
+        <div class="sf-item">
+          <i class="fas fa-check-circle"></i>
+          <span>عروض مخصصة حسب اهتماماتك</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="interests-card">
+
+      <div class="interests-header">
+        <h2>ما الذي يهمك؟</h2>
+        <p>اختر تصنيفاً أو أكثر</p>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="form-alert error">
+          <i class="fas fa-exclamation-circle"></i>
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <div class="categories-grid">
+        @for (cat of availableCategories(); track cat.id) {
+          <div class="cat-item"
+               [class.selected]="isSelected(cat.id)"
+               (click)="toggleCategory(cat.id)">
+            @if (cat.image_url) {
+              <div class="cat-img">
+                <img [src]="cat.image_url" [alt]="cat.name" />
+              </div>
+            } @else {
+              <div class="cat-icon">
+                <i class="fas fa-tag"></i>
+              </div>
+            }
+            <span>{{ cat.name }}</span>
+            @if (isSelected(cat.id)) {
+              <div class="cat-check">
+                <i class="fas fa-check"></i>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      @if (selectedIds().length > 0) {
+        <div class="selected-count">
+          <i class="fas fa-heart"></i>
+          اخترت {{ selectedIds().length }}
+          {{ selectedIds().length === 1 ? 'تصنيف' : 'تصنيفات' }}
+        </div>
+      }
+
+      <button class="btn-save"
+              (click)="onSave()"
+              [disabled]="isLoading() || selectedIds().length === 0">
+        @if (isLoading()) {
+          <i class="fas fa-spinner fa-spin"></i> جاري الحفظ...
+        } @else {
+          <i class="fas fa-arrow-left"></i> ابدأ التسوق
+        }
+      </button>
+
+      <button class="btn-skip" (click)="skipInterests()">
+        تخطي — سأختار لاحقاً
+      </button>
+
+    </div>
+  </div>
+
+</div>

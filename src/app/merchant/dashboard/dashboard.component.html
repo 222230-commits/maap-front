@@ -1,320 +1,379 @@
-<div class="flex flex-col gap-8">
-  
-  <!-- Header Section -->
-  <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden">
-    <div class="absolute top-0 right-0 w-1.5 h-full bg-primary"></div>
-    <div class="pr-2">
-      <h2 class="text-3xl font-bold mb-2 text-gray-900">
-        مرحباً، {{ authService.currentUser()?.name }} <i class="fas fa-hand-sparkles text-yellow-500 mr-1"></i>
-      </h2>
-      <p class="text-gray-500 font-medium flex items-center gap-2">
-        <i class="fas fa-calendar-alt text-primary"></i> {{ currentDate }}
-      </p>
+<div class="merchant-page">
+
+  <!-- Topbar -->
+  <div class="merchant-topbar">
+    <div>
+      <h2 class="page-title">لوحة التحكم</h2>
+      <p class="page-sub">مرحباً بك يا تاجر</p>
     </div>
-    <div class="mt-4 md:mt-0">
-      @if (shopInfo().isOpen) {
-        <span class="bg-green-50 text-green-700 px-5 py-2.5 rounded-full font-bold shadow-sm flex items-center gap-2 border border-green-200">
-          متجرك مفتوح <i class="fas fa-store"></i>
-        </span>
-      } @else {
-        <span class="bg-red-50 text-red-700 px-5 py-2.5 rounded-full font-bold shadow-sm flex items-center gap-2 border border-red-200">
-          متجرك مغلق <i class="fas fa-lock"></i>
-        </span>
+    @if (dashData()) {
+      <div class="topbar-actions">
+        <div class="rating-chip">
+          <i class="fas fa-star"></i>
+          {{ dashData()!.general_rating.display_text }}
+        </div>
+        <div class="store-badge">
+          <div class="store-badge-avatar">
+            <i class="fas fa-store"></i>
+          </div>
+          <div class="store-badge-text">
+            <span class="store-badge-name">{{ dashData()!.shop_info.name }}</span>
+            <div class="store-badge-status" [class.active]="dashData()!.shop_info.is_active" [class.suspended]="!dashData()!.shop_info.is_active">
+              <span class="dot"></span>
+              {{ dashData()!.shop_info.is_active ? (dashData()!.shop_info.status_text || 'المتجر نشط') : 'موقوف إدارياً من قِبل الإدارة' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    } @else if (isSuspended()) {
+      <div class="topbar-actions">
+        <div class="store-badge">
+          <div class="store-badge-avatar suspended">
+            <i class="fas fa-store-slash"></i>
+          </div>
+          <div class="store-badge-text">
+            <span class="store-badge-name">متجرك</span>
+            <div class="store-badge-status suspended">
+              <span class="dot"></span>
+              موقوف إدارياً من قِبل الإدارة
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="merchant-content">
+
+      @if (isLoading()) {
+        <div class="content-loading">
+          <i class="fas fa-circle-notch fa-spin"></i>
+        </div>
       }
-    </div>
-  </div>
 
-  <!-- Season Alert -->
-  <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 rounded-xl shadow-md flex items-center gap-6 relative overflow-hidden group hover:shadow-lg transition-shadow">
-    <div class="absolute -left-10 -top-10 text-white/10 text-9xl transform rotate-12 transition-transform group-hover:rotate-0 duration-500">
-      <i class="fas fa-graduation-cap"></i>
-    </div>
-    <div class="text-4xl bg-white/20 p-4 rounded-full flex items-center justify-center backdrop-blur-sm relative z-10 shadow-inner">
-      <i class="fas fa-bell animate-bounce"></i>
-    </div>
-    <div class="relative z-10">
-      <h3 class="font-bold text-xl mb-1 flex items-center gap-2">
-        موسم التخرج قادم خلال 30 يوم! 
-      </h3>
-      <p class="text-blue-100 text-sm font-medium leading-relaxed">العام الماضي ارتفعت المبيعات 340%، ابدأ بتجهيز عروضك ومنتجاتك الآن للحصول على أقصى أرباح ممكنة.</p>
-    </div>
-  </div>
-
-  <!-- Animated Stats Cards (Clickable) -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-    <div (click)="goToProducts()" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col hover:-translate-y-1 hover:shadow-md transition-all duration-300 group cursor-pointer">
-      <div class="flex justify-between items-start mb-4">
-        <span class="text-gray-500 font-bold text-sm">عدد المنتجات</span>
-        <div class="w-12 h-12 rounded-lg bg-gray-50 flex items-center justify-center text-xl text-gray-500 group-hover:bg-primary group-hover:text-white transition-colors shadow-sm">
-          <i class="fas fa-box"></i>
-        </div>
-      </div>
-      <span class="text-4xl font-bold text-gray-900 mb-3">{{ animatedStats().products }}</span>
-      <span class="text-xs font-bold text-green-600 flex items-center gap-1 bg-green-50 px-2.5 py-1 rounded-md w-fit border border-green-100">
-        <i class="fas fa-arrow-up"></i> 12% من الشهر الماضي
-      </span>
-    </div>
-
-    <div (click)="goToOrders('pending')" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col hover:-translate-y-1 hover:shadow-md transition-all duration-300 group cursor-pointer">
-      <div class="flex justify-between items-start mb-4">
-        <span class="text-gray-500 font-bold text-sm">الطلبات المعلقة</span>
-        <div class="w-12 h-12 rounded-lg bg-yellow-50 flex items-center justify-center text-xl text-yellow-600 group-hover:bg-yellow-500 group-hover:text-white transition-colors shadow-sm">
-          <i class="fas fa-hourglass-half"></i>
-        </div>
-      </div>
-      <span class="text-4xl font-bold text-gray-900 mb-3">{{ animatedStats().pending }}</span>
-      <span class="text-xs font-bold text-red-500 flex items-center gap-1 bg-red-50 px-2.5 py-1 rounded-md w-fit border border-red-100">
-        <i class="fas fa-exclamation-circle"></i> يجب معالجتها قريباً
-      </span>
-    </div>
-
-    <div (click)="goToOrders('completed')" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col hover:-translate-y-1 hover:shadow-md transition-all duration-300 group cursor-pointer">
-      <div class="flex justify-between items-start mb-4">
-        <span class="text-gray-500 font-bold text-sm">الطلبات المكتملة</span>
-        <div class="w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center text-xl text-green-600 group-hover:bg-green-500 group-hover:text-white transition-colors shadow-sm">
-          <i class="fas fa-check-circle"></i>
-        </div>
-      </div>
-      <span class="text-4xl font-bold text-gray-900 mb-3">{{ animatedStats().completed }}</span>
-      <span class="text-xs font-bold text-green-600 flex items-center gap-1 bg-green-50 px-2.5 py-1 rounded-md w-fit border border-green-100">
-        <i class="fas fa-arrow-up"></i> 24% من الشهر الماضي
-      </span>
-    </div>
-
-    <div (click)="goToFollowers()" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col hover:-translate-y-1 hover:shadow-md transition-all duration-300 group cursor-pointer">
-      <div class="flex justify-between items-start mb-4">
-        <span class="text-gray-500 font-bold text-sm">عدد المتابعين</span>
-        <div class="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center text-xl text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-colors shadow-sm">
-          <i class="fas fa-users"></i>
-        </div>
-      </div>
-      <span class="text-4xl font-bold text-gray-900 mb-3">{{ animatedStats().followers }}</span>
-      <span class="text-xs font-bold text-green-600 flex items-center gap-1 bg-green-50 px-2.5 py-1 rounded-md w-fit border border-green-100">
-        <i class="fas fa-arrow-up"></i> 8% من الأسبوع الماضي
-      </span>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Chart & Top Products -->
-    <div class="bg-white p-7 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-8">
-      
-      <!-- Chart -->
-      <div>
-        <div class="flex justify-between items-end mb-6">
-          <h3 class="text-xl font-bold text-gray-800"><i class="fas fa-chart-pie text-primary ml-2"></i>تحليلات الطلبات</h3>
-          <span class="text-sm font-bold text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-md">{{ orderChartData().total }} إجمالي الطلبات</span>
-        </div>
-        
-        <div class="flex flex-col md:flex-row items-center justify-center gap-8">
-          <!-- Donut SVG -->
-          <div class="relative w-36 h-36">
-            <svg viewBox="0 0 36 36" class="w-full h-full -rotate-90 drop-shadow-sm">
-              <!-- completed -->
-              <circle cx="18" cy="18" r="15.9" fill="none" 
-                      stroke="#22c55e" stroke-width="3"
-                      [attr.stroke-dasharray]="completedPercent() + ' 100'"
-                      stroke-dashoffset="0"
-                      class="transition-all duration-1000 ease-out"/>
-              <!-- pending -->
-              <circle cx="18" cy="18" r="15.9" fill="none"
-                      stroke="#eab308" stroke-width="3"
-                      [attr.stroke-dasharray]="pendingPercent() + ' 100'"
-                      [attr.stroke-dashoffset]="-completedPercent()"
-                      class="transition-all duration-1000 ease-out delay-100"/>
-              <!-- cancelled -->
-              <circle cx="18" cy="18" r="15.9" fill="none"
-                      stroke="#ef4444" stroke-width="3"
-                      [attr.stroke-dasharray]="cancelledPercent() + ' 100'"
-                      [attr.stroke-dashoffset]="-(completedPercent() + pendingPercent())"
-                      class="transition-all duration-1000 ease-out delay-200"/>
-            </svg>
-            <div class="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-full m-3 shadow-inner">
-              <span class="text-xl font-bold text-gray-800">{{ orderChartData().completed }}</span>
-              <span class="text-xs font-bold text-gray-500">مكتمل</span>
-            </div>
+      <!-- تنبيه عند تصفح لوحة التاجر بحساب مدير نظام Admin -->
+      @if (isNonMerchant()) {
+        <div class="admin-viewing-alert">
+          <div class="alert-icon">
+            <i class="fas fa-user-shield"></i>
           </div>
-          
-          <!-- Legend -->
-          <div class="flex flex-col gap-4 w-full md:w-auto">
-            <div class="flex justify-between md:justify-start items-center gap-6 font-bold text-sm">
-              <span class="flex items-center gap-2 text-gray-700"><i class="fas fa-circle text-green-500 text-[10px]"></i> مكتملة</span>
-              <span class="text-gray-900 bg-gray-50 px-2 py-0.5 rounded">{{ completedPercent() }}%</span>
-            </div>
-            <div class="flex justify-between md:justify-start items-center gap-6 font-bold text-sm">
-              <span class="flex items-center gap-2 text-gray-700"><i class="fas fa-circle text-yellow-500 text-[10px]"></i> معلقة</span>
-              <span class="text-gray-900 bg-gray-50 px-2 py-0.5 rounded">{{ pendingPercent() }}%</span>
-            </div>
-            <div class="flex justify-between md:justify-start items-center gap-6 font-bold text-sm">
-              <span class="flex items-center gap-2 text-gray-700"><i class="fas fa-circle text-red-500 text-[10px]"></i> ملغاة</span>
-              <span class="text-gray-900 bg-gray-50 px-2 py-0.5 rounded">{{ cancelledPercent() }}%</span>
+          <div class="alert-content">
+            <h3>أنت مسجل حالياً بحساب مدير المنصة (Admin)</h3>
+            <p>
+              أنت تتصفح لوحة تحكم التاجر بينما جلسة تسجيل الدخول الحالية هي لمدير النظام (Admin). لا يملك حساب المدير متجراً مسجلاً كبائع ولذلك قد تظهر لك أخطاء صلاحيات (401). لاختبار تجربة التاجر الفعلية، يُرجى تسجيل الدخول بحساب تاجر أو استخدام تطبيق الهاتف.
+            </p>
+            <div class="alert-actions">
+              <button class="btn-primary" (click)="goTo('/admin/dashboard')">
+                <i class="fas fa-arrow-right"></i> العودة للوحة تحكم المدير
+              </button>
+              <button class="btn-outline" (click)="goTo('/admin/shops')">
+                <i class="fas fa-store"></i> إدارة المتاجر
+              </button>
             </div>
           </div>
         </div>
-      </div>
+      }
 
-      <!-- Top Products -->
-      <div class="pt-6 border-t border-gray-100 mt-auto">
-        <h3 class="text-xl font-bold text-gray-800 mb-6"><i class="fas fa-trophy text-yellow-500 ml-2"></i>أفضل المنتجات مبيعاً</h3>
-        
-        <div class="flex flex-col gap-5">
-          @for (product of topProducts(); track product.id; let i = $index) {
-            <div class="flex items-center gap-4 group cursor-pointer" (click)="goToProducts()">
-              <div class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center font-bold text-xl text-gray-400 border border-gray-200 shadow-sm transition-transform group-hover:scale-105"
-                   [ngClass]="{'bg-yellow-50 text-yellow-600 border-yellow-200': i === 0, 'bg-gray-100 text-gray-500': i === 1, 'bg-orange-50 text-orange-600 border-orange-200': i === 2}">
-                #{{ i + 1 }}
-              </div>
-              <div class="flex-1">
-                <div class="flex justify-between items-center mb-1.5">
-                  <span class="font-bold text-gray-800 line-clamp-1 group-hover:text-primary transition-colors">{{ product.name }}</span>
-                  <span class="text-sm font-bold text-primary bg-primary/5 px-2 py-0.5 rounded">{{ product.ordersCount }} طلب</span>
-                </div>
-                <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden shadow-inner">
-                  <div class="h-full bg-primary rounded-full transition-all duration-1000 ease-out"
-                       [style.width.%]="mounted() ? (product.ordersCount / (topProducts()[0]?.ordersCount || 1)) * 100 : 0"></div>
-                </div>
-              </div>
+      <!-- تنبيه الإيقاف الإداري للمتجر (يظهر دائماً للمتجر الموقوف حتى لو تعذر جلب باقي البيانات) -->
+      @if (!isLoading() && isSuspended()) {
+        <div class="dash-admin-suspended-alert">
+          <div class="suspended-icon">
+            <i class="fas fa-store-slash"></i>
+          </div>
+          <div class="suspended-body">
+            <div class="suspended-badge">
+              <i class="fas fa-ban"></i> إيقاف إداري من قِبل إدارة المنصة
             </div>
-          }
+            <h3>تم إيقاف وتجميد نشاط متجرك مؤقتاً</h3>
+            <p>
+              تم إيقاف نشاط متجرك بقرار إداري من إدارة المنصة (وليس إغلاقاً اختيارياً من طرفك). متجرك ومنتجاتك مخفية حالياً عن المشترين ولا تستقبل طلبات جديدة.
+            </p>
+            <div class="suspended-contact-options">
+              <a href="https://wa.me/218XXXXXXXXX" target="_blank" class="contact-btn whatsapp">
+                <i class="fab fa-whatsapp"></i> تواصل مع الإدارة عبر واتساب
+              </a>
+              <a href="mailto:support@dalilni.ly" class="contact-btn email">
+                <i class="fas fa-envelope"></i> مراسلة الدعم الفني
+              </a>
+            </div>
+          </div>
         </div>
-      </div>
+      }
 
-    </div>
+      @if (!isLoading() && dashData()) {
 
-    <!-- Right Column: Tabs (Activity, Reviews, Notifications) -->
-    <div class="flex flex-col gap-6">
-      
-      <!-- Multi-Tab Section -->
-      <div class="bg-white p-7 rounded-xl shadow-sm border border-gray-100 flex-1 flex flex-col">
-        <div class="flex justify-between items-center mb-6">
-          <h3 class="text-xl font-bold text-gray-800">تحديثات المتجر</h3>
-          @if (activeBottomTab() === 'activity') {
-            <button (click)="refreshActivity()" class="text-sm font-bold text-primary bg-primary/5 hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-colors border border-primary/20 flex items-center gap-1 shadow-sm">
-              <i class="fas fa-sync-alt"></i> تحديث
+        <!-- Stock Alert Warning Banner -->
+        @if (stockAlerts().low_stock > 0 || stockAlerts().out_of_stock > 0) {
+          <div class="dash-stock-alert" (click)="goTo('/merchant/products')">
+            <div class="dash-stock-icon">
+              <i class="fas fa-triangle-exclamation"></i>
+            </div>
+            <div class="dash-stock-info">
+              <h4>تنبيه المخزون الحرج للمتجر</h4>
+              <p>
+                @if (stockAlerts().out_of_stock > 0 && stockAlerts().low_stock > 0) {
+                  لديك <strong>{{ stockAlerts().out_of_stock }}</strong> منتجات نفد مخزونها، و <strong>{{ stockAlerts().low_stock }}</strong> أوشكت على النفاد. يُرجى مراجعة الكميات.
+                } @else if (stockAlerts().out_of_stock > 0) {
+                  لديك <strong>{{ stockAlerts().out_of_stock }}</strong> منتجات نفد مخزونها بالكامل وتوقفت عن الظهور للمشترين.
+                } @else {
+                  لديك <strong>{{ stockAlerts().low_stock }}</strong> منتجات مخزونها منخفض (5 قطع أو أقل). يُنصح بإعادة التعبئة.
+                }
+              </p>
+            </div>
+            <button class="btn-dash-stock" (click)="$event.stopPropagation(); goTo('/merchant/products')">
+              <span>إدارة المنتجات</span>
+              <i class="fas fa-chevron-left"></i>
             </button>
-          }
-        </div>
-        
-        <!-- Tabs Nav -->
-        <div class="flex border-b border-gray-100 mb-6 font-bold text-sm">
-          <button (click)="activeBottomTab.set('activity')" class="flex-1 py-3 transition-colors border-b-2"
-                  [ngClass]="activeBottomTab() === 'activity' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-800'">
-            <i class="fas fa-history ml-1"></i> النشاطات
-          </button>
-          <button (click)="activeBottomTab.set('reviews')" class="flex-1 py-3 transition-colors border-b-2"
-                  [ngClass]="activeBottomTab() === 'reviews' ? 'border-yellow-500 text-yellow-600' : 'border-transparent text-gray-500 hover:text-gray-800'">
-            <i class="fas fa-star ml-1"></i> المراجعات
-          </button>
-          <button (click)="activeBottomTab.set('notifications')" class="flex-1 py-3 transition-colors border-b-2"
-                  [ngClass]="activeBottomTab() === 'notifications' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-800'">
-            <i class="fas fa-bell ml-1"></i> الإشعارات
-            <span class="inline-flex items-center justify-center w-4 h-4 mr-1 bg-red-500 text-white rounded-full text-[10px]">1</span>
-          </button>
+          </div>
+        }
+
+        <!-- Stats -->
+        <div class="m-stats-grid">
+
+          <div class="m-stat clickable"
+               (click)="goTo('/merchant/products')">
+            <div class="m-stat-icon products">
+              <i class="fas fa-box"></i>
+            </div>
+            <div class="m-stat-body">
+              <span class="m-stat-num">
+                {{ animatedCards().products }}
+              </span>
+              <span class="m-stat-label">المنتجات</span>
+            </div>
+            <i class="fas fa-chevron-left m-chevron"></i>
+          </div>
+
+          <div class="m-stat">
+            <div class="m-stat-icon followers">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="m-stat-body">
+              <span class="m-stat-num">
+                {{ animatedCards().followers }}
+              </span>
+              <span class="m-stat-label">المتابعون</span>
+            </div>
+          </div>
+
+          <div class="m-stat clickable"
+               (click)="goTo('/merchant/orders')">
+            <div class="m-stat-icon orders">
+              <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div class="m-stat-body">
+              <span class="m-stat-num">
+                {{ animatedCards().total_orders }}
+              </span>
+              <span class="m-stat-label">إجمالي الطلبات</span>
+            </div>
+            <i class="fas fa-chevron-left m-chevron"></i>
+          </div>
+
+          <div class="m-stat">
+            <div class="m-stat-icon completed">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="m-stat-body">
+              <span class="m-stat-num">
+                {{ animatedCards().completed }}
+              </span>
+              <span class="m-stat-label">طلبات مكتملة</span>
+            </div>
+          </div>
+
         </div>
 
-        <!-- Tab Content -->
-        <div class="flex-1 overflow-y-auto max-h-[350px] pl-2 custom-scrollbar">
-          
-          <!-- Activity Tab -->
-          @if (activeBottomTab() === 'activity') {
-            <div class="relative border-r-2 border-gray-100 pr-6 mr-2 flex flex-col gap-6">
-              @for (activity of recentActivity(); track activity.id) {
-                <div class="relative">
-                  <span class="absolute -right-[33px] top-2 w-4 h-4 rounded-full border-4 border-white shadow-sm flex items-center justify-center"
-                        [ngClass]="{'bg-green-500': activity.type === 'order', 'bg-yellow-400': activity.type === 'review', 'bg-blue-400': activity.type === 'view'}">
+        <!-- Two Column -->
+        <div class="m-two-col">
+
+          <!-- Analytics -->
+          <div class="m-content-card">
+            <div class="m-card-header">
+              <h3>
+                <i class="fas fa-chart-line"></i>
+                التحليلات والنمو
+              </h3>
+            </div>
+            <div class="analytics-list">
+              <div class="analytics-item">
+                <div class="analytics-icon">
+                  <i class="fas fa-calendar-day"></i>
+                </div>
+                <div class="analytics-text">
+                  <span class="analytics-label">أعلى يوم مبيعات</span>
+                  <span class="analytics-val">
+                    {{ dashData()!.analytics_and_growth.highest_sales_day }}
                   </span>
-                  <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 hover:bg-white hover:shadow-md transition-all">
-                    <div class="flex items-center gap-3 mb-2">
-                      <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm border border-gray-100 shrink-0">
-                        @if (activity.type === 'order') { <i class="fas fa-shopping-bag text-green-500 text-sm"></i> }
-                        @else if (activity.type === 'review') { <i class="fas fa-star text-yellow-500 text-sm"></i> }
-                        @else { <i class="fas fa-eye text-blue-500 text-sm"></i> }
-                      </div>
-                      <p class="font-bold text-gray-800 text-sm leading-relaxed">{{ activity.message }}</p>
-                    </div>
-                    <p class="text-xs font-bold text-gray-400 pr-11"><i class="fas fa-clock ml-1"></i> {{ activity.time }}</p>
-                  </div>
                 </div>
-              } @empty {
-                <p class="text-gray-500 text-center py-6 font-bold"><i class="fas fa-inbox block text-4xl mb-2 text-gray-300"></i>لا توجد نشاطات حالياً</p>
-              }
-            </div>
-          }
-
-          <!-- Reviews Tab -->
-          @if (activeBottomTab() === 'reviews') {
-            <div class="flex flex-col gap-4">
-              @for (review of reviews(); track review.id) {
-                <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 hover:shadow-sm transition-shadow">
-                  <div class="flex justify-between items-start mb-3">
-                    <div class="flex items-center gap-3">
-                      <div class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-400 shadow-sm">
-                        <i class="fas fa-user"></i>
-                      </div>
-                      <div>
-                        <h4 class="font-bold text-gray-900 text-sm">{{ review.buyer }}</h4>
-                        <p class="text-xs font-bold text-primary bg-primary/5 px-2 py-0.5 rounded mt-0.5 inline-block">{{ review.product }}</p>
-                      </div>
-                    </div>
-                    <div class="text-yellow-400 text-xs flex gap-0.5">
-                      @for (star of getRatingArray(review.rating); track $index) {
-                        <i class="fas fa-star drop-shadow-sm"></i>
-                      }
-                    </div>
-                  </div>
-                  <p class="text-sm text-gray-700 font-bold mb-3 p-3 bg-white rounded-lg border border-gray-100">"{{ review.comment }}"</p>
-                  <p class="text-xs font-bold text-gray-400"><i class="fas fa-clock ml-1"></i> {{ review.date }}</p>
+              </div>
+              <div class="analytics-item">
+                <div class="analytics-icon">
+                  <i class="fas fa-calendar-alt"></i>
                 </div>
-              } @empty {
-                <p class="text-gray-500 text-center py-6 font-bold"><i class="fas fa-comment-slash block text-4xl mb-2 text-gray-300"></i>لا توجد مراجعات حالياً</p>
-              }
-            </div>
-          }
-
-          <!-- Notifications Tab -->
-          @if (activeBottomTab() === 'notifications') {
-            <div class="flex flex-col gap-3">
-              @for (notif of notifications(); track notif.id) {
-                <div class="p-4 rounded-xl border flex items-start gap-3 transition-colors hover:shadow-sm"
-                     [ngClass]="notif.read ? 'bg-gray-50 border-gray-100' : 'bg-blue-50 border-blue-200'">
-                  <div class="mt-1 w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm" 
-                       [ngClass]="notif.read ? 'bg-white text-gray-400 border border-gray-200' : 'bg-blue-500 text-white'">
-                    @if (notif.type === 'season') { <i class="fas fa-bell text-sm"></i> }
-                    @else if (notif.type === 'order') { <i class="fas fa-box text-sm"></i> }
-                    @else { <i class="fas fa-star text-sm"></i> }
-                  </div>
-                  <div class="flex-1">
-                    <p class="font-bold text-sm mb-1.5 leading-relaxed" [ngClass]="notif.read ? 'text-gray-700' : 'text-blue-900'">{{ notif.message }}</p>
-                    <p class="text-xs font-bold" [ngClass]="notif.read ? 'text-gray-400' : 'text-blue-500'"><i class="fas fa-clock ml-1"></i> {{ notif.time }}</p>
-                  </div>
-                  @if (!notif.read) {
-                    <span class="w-2.5 h-2.5 bg-blue-500 rounded-full mt-2 shrink-0 shadow-sm shadow-blue-500/50"></span>
-                  }
+                <div class="analytics-text">
+                  <span class="analytics-label">أكثر شهر نشاطاً</span>
+                  <span class="analytics-val">
+                    {{ dashData()!.analytics_and_growth.most_active_month }}
+                  </span>
                 </div>
-              } @empty {
-                <p class="text-gray-500 text-center py-6 font-bold"><i class="fas fa-bell-slash block text-4xl mb-2 text-gray-300"></i>لا توجد إشعارات حالياً</p>
-              }
+              </div>
+              <div class="analytics-item">
+                <div class="analytics-icon">
+                  <i class="fas fa-arrow-trend-up"></i>
+                </div>
+                <div class="analytics-text">
+                  <span class="analytics-label">نمو الطلبات</span>
+                  <span class="analytics-val growth">
+                    {{ dashData()!.analytics_and_growth.order_growth }}
+                  </span>
+                </div>
+              </div>
             </div>
-          }
-        </div>
-      </div>
+          </div>
 
-      <!-- Quick Bottom Stats -->
-      <div class="bg-gray-900 text-white p-7 rounded-xl shadow-md grid grid-cols-3 gap-4 text-center divide-x divide-x-reverse divide-gray-700 relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-primary via-indigo-500 to-green-500"></div>
-        <div class="flex flex-col items-center justify-center">
-          <span class="text-gray-400 text-xs font-bold mb-1">إجمالي المبيعات</span>
-          <span class="text-2xl font-bold text-green-400">{{ totalSales() }} <span class="text-sm font-normal">د.ل</span></span>
+          <!-- Orders Chart -->
+          <div class="m-content-card">
+            <div class="m-card-header">
+              <h3>
+                <i class="fas fa-chart-pie"></i>
+                توزيع الطلبات
+              </h3>
+            </div>
+            <div class="orders-chart-section">
+              <div class="orders-bar">
+                <div class="orders-fill completed"
+                     [style.width.%]="dashData()!.order_analytics_chart.completed_percent">
+                </div>
+                <div class="orders-fill pending-fill"
+                     [style.width.%]="dashData()!.order_analytics_chart.pending_percent">
+                </div>
+              </div>
+              <div class="orders-legend">
+                <span class="legend-item completed-leg">
+                  <div class="leg-dot completed-dot"></div>
+                  مكتملة {{ dashData()!.order_analytics_chart.completed_percent }}%
+                </span>
+                <span class="legend-item">
+                  <div class="leg-dot pending-dot"></div>
+                  معلقة {{ dashData()!.order_analytics_chart.pending_percent }}%
+                </span>
+              </div>
+            </div>
+          </div>
+
         </div>
-        <div class="flex flex-col items-center justify-center">
-          <span class="text-gray-400 text-xs font-bold mb-1">متوسط الطلب</span>
-          <span class="text-2xl font-bold">{{ averageOrderValue() }} <span class="text-sm font-normal">د.ل</span></span>
+
+        <!-- Quick Links -->
+        <div class="m-content-card">
+          <div class="m-card-header">
+            <h3>
+              <i class="fas fa-bolt"></i>
+              روابط سريعة
+            </h3>
+          </div>
+          <div class="quick-links-grid">
+            <button class="quick-link"
+                    (click)="goTo('/merchant/products/create')">
+              <div class="ql-icon create">
+                <i class="fas fa-plus"></i>
+              </div>
+              <span>إضافة منتج</span>
+            </button>
+            <button class="quick-link"
+                    (click)="goTo('/merchant/orders')">
+              <div class="ql-icon orders-ql">
+                <i class="fas fa-shopping-bag"></i>
+              </div>
+              <span>الطلبات</span>
+            </button>
+            <button class="quick-link"
+                    (click)="goTo('/merchant/store-settings')">
+              <div class="ql-icon settings">
+                <i class="fas fa-cog"></i>
+              </div>
+              <span>الإعدادات</span>
+            </button>
+            <button class="quick-link"
+                    (click)="goTo('/')">
+              <div class="ql-icon visit">
+                <i class="fas fa-eye"></i>
+              </div>
+              <span>زيارة الموقع</span>
+            </button>
+          </div>
         </div>
-        <div class="flex flex-col items-center justify-center">
-          <span class="text-gray-400 text-xs font-bold mb-1">أعلى يوم</span>
-          <span class="text-lg font-bold text-blue-400 mt-1 flex items-center gap-1">الخميس <i class="fas fa-fire text-orange-500"></i></span>
+
+      }
+
+      <!-- حالة الخطأ عند تعذر تحميل البيانات بدون إيقاف وبدون أن يكون أدمن -->
+      @if (!isLoading() && !dashData() && !isNonMerchant() && !isSuspended() && error()) {
+        <div class="dash-error-card">
+          <div class="dash-error-icon">
+            <i class="fas fa-circle-exclamation"></i>
+          </div>
+          <div class="dash-error-body">
+            <h4>فشل تحميل بيانات لوحة التحكم</h4>
+            <p>{{ error() }}</p>
+          </div>
+          <button class="btn-dash-retry" (click)="retry()">
+            <i class="fas fa-rotate-right"></i>
+            <span>إعادة المحاولة</span>
+          </button>
+        </div>
+      }
+
+    </div>
+
+  <!-- النافذة المنبثقة التفاعلية للإيقاف الإداري (تظهر للتاجر فور دخوله إذا كان متجره موقوفاً بقرار إداري) -->
+  @if (isSuspended() && showSuspendedModal()) {
+    <div class="dash-modal-backdrop" (click)="closeSuspendedModal()">
+      <div class="dash-modal-card" (click)="$event.stopPropagation()">
+        <div class="dash-modal-header">
+          <div class="dash-modal-icon">
+            <i class="fas fa-store-slash"></i>
+          </div>
+          <button class="dash-modal-close" (click)="closeSuspendedModal()" aria-label="إغلاق">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="dash-modal-body">
+          <div class="modal-badge">
+            <i class="fas fa-ban"></i> إيقاف إداري من قِبل إدارة المنصة
+          </div>
+          <h3>تم إيقاف نشاط متجرك من قِبل الإدارة</h3>
+          <p class="modal-main-desc">
+            نحيطك علماً بأن متجرك تم إيقاف نشاطه وتجميده مؤقتاً بقرار إداري من قِبل إدارة المنصة (وليس إغلاقاً مؤقتاً تم ضبطه من طرفك).
+          </p>
+          <div class="modal-notice-box">
+            <div class="notice-item">
+              <i class="fas fa-eye-slash"></i>
+              <span>جميع منتجات متجرك مخفية حالياً عن الزبائن والمشترين.</span>
+            </div>
+            <div class="notice-item">
+              <i class="fas fa-hand-holding-dollar"></i>
+              <span>تم إيقاف استقبال الطلبات الجديدة مؤقتاً حتى معالجة الأمر.</span>
+            </div>
+          </div>
+          <p class="modal-contact-prompt">
+            إذا كنت تعتقد أن هذا الإجراء تم عن طريق الخطأ أو ترغب في استئناف نشاط المتجر، تواصل مع الإدارة مباشرة:
+          </p>
+          <div class="modal-actions">
+            <a href="https://wa.me/218XXXXXXXXX" target="_blank" class="contact-btn whatsapp">
+              <i class="fab fa-whatsapp"></i> تواصل عبر واتساب
+            </a>
+            <a href="mailto:support@dalilni.ly" class="contact-btn email">
+              <i class="fas fa-envelope"></i> مراسلة الدعم الفني
+            </a>
+          </div>
+        </div>
+        <div class="dash-modal-footer">
+          <button class="btn-dismiss" (click)="closeSuspendedModal()">
+            متابعة وتصفح اللوحة
+          </button>
         </div>
       </div>
     </div>
-  </div>
+  }
+
 </div>

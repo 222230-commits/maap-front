@@ -1,90 +1,183 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ThemeService } from '../../../core/services/theme.service';
-import { AuthMockService } from '@core/api/mock/auth.mock.service';
-import { ProductMockService } from '@core/api/mock/product.mock.service';
-import { CartMockService } from '@core/api/mock/cart.mock.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { CartService } from '../../../core/services/cart.service';
+import { NotificationService } from '../../../core/services/notification.service';
+import { AiService } from '../../../core/services/ai.service';
+import { BuyerService } from '../../../core/services/buyer.service';
 
 @Component({
   selector: 'app-navbar',
-  standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.scss'
+  styleUrl: './navbar.component.scss',
+  host: {
+    '(window:scroll)': 'onScroll()'
+  }
 })
 export class NavbarComponent {
-  themeService = inject(ThemeService);
-  router = inject(Router);
-  public authService = inject(AuthMockService);
-  public productService = inject(ProductMockService);
-  cartService = inject(CartMockService);
+  themeService  = inject(ThemeService);
+  authService   = inject(AuthService);
+  cartService   = inject(CartService);
+  notifService  = inject(NotificationService);
+  private aiService    = inject(AiService);
+  private buyerService = inject(BuyerService);
+  private router = inject(Router);
 
-  isLoggedIn = this.authService.isLoggedIn;
-  currentUser = this.authService.currentUser;
-  role = this.authService.role;
-  cartCount = this.cartService.totalItems;
-  isMobileMenuOpen = signal(false);
+  // Signals
+  isScrolled  = signal(false);
+  showSearch  = signal(false);
   showUserMenu = signal(false);
-  showNotifications = signal(false);
-  searchQuery = signal('');
-  showSearch = signal(false);
+  showMobile  = signal(false);
 
-  notifications = signal([
-    { id: 1, message: 'مرحباً بك في السوق الليبي!', time: 'الآن', read: false, icon: 'fas fa-store' },
-    { id: 2, message: 'اكتشف أحدث المنتجات', time: 'منذ دقيقة', read: false, icon: 'fas fa-box' }
-  ]);
+  // Live Search Signals
+  searchQuery     = signal('');
+  searchProducts  = signal<any[]>([]);
+  searchShops     = signal<any[]>([]);
+  isSearchingLive = signal(false);
+  private searchTimeout: any = null;
+  private allShopsCache: any[] = [];
 
-  unreadCount = computed(() => this.notifications().filter(n => !n.read).length);
+  // من الـ services
+  unreadCount = this.notifService.unreadCount;
 
   constructor() {
+    effect(() => {
+      if (this.authService.isLoggedIn()) {
+        this.notifService.startPolling();
+      } else {
+        this.notifService.stopPolling();
+      }
+    });
+
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        this.isMobileMenuOpen.set(false);
+        this.showMobile.set(false);
+        this.showUserMenu.set(false);
+        this.showSearch.set(false);
       }
     });
   }
 
-  goToLogin() { this.router.navigate(['/auth/login']); }
-  goToRegister() { this.router.navigate(['/auth/register']); }
-  goToProfile() { this.router.navigate(['/profile']); }
-  goToMerchant() { this.router.navigate(['/merchant']); }
-  goToAdmin() { this.router.navigate(['/admin']); }
+  onScroll() {
+    this.isScrolled.set(window.scrollY > 20);
+  }
 
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/']);
+  toggleSearch() {
+    this.showSearch.update(v => !v);
     this.showUserMenu.set(false);
-  }
-
-  markAllRead() {
-    this.notifications.update(ns => ns.map(n => ({...n, read: true})));
-  }
-
-  onSearch() {
-    if (this.searchQuery()) {
-      this.router.navigate(['/products'], { queryParams: { q: this.searchQuery() } });
-      this.showSearch.set(false);
-    }
-  }
-
-  updateSearch(v: string) {
-    this.searchQuery.set(v);
   }
 
   toggleUserMenu() {
     this.showUserMenu.update(v => !v);
-    this.showNotifications.set(false);
-  }
-
-  toggleNotifications() {
-    this.showNotifications.update(v => !v);
-    this.showUserMenu.set(false);
-  }
-
-  closeAll() {
-    this.showUserMenu.set(false);
-    this.showNotifications.set(false);
     this.showSearch.set(false);
+  }
+
+  toggleMobile() {
+    this.showMobile.update(v => !v);
+  }
+
+  scrollTo(id: string, event: Event) {
+    event.preventDefault();
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+    this.showMobile.set(false);
+  }
+
+  doSearch(query: string) {
+    if (!query.trim()) return;
+    this.router.navigate(['/products'], { queryParams: { q: query.trim() } });
+    this.showSearch.set(false);
+    this.searchQuery.set('');
+  }
+
+  onSearchInput(val: string) {
+    this.searchQuery.set(val);
+    if (this.searchTimeout) clearTimeout(this.searchTimeout);
+
+    const q = val.trim();
+    if (q.length < 2) {
+      this.searchProducts.set([]);
+      this.searchShops.set([]);
+      this.isSearchingLive.set(false);
+      return;
+    }
+
+    this.isSearchingLive.set(true);
+    this.searchTimeout = setTimeout(() => {
+      this.executeLiveSearch(q);
+    }, 280);
+  }
+
+  private executeLiveSearch(q: string) {
+    // 1. Products search
+    this.aiService.searchProducts({ q }).subscribe({
+      next: (res) => {
+        const list = Array.isArray(res?.data) ? res.data : [];
+        this.searchProducts.set(list.slice(0, 4));
+        this.isSearchingLive.set(false);
+      },
+      error: () => {
+        this.searchProducts.set([]);
+        this.isSearchingLive.set(false);
+      }
+    });
+
+    // 2. Shops search
+    if (this.allShopsCache.length > 0) {
+      this.filterShops(q);
+    } else {
+      this.buyerService.getShops().subscribe({
+        next: (res) => {
+          const list = Array.isArray(res?.data) ? res.data : [];
+          this.allShopsCache = list;
+          this.filterShops(q);
+        },
+        error: () => this.searchShops.set([])
+      });
+    }
+  }
+
+  private filterShops(q: string) {
+    const lower = q.toLowerCase();
+    const matched = this.allShopsCache.filter(s =>
+      (s.name && s.name.toLowerCase().includes(lower)) ||
+      (s.description && s.description.toLowerCase().includes(lower))
+    );
+    this.searchShops.set(matched.slice(0, 3));
+  }
+
+  goToProduct(product: any) {
+    this.router.navigate(['/products', product.slug || product.id], { state: { product } });
+    this.showSearch.set(false);
+    this.searchQuery.set('');
+  }
+
+  goToShop(shop: any) {
+    this.router.navigate(['/stores', shop.id]);
+    this.showSearch.set(false);
+    this.searchQuery.set('');
+  }
+
+  getItemImage(p: any): string {
+    if (!p) return '';
+    if (typeof p.primary_image === 'string') return p.primary_image;
+    if (p.primary_image?.image_url) return p.primary_image.image_url;
+    if (Array.isArray(p.images) && p.images.length > 0) {
+      const img = p.images[0];
+      return typeof img === 'string' ? img : (img?.image_url || img?.url || '');
+    }
+    if (Array.isArray(p.general_images) && p.general_images.length > 0) {
+      return p.general_images[0]?.image_url || '';
+    }
+    return p.image_url || '';
+  }
+
+  async logout() {
+    this.notifService.stopPolling();
+    await this.authService.logout();
+    this.showUserMenu.set(false);
   }
 }

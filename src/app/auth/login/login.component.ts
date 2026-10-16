@@ -1,7 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { AuthMockService } from '../../core/api/mock/auth.mock.service';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -9,31 +9,55 @@ import { AuthMockService } from '../../core/api/mock/auth.mock.service';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private fb = inject(FormBuilder);
-  private authService = inject(AuthMockService);
+  private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]]
   });
 
-  error = '';
+  isLoading = signal(false);
+  errorMessage = signal('');
+  showPassword = signal(false);
+  heroStats = { shops: 50, products: 500 };
 
-  onSubmit() {
+  ngOnInit(): void {
+    const emailParam = this.route.snapshot.queryParams['email'];
+    if (emailParam) {
+      this.loginForm.patchValue({ email: emailParam });
+    }
+  }
+
+  async onSubmit() {
     if (this.loginForm.invalid) return;
-
-    const { email, password } = this.loginForm.value;
-    const success = this.authService.login(email!, password!);
-
-    if (success) {
-      const role = this.authService.role();
-      if (role === 'admin') this.router.navigate(['/admin']);
-      else if (role === 'merchant') this.router.navigate(['/merchant']);
-      else this.router.navigate(['/']);
-    } else {
-      this.error = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+    
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+    
+    try {
+      const { email, password } = this.loginForm.value;
+      await this.authService.login(email!, password!);
+      // navigation تصير تلقائياً في الـ service
+    } catch (err: any) {
+      const msg = err?.error?.message || err?.error?.error || '';
+      if (
+        msg.includes('حظر') ||
+        msg.includes('تجميد') ||
+        msg.includes('موقوف') ||
+        msg.includes('معطل') ||
+        msg.includes('banned') ||
+        msg.includes('inactive')
+      ) {
+        this.authService.handleBannedUser(msg);
+        return;
+      }
+      this.errorMessage.set(msg || 'بيانات الدخول غير صحيحة');
+    } finally {
+      this.isLoading.set(false);
     }
   }
 }

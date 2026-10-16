@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>توثيق واجهات لوحة تحكم الأدمن — مآب</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --bg:#faf9fc;
+  --surface:#ffffff;
+  --ink:#1f1530;
+  --muted:#6b6478;
+  --primary:#5b21b6;
+  --primary-deep:#2d0a5e;
+  --accent:#8b5cf6;
+  --accent-light:#ede9fe;
+  --border:#e6e1f2;
+  --success:#16a34a;
+  --success-bg:#ecfdf3;
+  --danger:#dc2626;
+  --danger-bg:#fef2f2;
+  --warning:#d97706;
+  --warning-bg:#fffbeb;
+  --code-bg:#1c1330;
+  --code-ink:#e5deff;
+  --radius:14px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Tajawal',Tahoma,sans-serif;
+  display:flex;
+  min-height:100vh;
+}
+::selection{background:var(--accent-light);color:var(--primary-deep);}
+
+/* ============ SIDEBAR ============ */
+.sidebar{
+  width:290px;
+  flex-shrink:0;
+  background:linear-gradient(175deg,var(--primary-deep) 0%, #3d1178 55%, var(--primary) 100%);
+  color:#fff;
+  position:sticky;
+  top:0;
+  height:100vh;
+  overflow-y:auto;
+  padding:1.5rem 1.1rem 2rem;
+  border-left:1px solid rgba(255,255,255,0.06);
+}
+.sidebar::-webkit-scrollbar{width:6px;}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:10px;}
+
+.brand{
+  display:flex;align-items:center;gap:10px;
+  padding:.4rem .5rem 1.4rem;
+  border-bottom:1px solid rgba(255,255,255,0.12);
+  margin-bottom:1.2rem;
+}
+.brand-mark{
+  width:38px;height:38px;border-radius:11px;
+  background:rgba(255,255,255,0.12);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+  border:1px solid rgba(255,255,255,0.18);
+}
+.brand-mark::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 30% 20%, rgba(192,132,252,0.55), transparent 60%);
+  animation:glow 4s ease-in-out infinite;
+}
+@keyframes glow{0%,100%{opacity:.5}50%{opacity:1}}
+.brand-mark svg{width:20px;height:20px;stroke:#e9d5ff;position:relative;z-index:1;}
+.brand-text .t1{font-weight:900;font-size:15px;letter-spacing:.5px;}
+.brand-text .t2{font-size:11px;color:#c9b8f5;font-weight:400;}
+
+.nav-group-label{
+  font-size:11px;color:#b7a3ec;text-transform:uppercase;letter-spacing:1.5px;
+  margin:1.3rem .6rem .5rem;font-weight:700;
+}
+.nav-btn{
+  width:100%;
+  display:flex;align-items:center;gap:10px;
+  background:transparent;border:none;
+  color:#e6dcff;
+  font-family:inherit;font-size:14px;font-weight:500;
+  padding:.68rem .8rem;border-radius:10px;
+  cursor:pointer;text-align:right;
+  transition:background .18s, color .18s, transform .12s;
+  position:relative;
+}
+.nav-btn .num{
+  font-family:'JetBrains Mono',monospace;font-size:11px;color:#9d84d6;
+  width:18px;flex-shrink:0;
+}
+.nav-btn:hover{background:rgba(255,255,255,0.08);color:#fff;}
+.nav-btn.active{
+  background:rgba(255,255,255,0.14);
+  color:#fff;
+  box-shadow:inset 3px 0 0 #c084fc;
+}
+.nav-btn.active .num{color:#e9d5ff;}
+
+/* ============ MAIN ============ */
+main{
+  flex:1;
+  padding:2.6rem 3.2rem 6rem;
+  max-width:1180px;
+}
+.page-header{margin-bottom:2.2rem;}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;font-weight:700;color:var(--primary);
+  background:var(--accent-light);padding:.3rem .8rem;border-radius:100px;
+  margin-bottom:.9rem;letter-spacing:.4px;
+}
+h1{font-size:clamp(26px,3vw,34px);font-weight:900;margin:.2rem 0 .5rem;color:var(--primary-deep);}
+.lede{color:var(--muted);font-size:15.5px;line-height:1.9;max-width:760px;}
+
+section{display:none;animation:fadeIn .35s ease;}
+section.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+h2.block-title{
+  font-size:19px;font-weight:800;color:var(--primary-deep);
+  margin:2.6rem 0 1rem;display:flex;align-items:center;gap:10px;
+}
+h2.block-title::before{content:'';width:5px;height:20px;background:var(--accent);border-radius:4px;}
+
+/* ---- Endpoint card ---- */
+.endpoint{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  margin-bottom:1.5rem;
+  overflow:hidden;
+  box-shadow:0 1px 2px rgba(45,10,94,0.04);
+}
+.endpoint-head{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:1rem 1.3rem;border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,#fdfcff,#ffffff);
+}
+.method{
+  font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;
+  padding:.28rem .6rem;border-radius:7px;color:#fff;letter-spacing:.3px;
+}
+.method.get{background:#2563eb;}
+.method.post{background:var(--success);}
+.method.put{background:var(--warning);}
+.method.delete{background:var(--danger);}
+.path{font-family:'JetBrains Mono',monospace;font-size:13.5px;color:var(--ink);font-weight:600;}
+.ep-desc{color:var(--muted);font-size:13.5px;padding:0 1.3rem 1rem;line-height:1.8;}
+.ep-body{padding:0 1.3rem 1.3rem;}
+
+table.spec{width:100%;border-collapse:collapse;font-size:13px;margin:.6rem 0 1rem;}
+table.spec th{
+  text-align:right;color:var(--muted);font-weight:700;font-size:11.5px;
+  text-transform:uppercase;letter-spacing:.4px;padding:.5rem .6rem;border-bottom:2px solid var(--border);
+}
+table.spec td{padding:.55rem .6rem;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.7;}
+table.spec code{background:var(--accent-light);color:var(--primary-deep);padding:1px 6px;border-radius:5px;font-family:'JetBrains Mono',monospace;font-size:12px;}
+
+pre{
+  background:var(--code-bg);color:var(--code-ink);
+  border-radius:11px;padding:1rem 1.1rem;overflow-x:auto;
+  font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.75;
+  direction:ltr;text-align:left;margin:.6rem 0;
+  border:1px solid rgba(192,132,252,0.15);
+}
+.tag-json{color:#c4b5fd;}
+.k{color:#93c5fd;}
+.s{color:#86efac;}
+.n{color:#fca5a5;}
+.b{color:#fcd34d;}
+.cm{color:#7c7398;}
+
+.note{
+  border-radius:10px;padding:.85rem 1.1rem;font-size:13.5px;line-height:1.85;margin:.8rem 0;
+  display:flex;gap:10px;align-items:flex-start;
+}
+.note.warn{background:var(--warning-bg);color:#7c4a03;border:1px solid #fde3ad;}
+.note.tip{background:var(--accent-light);color:var(--primary-deep);border:1px solid #ddd0f7;}
+.note.danger{background:var(--danger-bg);color:#8a1c1c;border:1px solid #f7c9c9;}
+.note svg{width:18px;height:18px;flex-shrink:0;margin-top:2px;}
+
+.badge{
+  display:inline-block;font-size:11px;font-weight:700;padding:.2rem .55rem;border-radius:100px;
+}
+.badge.ok{background:var(--success-bg);color:var(--success);}
+.badge.danger{background:var(--danger-bg);color:var(--danger);}
+.badge.muted{background:#f1eefb;color:var(--muted);}
+
+/* ---- Mockup frame ---- */
+.mockup-wrap{margin:1.4rem 0 2rem;}
+.mockup-label{
+  display:flex;align-items:center;gap:8px;
+  font-size:12.5px;font-weight:700;color:var(--primary);margin-bottom:.6rem;
+}
+.mockup-label svg{width:16px;height:16px;stroke:var(--primary);}
+.mockup{
+  background:#f4f1fb;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:1.2rem;
+  position:relative;
+}
+.mockup::before{
+  content:'مثال توضيحي — ليس لقطة شاشة فعلية';
+  position:absolute;top:10px;left:14px;font-size:10.5px;color:#a89bd1;font-weight:600;
+}
+
+/* KPI cards mockup */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:1.4rem;}
+.kpi{background:#fff;border-radius:12px;padding:.9rem .9rem;border:1px solid var(--border);}
+.kpi .lbl{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:.3rem;}
+.kpi .val{font-size:20px;font-weight:900;color:var(--primary-deep);}
+.kpi .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-left:5px;}
+
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;}
+.donut{width:120px;height:120px;border-radius:50%;margin:10px auto;
+  background:conic-gradient(var(--primary) 0 65%, var(--accent) 65% 90%, #d8cff2 90% 100%);
+  position:relative;}
+.donut::after{content:'';position:absolute;inset:22px;background:#fff;border-radius:50%;}
+.card-mini{background:#fff;border-radius:12px;padding:.9rem;border:1px solid var(--border);}
+.card-mini h4{margin:0 0 8px;font-size:12.5px;color:var(--muted);}
+.pbar-row{display:flex;align-items:center;gap:8px;font-size:11.5px;margin-bottom:8px;}
+.pbar-track{flex:1;height:7px;background:#ece7f8;border-radius:10px;overflow:hidden;}
+.pbar-fill{height:100%;border-radius:10px;}
+
+/* table mockup */
+.tbl-mock{background:#fff;border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-top:12px;}
+.tbl-toolbar{display:flex;gap:8px;align-items:center;padding:.7rem .9rem;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.chip{font-size:11.5px;padding:.32rem .8rem;border-radius:100px;background:#f1eefb;color:var(--muted);font-weight:600;cursor:pointer;}
+.chip.on{background:var(--primary);color:#fff;}
+.search-fake{flex:1;min-width:140px;height:30px;border-radius:8px;background:#f4f2fb;border:1px solid var(--border);}
+.trow{display:grid;grid-template-columns:1.6fr 1fr .8fr .8fr;gap:10px;align-items:center;padding:.65rem .9rem;border-bottom:1px solid #f1eef7;font-size:12.5px;}
+.trow.head{font-weight:700;color:var(--muted);font-size:11px;background:#faf9fd;}
+.avatar-fake{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--primary));display:inline-block;vertical-align:middle;margin-left:8px;}
+.toggle-fake{width:34px;height:18px;border-radius:20px;background:var(--border);display:inline-block;position:relative;}
+.toggle-fake.on{background:var(--success);}
+.toggle-fake::after{content:'';position:absolute;top:2px;right:2px;width:14px;height:14px;background:#fff;border-radius:50%;}
+.toggle-fake.on::after{right:auto;left:2px;}
+
+/* card grid mockup (shops/products) */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:12px;}
+.item-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:.8rem;}
+.item-thumb{height:70px;border-radius:9px;background:linear-gradient(135deg,var(--accent-light),#d8cff2);margin-bottom:.6rem;}
+.item-title{font-size:12.5px;font-weight:700;margin-bottom:2px;}
+.item-sub{font-size:11px;color:var(--muted);}
+
+/* tree mockup */
+.tree-mock{background:#fff;border-radius:12px;border:1px solid var(--border);padding:.8rem;margin-top:12px;font-size:13px;}
+.tnode{display:flex;align-items:center;gap:6px;padding:.4rem .3rem;border-radius:8px;}
+.tnode:hover{background:#f7f4fd;}
+.tnode .caret{width:14px;height:14px;color:var(--muted);}
+.tline{border-right:1px solid var(--border);margin-right:11px;padding-right:14px;}
+
+/* kanban / applications mockup */
+.kanban-mock{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;}
+.kanban-col h5{font-size:11.5px;color:var(--muted);margin:0 0 8px;text-align:center;}
+.kanban-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:.6rem .7rem;font-size:11.5px;margin-bottom:8px;}
+.kanban-card.pending{border-right:3px solid var(--warning);}
+.kanban-card.approved{border-right:3px solid var(--success);}
+.kanban-card.rejected{border-right:3px solid var(--danger);}
+
+.dialog-mock{background:#fff;border-radius:12px;border:1px solid var(--border);padding:1rem;margin-top:12px;max-width:340px;}
+.dialog-mock .dtitle{font-weight:800;font-size:13px;margin-bottom:6px;color:var(--danger);}
+.dialog-mock .dtext{font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:10px;}
+.dialog-mock .dinput{height:30px;border:1px solid var(--border);border-radius:8px;background:#fafafa;margin-bottom:10px;}
+.dialog-mock .drow{display:flex;gap:8px;}
+.btn-fake{flex:1;text-align:center;padding:.5rem;border-radius:8px;font-size:12px;font-weight:700;}
+.btn-fake.danger{background:var(--danger);color:#fff;}
+.btn-fake.ghost{background:#f1eefb;color:var(--muted);}
+
+.timeline-mock{margin-top:12px;}
+.trow2{display:flex;gap:10px;margin-bottom:12px;}
+.tdot{width:9px;height:9px;border-radius:50%;background:var(--accent);margin-top:5px;flex-shrink:0;}
+.tcontent .tt{font-size:12.5px;font-weight:600;}
+.tcontent .ta{font-size:11px;color:var(--muted);}
+
+footer{color:var(--muted);font-size:12px;text-align:center;padding:3rem 0 1rem;}
+
+@media(max-width:900px){
+  body{flex-direction:column;}
+  .sidebar{position:relative;height:auto;width:100%;}
+  main{padding:1.6rem;}
+  .kanban-mock{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+    </div>
+    <div class="brand-text">
+      <div class="t1">MA'AB · مآب</div>
+      <div class="t2">توثيق لوحة تحكم الأدمن</div>
+    </div>
+  </div>
+
+  <div class="nav-group-label">نظرة عامة</div>
+  <button class="nav-btn active" data-target="s-intro"><span class="num">00</span> مبادئ عامة قبل البدء</button>
+
+  <div class="nav-group-label">الوحدات الإدارية</div>
+  <button class="nav-btn" data-target="s-dashboard"><span class="num">01</span> لوحة التحكم الرئيسية</button>
+  <button class="nav-btn" data-target="s-buyers"><span class="num">02</span> الزبائن والتجار</button>
+  <button class="nav-btn" data-target="s-sellers"><span class="num">03</span> إدارة التجار (حظر/حذف)</button>
+  <button class="nav-btn" data-target="s-apps"><span class="num">04</span> طلبات الانضمام</button>
+  <button class="nav-btn" data-target="s-shops"><span class="num">05</span> إدارة المتاجر</button>
+  <button class="nav-btn" data-target="s-categories"><span class="num">06</span> التصنيفات الشجرية</button>
+  <button class="nav-btn" data-target="s-products"><span class="num">07</span> إدارة المنتجات</button>
+
+  <div class="nav-group-label">ملاحق</div>
+  <button class="nav-btn" data-target="s-notes"><span class="num">08</span> مسارات غير موثّقة بعد</button>
+  <button class="nav-btn" data-target="s-arch"><span class="num">09</span> بنية مشروع Angular</button>
+</aside>
+
+<main>
+
+<!-- ============ 00 INTRO ============ -->
+<section id="s-intro" class="active">
+  <div class="page-header">
+    <span class="eyebrow">Admin API · v1</span>
+    <h1>توثيق واجهات لوحة تحكم الأدمن</h1>
+    <p class="lede">دليل تقني كامل موجّه لمطوّر Angular، يغطي كل نقاط النهاية (Endpoints) الخاصة بلوحة تحكم الأدمن — الطلبات، الاستجابات، قواعد التحقق، وأفضل طريقة لعرض كل جزء في الواجهة مع مثال بصري توضيحي.</p>
+  </div>
+
+  <h2 class="block-title">المصادقة (Authentication)</h2>
+  <p style="color:var(--muted);font-size:14px;line-height:1.9">كل الروابط محمية بـ <code style="background:var(--accent-light);padding:2px 7px;border-radius:6px">auth:sanctum + IsAdmin</code>. أرسل الهيدر التالي مع كل طلب بعد تسجيل الدخول عبر <code style="background:var(--accent-light);padding:2px 7px;border-radius:6px">POST /admin/login</code>:</p>
+  <pre>Authorization: <span class="s">Bearer {token}</span>
+Accept: <span class="s">application/json</span>
+Content-Type: <span class="s">application/json</span></pre>
+
+  <div class="note tip">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4m0 4h.01"/></svg>
+    <div>أنشئ <b>AuthInterceptor</b> واحد يحقن التوكن تلقائياً في كل طلب، ويتعامل مع رد <code>401</code> بتسجيل خروج فوري وإعادة توجيه لصفحة الدخول.</div>
+  </div>
+
+  <h2 class="block-title">تسجيل الخروج</h2>
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method post">POST</span><span class="path">/admin/logout</span></div>
+    <div class="ep-desc">يُبطل توكن الجلسة الحالي على السيرفر (Sanctum). استدعِه ثم امسح التوكن محلياً (localStorage/Signal) ووجّه المستخدم لصفحة الدخول — لا تعتمد على مسح التوكن محلياً فقط دون استدعاء هذا الـ Endpoint.</div>
+  </div>
+
+  <h2 class="block-title">شكل الاستجابة الموحّد</h2>
+  <p style="color:var(--muted);font-size:14px;line-height:1.9">ابنِ <b>Interface عام واحد</b> بدل تكراره في كل خدمة:</p>
+  <pre><span class="cm">// core/models/api-response.model.ts</span>
+<span class="k">export interface</span> ApiResponse&lt;T&gt; {
+  success: <span class="b">boolean</span>;
+  message?: <span class="b">string</span>;
+  data: T;
+  error?: <span class="b">string</span>;
+  errors?: Record&lt;<span class="b">string</span>, <span class="b">string</span>[]&gt;; <span class="cm">// أخطاء التحقق 422</span>
+}</pre>
+
+  <div class="note warn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+    <div>شكل الـ <b>Pagination يختلف بين الأقسام</b>: بعضها يُرجع كائن Laravel Paginator القياسي داخل <code>data</code>، وبعضها (المتاجر، المنتجات) يُعيد تغليفه يدوياً بحقول <code>pagination</code> منفصلة. تحقّق من الشكل الموثّق تحت كل Endpoint تحديداً ولا تفترض نمطاً موحداً.</div>
+  </div>
+
+  <h2 class="block-title">خريطة أكواد الحالة</h2>
+  <table class="spec">
+    <tr><th>الكود</th><th>الحالة</th><th>ماذا تفعل الواجهة</th></tr>
+    <tr><td><span class="badge ok">200</span></td><td>نجاح</td><td>اعرض البيانات أو Toast نجاح</td></tr>
+    <tr><td><span class="badge ok">201</span></td><td>تم الإنشاء</td><td>مورد جديد أُنشئ (تصنيف مثلاً)</td></tr>
+    <tr><td><span class="badge muted">400</span></td><td>طلب غير صالح</td><td>اعرض <code>message</code> مباشرة</td></tr>
+    <tr><td><span class="badge muted">404</span></td><td>غير موجود</td><td>Empty State أو إعادة توجيه</td></tr>
+    <tr><td><span class="badge danger">422</span></td><td>فشل تحقق</td><td>اربط <code>errors</code> بحقول الفورم</td></tr>
+    <tr><td><span class="badge danger">500</span></td><td>خطأ خادم</td><td>رسالة عامة + سجل تفاصيل في الـ Console فقط</td></tr>
+  </table>
+
+  <h2 class="block-title">الأدوات الموصى بها</h2>
+  <table class="spec">
+    <tr><th>الحاجة</th><th>الأداة</th></tr>
+    <tr><td>جداول Server-Side</td><td><code>MatTable + MatPaginator</code> أو <code>PrimeNG p-table</code></td></tr>
+    <tr><td>الأشجار الهرمية</td><td><code>mat-tree (CDK)</code> أو <code>PrimeNG p-treeTable</code> + <code>cdk/drag-drop</code></td></tr>
+    <tr><td>الرسوم البيانية</td><td><code>ngx-charts</code> أو <code>ng2-charts</code></td></tr>
+    <tr><td>نوافذ التأكيد</td><td><code>MatDialog</code> + مكوّن <code>ConfirmDialogComponent</code> عام</td></tr>
+    <tr><td>الإشعارات</td><td><code>ngx-toastr</code> أو <code>MatSnackBar</code></td></tr>
+    <tr><td>الفورمات</td><td><code>Reactive Forms</code> مطابقة تماماً لقواعد الباك إند</td></tr>
+  </table>
+</section>
+
+<!-- ============ 01 DASHBOARD ============ -->
+<section id="s-dashboard">
+  <div class="page-header">
+    <span class="eyebrow">01 · Dashboard</span>
+    <h1>لوحة التحكم الرئيسية</h1>
+    <p class="lede">نقطة نهاية واحدة "شاملة" تُرجع كل إحصائيات الصفحة الرئيسية بطلب واحد فقط، محسّنة باستعلام SQL مجمّع.</p>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method get">GET</span><span class="path">/admin/dashboard</span></div>
+    <div class="ep-desc">Query اختياري: <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">range</code> (افتراضي <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">all</code>) — يُعاد فقط في <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">filter_applied</code> ولا يُفلتر فعلياً حالياً.</div>
+    <div class="ep-body">
+<pre>{
+  <span class="k">"success"</span>: <span class="b">true</span>,
+  <span class="k">"data"</span>: {
+    <span class="k">"top_cards"</span>: { <span class="k">"buyers_count"</span>: <span class="n">1240</span>, <span class="k">"sellers_count"</span>: <span class="n">87</span>, <span class="k">"products_count"</span>: <span class="n">3210</span>, ... },
+    <span class="k">"users_distribution"</span>: { <span class="k">"buyers"</span>: <span class="n">1240</span>, <span class="k">"sellers"</span>: <span class="n">87</span> },
+    <span class="k">"seller_applications_chart"</span>: {
+      <span class="k">"pending"</span>:  { <span class="k">"count"</span>: <span class="n">12</span>, <span class="k">"percentage"</span>: <span class="n">20</span> },
+      <span class="k">"approved"</span>: { <span class="k">"count"</span>: <span class="n">40</span>, <span class="k">"percentage"</span>: <span class="n">67</span> },
+      <span class="k">"rejected"</span>: { <span class="k">"count"</span>: <span class="n">8</span>,  <span class="k">"percentage"</span>: <span class="n">13</span> }
+    },
+    <span class="k">"pending_applications_list"</span>: [ <span class="cm">/* آخر 5 */</span> ],
+    <span class="k">"latest_reports_list"</span>: [ <span class="cm">/* آخر 5 */</span> ],
+    <span class="k">"recent_activities"</span>: [{ <span class="k">"type"</span>: <span class="s">"application"</span>, <span class="k">"title"</span>: <span class="s">"طلب انضمام جديد رقم #a1b2c3d4"</span>, <span class="k">"time_ago"</span>: <span class="s">"مؤخراً"</span> }],
+    <span class="k">"footer_counters"</span>: { <span class="k">"total_users"</span>: <span class="n">1327</span>, <span class="k">"approval_rate_percentage"</span>: <span class="n">67</span>, ... }
+  }
+}</pre>
+      <div class="note tip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4m0 4h.01"/></svg>
+        <div>Endpoint ثقيل نسبياً (10 استعلامات مجمّعة). استدعِه مرة عند الدخول فقط، واستخدم <code>shareReplay(1)</code> في الـ Service لتفادي التكرار.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup-wrap">
+    <div class="mockup-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg> مثال بصري مقترح للواجهة</div>
+    <div class="mockup">
+      <div class="kpi-row">
+        <div class="kpi"><div class="lbl">الزبائن</div><div class="val">1,240</div></div>
+        <div class="kpi"><div class="lbl">التجار</div><div class="val">87</div></div>
+        <div class="kpi"><div class="lbl">المنتجات</div><div class="val">3,210</div></div>
+        <div class="kpi"><div class="lbl">الطلبات</div><div class="val">542</div></div>
+        <div class="kpi"><div class="lbl">طلبات معلّقة</div><div class="val" style="color:var(--warning)">12</div></div>
+        <div class="kpi"><div class="lbl">بلاغات جديدة</div><div class="val" style="color:var(--danger)">4</div></div>
+      </div>
+      <div class="chart-row">
+        <div class="card-mini">
+          <h4>توزيع المستخدمين</h4>
+          <div class="donut"></div>
+          <div style="display:flex;justify-content:center;gap:14px;font-size:11px;color:var(--muted)"><span>● زبائن</span><span style="color:var(--accent)">● تجار</span></div>
+        </div>
+        <div class="card-mini">
+          <h4>حالة طلبات الانضمام</h4>
+          <div class="pbar-row"><span style="width:56px">معلّقة</span><div class="pbar-track"><div class="pbar-fill" style="width:20%;background:var(--warning)"></div></div><b>20%</b></div>
+          <div class="pbar-row"><span style="width:56px">مقبولة</span><div class="pbar-track"><div class="pbar-fill" style="width:67%;background:var(--success)"></div></div><b>67%</b></div>
+          <div class="pbar-row"><span style="width:56px">مرفوضة</span><div class="pbar-track"><div class="pbar-fill" style="width:13%;background:var(--danger)"></div></div><b>13%</b></div>
+        </div>
+      </div>
+      <div class="card-mini" style="margin-top:14px">
+        <h4>النشاط الأخير</h4>
+        <div class="timeline-mock">
+          <div class="trow2"><div class="tdot"></div><div class="tcontent"><div class="tt">طلب انضمام جديد رقم #a1b2c3d4</div><div class="ta">مؤخراً</div></div></div>
+          <div class="trow2"><div class="tdot" style="background:var(--danger)"></div><div class="tcontent"><div class="tt">بلاغ وارد جديد رقم #f9e8d7c6</div><div class="ta">مؤخراً</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 BUYERS ============ -->
+<section id="s-buyers">
+  <div class="page-header">
+    <span class="eyebrow">02 · Buyers &amp; Sellers</span>
+    <h1>إدارة الزبائن والتجار</h1>
+    <p class="lede"><code style="background:var(--accent-light);padding:2px 7px;border-radius:6px">BuyerController</code> هو فعلياً متحكم موحّد لعرض كل المستخدمين (زبائن + تجار) عبر فلتر <code style="background:var(--accent-light);padding:2px 7px;border-radius:6px">role</code>. اجعلها صفحة واحدة بتبويبين.</p>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method get">GET</span><span class="path">/admin/buyers</span></div>
+    <div class="ep-body">
+      <table class="spec">
+        <tr><th>Query</th><th>القيم</th><th>افتراضي</th></tr>
+        <tr><td><code>role</code></td><td>all, buyer, seller</td><td>all</td></tr>
+        <tr><td><code>status</code></td><td>all, active, banned</td><td>all</td></tr>
+        <tr><td><code>search</code></td><td>اسم / إيميل / هاتف / اسم المتجر</td><td>—</td></tr>
+        <tr><td><code>per_page</code></td><td>1–100</td><td>15</td></tr>
+      </table>
+<pre>{
+  <span class="k">"counts"</span>: {
+    <span class="k">"buyers"</span>:  { <span class="k">"all"</span>: <span class="n">1240</span>, <span class="k">"active"</span>: <span class="n">1190</span>, <span class="k">"banned"</span>: <span class="n">50</span> },
+    <span class="k">"sellers"</span>: { <span class="k">"all"</span>: <span class="n">87</span>,   <span class="k">"active"</span>: <span class="n">80</span>,   <span class="k">"banned"</span>: <span class="n">7</span>  }
+  },
+  <span class="k">"data"</span>: { <span class="cm">/* Laravel Paginator: id, full_name, email, role, is_active, shop{...} */</span> }
+}</pre>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method get">GET</span><span class="path">/admin/buyers/{id}</span></div>
+    <div class="ep-desc">تفاصيل مستخدم واحد كاملة. محميّة أمنياً: يمنع جلب أو عرض أي مستخدم بدور <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">admin</code> عبر هذا المسار (404).</div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method post">POST</span><span class="path">/admin/buyers/{id}/toggle-status</span></div>
+    <div class="ep-desc">يعكس <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">is_active</code> لزبون واحد فقط (بدون تأثير على متجر — هذا مسار الزبائن العاديين. لتاجر له متجر استخدم <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">/admin/sellers/{id}/toggle-status</code> الموثّق في القسم 03).</div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method put">PUT</span><span class="path">/admin/buyers/{id}</span></div>
+    <div class="ep-body">
+      <table class="spec">
+        <tr><th>الحقل</th><th>القاعدة</th></tr>
+        <tr><td><code>full_name</code></td><td>نص، حد أقصى 255</td></tr>
+        <tr><td><code>phone_number</code></td><td>Regex: <code>^(091|092|093|094|095)\d{7}$</code> + فريد</td></tr>
+        <tr><td><code>address</code></td><td>نص، اختياري</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method delete">DELETE</span><span class="path">/admin/buyers/{id}</span></div>
+    <div class="ep-body">
+      <div class="note danger">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"/></svg>
+        <div>حذف <b>لا يمكن التراجع عنه</b> — يطمس البيانات الشخصية نهائياً لكن يحتفظ بسجلات الطلبات المالية. استخدم Dialog من نمط "اكتب DELETE للتأكيد".</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method get">GET</span><span class="path">/admin/buyers/{id}/orders</span></div>
+    <div class="ep-desc">تاريخ طلبيات مشتري محدد، Pagination ثابتة 10 عناصر/صفحة (غير قابلة للتخصيص من الـ Query). كل طلب يحتوي <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">shop: {id, name}</code>.</div>
+  </div>
+
+  <div class="mockup-wrap">
+    <div class="mockup-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg> مثال بصري مقترح للواجهة</div>
+    <div class="mockup">
+      <div class="tbl-mock">
+        <div class="tbl-toolbar">
+          <span class="chip on">الكل 1327</span><span class="chip">زبائن 1240</span><span class="chip">تجار 87</span>
+          <div style="flex:1"></div>
+          <span class="chip">نشط</span><span class="chip">محظور</span>
+          <div class="search-fake"></div>
+        </div>
+        <div class="trow head"><span>المستخدم</span><span>الدور</span><span>الهاتف</span><span>الحالة</span></div>
+        <div class="trow"><span><span class="avatar-fake"></span>سارة أحمد</span><span>زبون</span><span>0912345678</span><span class="toggle-fake on"></span></div>
+        <div class="trow"><span><span class="avatar-fake"></span>متجر الأصالة</span><span>تاجر</span><span>0923456789</span><span class="toggle-fake on"></span></div>
+        <div class="trow"><span><span class="avatar-fake"></span>خالد يوسف</span><span>زبون</span><span>0934567890</span><span class="toggle-fake"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 SELLERS ACTIONS ============ -->
+<section id="s-sellers">
+  <div class="page-header">
+    <span class="eyebrow">03 · Seller Actions</span>
+    <h1>إدارة التجار (حظر / حذف مرتبط بالمتجر)</h1>
+    <p class="lede">عمليتان حساستان فقط، منفصلتان لأنهما تؤثران على <b>التاجر ومتجره معاً</b> ضمن Transaction واحدة.</p>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method post">POST</span><span class="path">/admin/sellers/{id}/toggle-status</span></div>
+    <div class="ep-desc">يعكس حالة التاجر <b>و</b> متجره معاً في نفس اللحظة.</div>
+    <div class="ep-body">
+<pre>{
+  <span class="k">"success"</span>: <span class="b">true</span>,
+  <span class="k">"message"</span>: <span class="s">"تم حظر التاجر بالكامل وتجميد متجره..."</span>,
+  <span class="k">"data"</span>: { <span class="k">"user_is_active"</span>: <span class="b">false</span>, <span class="k">"shop_is_active"</span>: <span class="b">false</span> }
+}</pre>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method delete">DELETE</span><span class="path">/admin/sellers/{id}/delete</span></div>
+    <div class="ep-desc">يحذف المتجر ناعماً، يسحب التوكنز (تسجيل خروج فوري)، ويطمس بيانات التاجر الشخصية.</div>
+  </div>
+
+  <div class="mockup-wrap">
+    <div class="mockup-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg> مثال بصري: نافذة تأكيد إجراء حساس</div>
+    <div class="mockup">
+      <div class="dialog-mock">
+        <div class="dtitle">حظر التاجر "متجر الأصالة"؟</div>
+        <div class="dtext">سيؤدي هذا لتجميد متجره بالكامل أيضاً — لن يتمكن من الدخول أو البيع أو الشراء.</div>
+        <div class="drow"><div class="btn-fake ghost">إلغاء</div><div class="btn-fake danger">تأكيد الحظر</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 APPLICATIONS ============ -->
+<section id="s-apps">
+  <div class="page-header">
+    <span class="eyebrow">04 · Seller Applications</span>
+    <h1>طلبات انضمام التجار</h1>
+    <p class="lede">دورة حياة كاملة: عرض، تفاصيل، قبول (يُنشئ المتجر تلقائياً)، أو رفض (يخصم من رصيد المحاولات).</p>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method get">GET</span><span class="path">/admin/applications</span><span class="badge muted">status: all|pending|approved|rejected</span></div>
+  </div>
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method get">GET</span><span class="path">/admin/applications/{id}</span></div>
+  </div>
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method post">POST</span><span class="path">/admin/applications/{id}/approve</span></div>
+    <div class="ep-body">
+<pre><span class="cm">// نجاح</span>
+{ <span class="k">"success"</span>: <span class="b">true</span>, <span class="k">"message"</span>: <span class="s">"تم قبول طلب المتجر بنجاح..."</span>, <span class="k">"shop"</span>: { ... } }
+
+<span class="cm">// فشل بسبب تكرار بيانات (422)</span>
+{ <span class="k">"success"</span>: <span class="b">false</span>, <span class="k">"message"</span>: <span class="s">"لا يمكن قبول الطلب لأن اسم المتجر مسجل مسبقاً..."</span> }</pre>
+    </div>
+  </div>
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method post">POST</span><span class="path">/admin/applications/{id}/reject</span></div>
+    <div class="ep-body">
+      <table class="spec">
+        <tr><th>الحقل</th><th>القاعدة</th></tr>
+        <tr><td><code>rejection_reason</code></td><td>مطلوب، نص، حد أقصى 255</td></tr>
+        <tr><td><code>admin_notes</code></td><td>اختياري، حد أقصى 255</td></tr>
+      </table>
+<pre>{
+  <span class="k">"success"</span>: <span class="b">true</span>,
+  <span class="k">"data"</span>: { <span class="k">"remaining_attempts"</span>: <span class="n">2</span>, <span class="k">"is_permanently_banned"</span>: <span class="b">false</span> }
+}</pre>
+      <div class="note warn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        <div>كل رفض يخصم محاولة من <code>remaining_upgrade_attempts</code>. عند الوصول للصفر يُحظر المستخدم دائماً من التقديم مجدداً — اعرض شارة تحذيرية واضحة عند <code>is_permanently_banned === true</code>.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup-wrap">
+    <div class="mockup-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg> مثال بصري مقترح للواجهة</div>
+    <div class="mockup">
+      <div class="kanban-mock">
+        <div class="kanban-col">
+          <h5>معلّقة (12)</h5>
+          <div class="kanban-card pending"><b>متجر ياسمين</b><br>قدّم منذ يومين</div>
+          <div class="kanban-card pending"><b>بوتيك لمسات</b><br>قدّم منذ 5 أيام</div>
+        </div>
+        <div class="kanban-col">
+          <h5>مقبولة (40)</h5>
+          <div class="kanban-card approved"><b>متجر النخبة</b><br>قُبل قبل أسبوع</div>
+        </div>
+        <div class="kanban-col">
+          <h5>مرفوضة (8)</h5>
+          <div class="kanban-card rejected"><b>محل الفخامة</b><br>محاولات متبقية: 1</div>
+        </div>
+      </div>
+      <div class="card-mini" style="margin-top:14px">
+        <h4>تفاصيل الطلب — أزرار ثابتة أسفل الصفحة</h4>
+        <div class="drow" style="display:flex;gap:10px">
+          <div class="btn-fake" style="background:var(--danger-bg);color:var(--danger)">رفض</div>
+          <div class="btn-fake" style="background:var(--success-bg);color:var(--success)">قبول الطلب</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 SHOPS ============ -->
+<section id="s-shops">
+  <div class="page-header">
+    <span class="eyebrow">05 · Shops</span>
+    <h1>إدارة المتاجر</h1>
+    <p class="lede">قائمة، تفاصيل، تحليلات مبيعات دقيقة (طلبات مكتملة فقط)، وحذف جذري شامل.</p>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method get">GET</span><span class="path">/admin/shops</span></div>
+    <div class="ep-body">Query: <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">status</code>, <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">search</code> (يبحث أيضاً في بيانات التاجر المالك), <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">per_page</code></div>
+  </div>
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method get">GET</span><span class="path">/admin/shops/{id}</span></div>
+    <div class="ep-desc">تفاصيل المتجر مع <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">seller</code>, <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">categories</code>, <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">badges</code>، وعدّادات <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">products_count / followers_count / orders_count</code>.</div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method post">POST</span><span class="path">/admin/shops/{id}/toggle-status</span></div>
+    <div class="ep-desc">عكس بسيط لحالة <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">is_active</code> للمتجر فقط (بدون التأثير على حساب التاجر نفسه — للتمييز عن مسار 03 الذي يحظر الاثنين معاً).</div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method get">GET</span><span class="path">/admin/shops/{id}/analytics</span></div>
+    <div class="ep-body">
+<pre>{ <span class="k">"analytics"</span>: { <span class="k">"total_sales"</span>: <span class="n">154320.50</span>, <span class="k">"total_orders"</span>: <span class="n">212</span>, <span class="k">"latest_orders"</span>: [...] } }</pre>
+      <div class="note tip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4m0 4h.01"/></svg>
+        <div>الأرقام تُحسب من الطلبات <b>المؤكدة من الطرفين فقط</b>. اعرضها كـ "صافي المبيعات المؤكدة" لتفادي التباس الأدمن مع إجمالي كل الطلبات.</div>
+      </div>
+    </div>
+  </div>
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method get">GET</span><span class="path">/admin/shops/{id}/orders</span></div>
+    <div class="ep-desc">سجل طلبات المتجر مع Pagination عبر <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">per_page</code> (افتراضي 15). الاستجابة تتضمن أيضاً <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">shop_name</code>.</div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method delete">DELETE</span><span class="path">/admin/shops/{id}/delete</span><span class="badge danger">الأخطر في النظام</span></div>
+    <div class="ep-body">
+      <div class="note danger">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"/></svg>
+        <div>يخفّض رتبة التاجر إلى زبون، يحذف كل منتجاته وينظفها من كل السلات وقوائم الأمنيات لدى كل المستخدمين. <b>يحتفظ</b> بسجلات الطلبات التاريخية فقط.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup-wrap">
+    <div class="mockup-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg> مثال بصري مقترح للواجهة</div>
+    <div class="mockup">
+      <div class="card-grid">
+        <div class="item-card"><div class="item-thumb"></div><div class="item-title">متجر النخبة</div><div class="item-sub">124 منتج · نشط</div></div>
+        <div class="item-card"><div class="item-thumb"></div><div class="item-title">بوتيك لمسات</div><div class="item-sub">58 منتج · نشط</div></div>
+        <div class="item-card"><div class="item-thumb" style="filter:grayscale(1)"></div><div class="item-title">محل الفخامة</div><div class="item-sub" style="color:var(--danger)">12 منتج · محظور</div></div>
+        <div class="item-card"><div class="item-thumb"></div><div class="item-title">متجر ياسمين</div><div class="item-sub">31 منتج · نشط</div></div>
+      </div>
+      <div class="dialog-mock" style="margin-top:14px;max-width:100%">
+        <div class="dtitle">حذف "محل الفخامة" جذرياً؟</div>
+        <div class="dtext">
+          ✗ إلغاء صلاحية التاجر كبائع (سيعود زبوناً عادياً)<br>
+          ✗ حذف 12 منتج نهائياً وإزالتها من كل السلات<br>
+          ✓ الاحتفاظ بسجل الطلبات والفواتير التاريخية
+        </div>
+        <div class="dinput"></div>
+        <div class="drow"><div class="btn-fake ghost">إلغاء</div><div class="btn-fake danger">حذف نهائي</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 06 CATEGORIES ============ -->
+<section id="s-categories">
+  <div class="page-header">
+    <span class="eyebrow">06 · Categories</span>
+    <h1>التصنيفات — بنية شجرية (حتى 5 مستويات)</h1>
+    <p class="lede">أكثر الوحدات تعقيداً من ناحية الواجهة؛ يجب استخدام مكوّن شجري حقيقي وليس جدولاً مسطحاً.</p>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method get">GET</span><span class="path">/admin/categories</span></div>
+    <div class="ep-body">
+      <table class="spec">
+        <tr><th>type</th><th>شكل data</th></tr>
+        <tr><td><code>tree</code></td><td>Array شجري متداخل (children)</td></tr>
+        <tr><td><code>main</code> / <code>sub</code></td><td>Array مسطّح</td></tr>
+        <tr><td><code>all</code> / <code>trashed</code></td><td>Laravel Paginator</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method get">GET</span><span class="path">/admin/categories/dynamic</span></div>
+    <div class="ep-desc">Query: <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">parent_id</code> (اختياري، UUID). تحميل كسول (Lazy Loading) للأبناء عند الطلب — استخدمها فقط إن اخترت بناء الشجرة بنمط Lazy Node بدل جلب <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">type=tree</code> كاملة دفعة واحدة.</div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method post">POST</span><span class="path">/admin/categories/store</span></div>
+    <div class="ep-body">
+      <table class="spec">
+        <tr><th>الحقل</th><th>القاعدة</th></tr>
+        <tr><td><code>name</code></td><td>مطلوب، نص، حد أقصى 255</td></tr>
+        <tr><td><code>parent_id</code></td><td>اختياري، UUID موجود فعلياً</td></tr>
+        <tr><td><code>image_url</code></td><td>اختياري، نص (رابط)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method get">GET</span><span class="path">/admin/categories/{id}/show</span></div>
+    <div class="ep-desc">تفاصيل تصنيف واحد + الأبناء المباشرين + اسم الأب <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">parent_name</code>.</div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method put">PUT</span><span class="path">/admin/categories/{id}/update</span></div>
+    <div class="ep-desc">نفس حقول الإنشاء (كلها اختيارية). يحمي تلقائياً من جعل التصنيف أباً لنفسه أو نقله ليصبح تابعاً لأحد أبنائه — عطّل بصرياً هذه الخيارات في الفورم لتجربة أفضل، لكن لا تعتمد على الفرونت فقط كحماية وحيدة.</div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method post">POST</span><span class="path">/admin/categories/{id}/restore</span></div>
+    <div class="ep-desc">استعادة تصنيف من سلة المحذوفات (يعمل فقط على العناصر المحذوفة ناعماً — <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">onlyTrashed</code>).</div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method post">POST</span><span class="path">/admin/categories/{id}/move-branch</span></div>
+    <div class="ep-body">
+      <div class="note danger">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01"/></svg>
+        <div>الباك إند يحمي من: النقل داخل النفس، الحلقات المغلقة (نقل فرع ليصبح تابعاً لأحد أحفاده)، وتجاوز سقف 5 مستويات عمق. عند الرفض (400) أعد العنصر بصرياً لمكانه الأصلي.</div>
+      </div>
+    </div>
+  </div>
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method delete">DELETE</span><span class="path">/admin/categories/{id}/destroy</span></div>
+    <div class="ep-desc">يُرفض (400) إن كان للتصنيف منتجات مرتبطة (حتى بأعماقه) أو أبناء مباشرون.</div>
+  </div>
+
+  <div class="mockup-wrap">
+    <div class="mockup-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg> مثال بصري مقترح: شجرة قابلة للسحب والإفلات</div>
+    <div class="mockup">
+      <div class="tree-mock">
+        <div class="tnode"><svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg> 🗂️ الأزياء النسائية <span class="badge muted" style="margin-right:6px">42 منتج</span></div>
+        <div class="tline">
+          <div class="tnode">📁 فساتين</div>
+          <div class="tnode" style="background:#f7f4fd"><svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg> 📁 عبايات</div>
+          <div class="tline">
+            <div class="tnode">📄 عبايات كاجوال</div>
+            <div class="tnode">📄 عبايات سهرة</div>
+          </div>
+        </div>
+        <div class="tnode">🗂️ الإلكترونيات <span class="badge muted" style="margin-right:6px">18 منتج</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 07 PRODUCTS ============ -->
+<section id="s-products">
+  <div class="page-header">
+    <span class="eyebrow">07 · Products</span>
+    <h1>إدارة المنتجات</h1>
+    <p class="lede">فلترة شجرية للأقسام (تشمل الفروع تلقائياً)، ونقل جماعي بالتحديد المتعدد.</p>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method get">GET</span><span class="path">/admin/products</span></div>
+    <div class="ep-body">
+      <table class="spec">
+        <tr><th>Query</th><th>ملاحظة</th></tr>
+        <tr><td><code>tab</code></td><td>all / active / blocked</td></tr>
+        <tr><td><code>status</code></td><td>published / unpublished</td></tr>
+        <tr><td><code>category_id</code></td><td>يشمل تلقائياً كل التصنيفات الفرعية تحته (CTE)</td></tr>
+      </table>
+      <div class="note warn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01"/></svg>
+        <div>شكل الـ Pagination هنا <b>مختلف</b> — حقول <code>total, count, per_page, current_page, total_pages</code> منفصلة عن <code>data</code> (وليست كائن Paginator قياسي).</div>
+      </div>
+    </div>
+  </div>
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method post">POST</span><span class="path">/admin/products/{id}/toggle-approval</span></div>
+    <div class="ep-desc">يعكس <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">is_active</code> للمنتج (حظر/إظهار). Response يتضمن <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">is_active</code> الجديدة مباشرة — استخدمها للتحديث الفوري (Optimistic UI) بدل إعادة جلب القائمة كاملة.</div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method get">GET</span><span class="path">/admin/products/trending</span></div>
+    <div class="ep-desc">أعلى 10 منتجات حسب عدد مرات الإضافة للمفضلة. لا Pagination — Array ثابت الحجم.</div>
+<pre>{ <span class="k">"data"</span>: [{ <span class="k">"id"</span>: <span class="s">"uuid"</span>, <span class="k">"title"</span>: <span class="s">"..."</span>, <span class="k">"price"</span>: <span class="n">250</span>, <span class="k">"favorites_count"</span>: <span class="n">340</span> }] }</pre>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head"><span class="method post">POST</span><span class="path">/admin/products/move-products</span></div>
+    <div class="ep-desc">استخدم <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">product_ids</code> أو <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">from_category_id</code> (وليس الاثنين). يُرفض (422) إن كان الهدف تصنيفاً رئيسياً أو له أبناء.</div>
+  </div>
+
+  <div class="note danger" style="margin-top:1.4rem">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01"/></svg>
+    <div>يوجد <code>destroy()</code> لحذف منتج مفرد داخل الكونترولر لكن <b>بلا Route مسجَّل</b> في <code>admin.php</code>. لا تُضِف زر حذف منفرد قبل تأكيد إضافة الراوت من الباك إند.</div>
+  </div>
+
+  <div class="mockup-wrap">
+    <div class="mockup-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg> مثال بصري مقترح للواجهة</div>
+    <div class="mockup">
+      <div class="tbl-toolbar" style="background:#fff;border-radius:10px 10px 0 0;border:1px solid var(--border);border-bottom:none">
+        <span class="chip on">الكل</span><span class="chip">نشط</span><span class="chip">محظور</span>
+        <div style="flex:1"></div>
+        <span class="chip">📁 اختر تصنيف</span>
+        <div class="search-fake" style="max-width:160px"></div>
+      </div>
+      <div class="card-grid" style="background:#fff;border:1px solid var(--border);border-radius:0 0 12px 12px;padding:.9rem;margin-top:0">
+        <div class="item-card"><div class="item-thumb"></div><div class="item-title">فستان صيفي أزرق</div><div class="item-sub">⭐ 4.3 · 250 د.ل</div></div>
+        <div class="item-card"><div class="item-thumb"></div><div class="item-title">عباءة سوداء كلاسيك</div><div class="item-sub">⭐ 4.8 · 410 د.ل</div></div>
+        <div class="item-card"><div class="item-thumb" style="filter:grayscale(1)"></div><div class="item-title">حقيبة جلد (محظور)</div><div class="item-sub" style="color:var(--danger)">⭐ 3.1 · 180 د.ل</div></div>
+      </div>
+      <div class="card-mini" style="margin-top:12px;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:12px;color:var(--muted)">✓ تم تحديد 3 منتجات</span>
+        <div class="btn-fake" style="background:var(--primary);color:#fff;flex:none;padding:.5rem 1.2rem">نقل إلى تصنيف آخر</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 08 NOTES ============ -->
+<section id="s-notes">
+  <div class="page-header">
+    <span class="eyebrow">08 · Appendix</span>
+    <h1>مسارات ذُكرت في admin.php دون كود متحكم مرفق</h1>
+    <p class="lede">لم تُوثَّق تفصيلياً لتفادي التخمين. وثّقها فور توفّر أكواد المتحكمات.</p>
+  </div>
+  <table class="spec">
+    <tr><th>المسار</th><th>الوصف المتوقع</th></tr>
+    <tr><td><code>GET /admin/reports</code></td><td>عرض البلاغات</td></tr>
+    <tr><td><code>POST /admin/reports/{id}/resolve</code></td><td>حل بلاغ</td></tr>
+    <tr><td><code>POST /admin/management/users/{id}/promote-to-admin</code></td><td>ترقية مستخدم لأدمن</td></tr>
+    <tr><td><code>POST /admin/login</code></td><td>تسجيل دخول الأدمن</td></tr>
+  </table>
+</section>
+
+<!-- ============ 09 ARCH ============ -->
+<section id="s-arch">
+  <div class="page-header">
+    <span class="eyebrow">09 · Architecture</span>
+    <h1>بنية مشروع Angular المقترحة</h1>
+  </div>
+<pre>src/app/
+├── core/
+│   ├── interceptors/auth.interceptor.ts
+│   ├── models/api-response.model.ts
+│   └── guards/admin.guard.ts
+├── shared/
+│   ├── components/confirm-dialog/
+│   ├── components/type-to-confirm-dialog/
+│   ├── components/kpi-card/
+│   ├── components/category-tree-select/   <span class="cm">← يُعاد استخدامه في التصنيفات والمنتجات</span>
+│   └── components/status-badge/
+└── features/
+    └── admin/
+        ├── dashboard/
+        ├── buyers/           <span class="cm">← يشمل تبويب "تجار" (endpoints مختلفة)</span>
+        ├── sellers/          <span class="cm">← toggle-status و destroy فقط</span>
+        ├── applications/
+        ├── shops/
+        ├── categories/
+        └── products/</pre>
+  <p style="color:var(--muted);font-size:13.5px">كل Feature Module يحتوي: <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">*.service.ts</code> + <code style="background:var(--accent-light);padding:1px 6px;border-radius:5px">*.model.ts</code> مطابقة تماماً لما هو موثّق، بالإضافة إلى مكوّنات القائمة والتفاصيل والفورمات.</p>
+
+  <footer>توثيق داخلي — لوحة تحكم أدمن مآب · لأغراض التطوير فقط</footer>
+</section>
+
+</main>
+
+<script>
+document.querySelectorAll('.nav-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.target).classList.add('active');
+    document.querySelector('main').scrollTo({top:0,behavior:'smooth'});
+  });
+});
+</script>
+
+</body>
+</html>

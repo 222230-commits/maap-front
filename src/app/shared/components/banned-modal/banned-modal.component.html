@@ -1,0 +1,96 @@
+<div class="banned-lockout-backdrop"
+     (click)="onBackdropClick($event)"
+     role="alertdialog"
+     aria-modal="true"
+     aria-labelledby="bannedTitle">
+
+  <!-- Toast عند محاولة النقر خارج النافذة للهروب -->
+  @if (showBackdropWarning()) {
+    <div class="banned-warning-toast" role="alert">
+      <i class="fas fa-shield-alt"></i>
+      <span>حسابك محظور بالكامل! تم قفل التصفح ومنع كافة العمليات لحين مراجعة الإدارة.</span>
+    </div>
+  }
+
+  <div class="banned-lockout-card" [class.shake-anim]="shake()">
+
+    <div class="banned-message">
+      <i class="fas fa-ban"></i>
+      <h2 id="bannedTitle">تم تعليق حسابك</h2>
+      <p>إذا كنت تعتقد أن هذا خطأ، تواصل معنا مباشرة:</p>
+      <div class="contact-options">
+        <a href="mailto:support@dalilni.ly" class="contact-email">
+          <i class="fas fa-envelope"></i>
+          support@dalilni.ly
+        </a>
+        <a href="https://wa.me/218XXXXXXXXX" target="_blank" class="contact-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+          تواصل عبر واتساب
+        </a>
+      </div>
+    </div>
+
+    <!-- سبب الإيقاف -->
+    <div class="ban-reason-box">
+      <div class="ban-reason-label">
+        <i class="fas fa-exclamation-circle"></i>
+        <span>سبب الإيقاف المعتمد:</span>
+      </div>
+      <p class="ban-reason-text">{{ banReason() }}</p>
+    </div>
+
+    <!-- القيود المفروضة -->
+    <div class="restrictions-view">
+      <div class="restrictions-intro">
+        <i class="fas fa-lock"></i>
+        <span>حسب قرار الإدارة، يمنع هذا الحساب من العمليات التالية:</span>
+      </div>
+
+      <div class="restrictions-grid">
+        <div class="restriction-item">
+          <div class="res-icon buy"><i class="fas fa-shopping-cart"></i></div>
+          <div class="res-info">
+            <strong>ممنوع من الشراء والطلب</strong>
+            <p>تم تعطيل إمكانية إتمام الطلبات أو استخدام سلة المشتريات والدفع.</p>
+          </div>
+        </div>
+
+        <div class="restriction-item">
+          <div class="res-icon browse"><i class="fas fa-eye-slash"></i></div>
+          <div class="res-info">
+            <strong>ممنوع من تصفح المنتجات</strong>
+            <p>تم تعليق استعراض تفاصيل المنتجات والأسعار والعروض عبر المنصة.</p>
+          </div>
+        </div>
+
+        <div class="restriction-item">
+          <div class="res-icon follow"><i class="fas fa-store-slash"></i></div>
+          <div class="res-info">
+            <strong>ممنوع من متابعة المتاجر</strong>
+            <p>تم تعطيل متابعة المتاجر أو التفاعل مع التقييمات وقوائم الرغبات.</p>
+          </div>
+        </div>
+
+        <div class="restriction-item">
+          <div class="res-icon sell"><i class="fas fa-box-open"></i></div>
+          <div class="res-info">
+            <strong>ممنوع من البيع وإدارة المتجر</strong>
+            <p>تم تجميد المتجر بالكامل وإخفاء المنتجات عن المتسوقين إن كنت تاجراً.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- أزرار الإجراءات -->
+      <div class="modal-action-buttons">
+        <button type="button" class="btn-relogin" (click)="relogin()">
+          <i class="fas fa-sync-alt"></i> هل رَفعت الإدارة الحظر؟ تحديث حالة الحساب
+        </button>
+
+        <button type="button" class="btn-logout" (click)="logout()">
+          <i class="fas fa-sign-out-alt"></i> تسجيل الخروج من الحساب
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

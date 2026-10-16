@@ -1,19 +1,29 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-splash-screen',
-  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   templateUrl: './splash-screen.component.html',
   styleUrl: './splash-screen.component.scss'
 })
 export class SplashScreenComponent implements OnInit {
-  showSplash = signal(true);
+  isVisible = signal(true);
+  progress = signal(0);
 
   ngOnInit(): void {
-    setTimeout(() => {
-      this.showSplash.set(false);
-    }, 2500);
+    // progress bar animation
+    let p = 0;
+    const timer = setInterval(() => {
+      p += 2;
+      this.progress.set(p);
+      if (p >= 100) {
+        clearInterval(timer);
+        setTimeout(() => {
+          this.isVisible.set(false);
+        }, 300);
+      }
+    }, 30);
   }
 }

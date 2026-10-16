@@ -1,271 +1,260 @@
-<div class="space-y-6">
-  <!-- Header & Stats -->
-  <div class="bg-white dark:bg-darkest rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm p-6">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">المستخدمون</h1>
-      
-      <!-- Quick Stats -->
-      <div class="flex flex-wrap gap-3">
-        <div class="px-4 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 flex items-center gap-2">
-          <i class="fas fa-users text-gray-400"></i>
-          <span class="text-sm text-gray-600 dark:text-gray-300">الإجمالي:</span>
-          <span class="font-bold text-gray-900 dark:text-white">{{ totalUsers() }}</span>
-        </div>
-        <div class="px-4 py-2 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-100 dark:border-blue-800 flex items-center gap-2">
-          <i class="fas fa-shopping-bag text-blue-400"></i>
-          <span class="text-sm text-blue-700 dark:text-blue-300">مشترون:</span>
-          <span class="font-bold text-blue-900 dark:text-blue-100">{{ totalBuyers() }}</span>
-        </div>
-        <div class="px-4 py-2 bg-purple-50 dark:bg-purple-900/10 rounded-lg border border-purple-100 dark:border-purple-800 flex items-center gap-2">
-          <i class="fas fa-store text-purple-400"></i>
-          <span class="text-sm text-purple-700 dark:text-purple-300">تجار:</span>
-          <span class="font-bold text-purple-900 dark:text-purple-100">{{ totalMerchants() }}</span>
-        </div>
-        <div class="px-4 py-2 bg-red-50 dark:bg-red-900/10 rounded-lg border border-red-100 dark:border-red-800 flex items-center gap-2">
-          <i class="fas fa-ban text-red-400"></i>
-          <span class="text-sm text-red-700 dark:text-red-300">محظورون:</span>
-          <span class="font-bold text-red-900 dark:text-red-100">{{ totalBanned() }}</span>
-        </div>
-      </div>
+<div class="admin-page">
+
+  <div class="admin-topbar">
+    <div>
+      <h2 class="page-title">
+        <i class="fas fa-users"></i>
+        إدارة المستخدمين
+      </h2>
+      <p class="page-sub">{{ displayRange() }}</p>
     </div>
 
-    <!-- Search & Tabs -->
-    <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
-      <!-- Tabs -->
-      <div class="flex gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
-        <button (click)="activeTab.set('all')"
-                class="px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
-                [class.bg-primary]="activeTab() === 'all'"
-                [class.text-white]="activeTab() === 'all'"
-                [class.bg-gray-100]="activeTab() !== 'all'"
-                [class.text-gray-600]="activeTab() !== 'all'"
-                [class.dark:bg-gray-800]="activeTab() !== 'all'"
-                [class.dark:text-gray-300]="activeTab() !== 'all'">
-          الكل
-        </button>
-        <button (click)="activeTab.set('buyers')"
-                class="px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
-                [class.bg-primary]="activeTab() === 'buyers'"
-                [class.text-white]="activeTab() === 'buyers'"
-                [class.bg-gray-100]="activeTab() !== 'buyers'"
-                [class.text-gray-600]="activeTab() !== 'buyers'"
-                [class.dark:bg-gray-800]="activeTab() !== 'buyers'"
-                [class.dark:text-gray-300]="activeTab() !== 'buyers'">
-          المشترون
-        </button>
-        <button (click)="activeTab.set('merchants')"
-                class="px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
-                [class.bg-primary]="activeTab() === 'merchants'"
-                [class.text-white]="activeTab() === 'merchants'"
-                [class.bg-gray-100]="activeTab() !== 'merchants'"
-                [class.text-gray-600]="activeTab() !== 'merchants'"
-                [class.dark:bg-gray-800]="activeTab() !== 'merchants'"
-                [class.dark:text-gray-300]="activeTab() !== 'merchants'">
-          التجار
-        </button>
-        <button (click)="activeTab.set('banned')"
-                class="px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
-                [class.bg-red-600]="activeTab() === 'banned'"
-                [class.text-white]="activeTab() === 'banned'"
-                [class.bg-gray-100]="activeTab() !== 'banned'"
-                [class.text-gray-600]="activeTab() !== 'banned'"
-                [class.dark:bg-gray-800]="activeTab() !== 'banned'"
-                [class.dark:text-gray-300]="activeTab() !== 'banned'">
-          المحظورون
-        </button>
+    @if (countsSummary().buyers !== null || countsSummary().sellers !== null) {
+      <div class="stats-pills">
+        <span class="stat-pill buyers">
+          <i class="fas fa-shopping-bag"></i>
+          <span>الزبائن: <strong>{{ countsSummary().buyers ?? 0 }}</strong></span>
+        </span>
+        <span class="stat-pill sellers">
+          <i class="fas fa-store"></i>
+          <span>التجار: <strong>{{ countsSummary().sellers ?? 0 }}</strong></span>
+        </span>
+        <span class="stat-pill total">
+          <i class="fas fa-users"></i>
+          <span>الإجمالي: <strong>{{ countsSummary().total }}</strong></span>
+        </span>
       </div>
-
-      <!-- Search Bar -->
-      <div class="relative w-full md:w-96">
-        <i class="fas fa-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-        <input type="text"
-               [ngModel]="searchQuery()"
-               (ngModelChange)="updateSearch($event)"
-               placeholder="ابحث بالاسم أو البريد الإلكتروني..."
-               class="w-full pl-4 pr-10 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none">
-      </div>
-    </div>
+    }
   </div>
 
-  <!-- Grid View -->
-  @if (filteredUsers().length > 0) {
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      @for (user of filteredUsers(); track user.id) {
-        <div class="bg-white dark:bg-darkest rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden hover:shadow-md hover:border-primary/30 transition-all flex flex-col items-center p-6 text-center">
-          
-          <!-- Status Badge (Top Right) -->
-          <div class="w-full flex justify-end mb-2">
-            @if (user.status === 'active') {
-              <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-bold rounded shadow-sm border border-green-200">نشط</span>
-            } @else {
-              <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-bold rounded shadow-sm border border-red-200">محظور</span>
-            }
-          </div>
+  <div class="admin-content">
 
-          <!-- User Icon & Name -->
-          <i class="fas fa-user-circle text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
-          <h2 class="text-lg font-bold text-gray-900 dark:text-white line-clamp-1 w-full">{{ user.name }}</h2>
-          <p class="text-sm text-gray-500 dark:text-gray-400 mb-3 line-clamp-1 w-full" dir="ltr">{{ user.email }}</p>
-
-          <!-- Role Badge -->
-          @if (user.role === 'buyer') {
-            <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-full mb-4 shadow-sm">مشتري</span>
-          } @else {
-            <span class="px-3 py-1 bg-purple-100 text-purple-800 text-xs font-bold rounded-full mb-4 shadow-sm">تاجر</span>
-          }
-
-          <!-- Stats -->
-          <div class="flex items-center justify-between w-full text-sm text-gray-600 dark:text-gray-300 mb-6 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg border border-gray-100 dark:border-gray-700">
-            <div class="flex flex-col items-center gap-1">
-              <i class="fas fa-calendar text-gray-400"></i>
-              <span class="text-xs">{{ user.joinDate }}</span>
-            </div>
-            <div class="w-px h-8 bg-gray-200 dark:bg-gray-700"></div>
-            <div class="flex flex-col items-center gap-1">
-              <i class="fas fa-shopping-bag text-gray-400"></i>
-              <span class="text-xs">{{ user.ordersCount }} طلب</span>
-            </div>
-          </div>
-
-          <!-- Actions -->
-          <div class="w-full flex gap-2">
-            <button (click)="openProfile(user)" class="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-bold rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors shadow-sm border border-gray-200 dark:border-gray-700">
-              البروفايل
-            </button>
-            <button (click)="confirmToggle(user)" 
-                    class="w-10 h-10 flex items-center justify-center rounded-lg text-white transition-colors shadow-sm"
-                    [class.bg-red-600]="user.status === 'active'"
-                    [class.hover:bg-red-700]="user.status === 'active'"
-                    [class.bg-green-600]="user.status === 'banned'"
-                    [class.hover:bg-green-700]="user.status === 'banned'"
-                    [title]="user.status === 'active' ? 'حظر المستخدم' : 'تفعيل المستخدم'">
-              @if (user.status === 'active') {
-                <i class="fas fa-ban"></i>
-              } @else {
-                <i class="fas fa-check"></i>
-              }
-            </button>
-          </div>
-        </div>
-      }
-    </div>
-  } @else {
-    <div class="bg-white dark:bg-darkest rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm p-16 flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
-      <div class="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center text-5xl mb-6">
-        <i class="fas fa-users-slash"></i>
-      </div>
-      <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">لا يوجد مستخدمون</h3>
-      <p>لم يتم العثور على أي مستخدمين يطابقون بحثك.</p>
-    </div>
-  }
-</div>
-
-<!-- Profile Modal -->
-@if (showProfileModal() && selectedUser()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-    <div class="bg-white dark:bg-darkest w-full max-w-md rounded-2xl shadow-2xl flex flex-col">
-      
-      <!-- Modal Header -->
-      <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
-        <h2 class="text-xl font-bold text-gray-900 dark:text-white">بروفايل المستخدم</h2>
-        <button (click)="closeProfile()" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-
-      <!-- Modal Body -->
-      <div class="p-6 flex flex-col items-center text-center">
-        <i class="fas fa-user-circle text-8xl text-gray-300 dark:text-gray-600 mb-4"></i>
-        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-1">{{ selectedUser()?.name }}</h3>
-        <p class="text-gray-500 dark:text-gray-400 mb-6" dir="ltr">{{ selectedUser()?.email }}</p>
-
-        <div class="flex gap-2 justify-center mb-8">
-          @if (selectedUser()?.role === 'buyer') {
-            <span class="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-bold rounded-full">مشتري</span>
-          } @else {
-            <span class="px-3 py-1 bg-purple-100 text-purple-800 text-sm font-bold rounded-full">تاجر</span>
-          }
-          
-          @if (selectedUser()?.status === 'active') {
-            <span class="px-3 py-1 bg-green-100 text-green-800 text-sm font-bold rounded-full">حساب نشط</span>
-          } @else {
-            <span class="px-3 py-1 bg-red-100 text-red-800 text-sm font-bold rounded-full">حساب محظور</span>
-          }
-        </div>
-
-        <div class="w-full bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 grid grid-cols-2 gap-4 border border-gray-100 dark:border-gray-700">
-          <div class="text-center">
-            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">تاريخ التسجيل</p>
-            <p class="font-bold text-gray-900 dark:text-white">{{ selectedUser()?.joinDate }}</p>
-          </div>
-          <div class="text-center">
-            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">عدد الطلبات</p>
-            <p class="font-bold text-gray-900 dark:text-white">{{ selectedUser()?.ordersCount }}</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Modal Footer -->
-      <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/30 rounded-b-2xl flex gap-3">
-        <button (click)="closeProfile()" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-darkest hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-          إغلاق
-        </button>
-        <button (click)="confirmToggle(selectedUser()!)" 
-                class="flex-1 px-4 py-2 rounded-lg text-sm font-bold text-white transition-colors flex items-center justify-center gap-2 shadow-sm"
-                [class.bg-red-600]="selectedUser()?.status === 'active'"
-                [class.hover:bg-red-700]="selectedUser()?.status === 'active'"
-                [class.bg-green-600]="selectedUser()?.status === 'banned'"
-                [class.hover:bg-green-700]="selectedUser()?.status === 'banned'">
-          @if (selectedUser()?.status === 'active') {
-            <i class="fas fa-ban"></i> حظر الحساب
-          } @else {
-            <i class="fas fa-check"></i> تفعيل الحساب
-          }
-        </button>
-      </div>
-
-    </div>
-  </div>
-}
-
-<!-- Confirm Action Modal -->
-@if (showConfirmModal() && selectedUser()) {
-  <div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-    <div class="bg-white dark:bg-darkest w-full max-w-sm rounded-2xl shadow-2xl flex flex-col p-6 text-center">
-      <div class="w-20 h-20 rounded-full mx-auto mb-5 flex items-center justify-center text-4xl shadow-inner"
-           [class.bg-red-100]="selectedUser()?.status === 'active'"
-           [class.text-red-600]="selectedUser()?.status === 'active'"
-           [class.bg-green-100]="selectedUser()?.status === 'banned'"
-           [class.text-green-600]="selectedUser()?.status === 'banned'">
-        @if (selectedUser()?.status === 'active') {
-          <i class="fas fa-exclamation-triangle"></i>
-        } @else {
-          <i class="fas fa-check-circle"></i>
+    <div class="controls-row">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="ابحث بالاسم أو البريد الإلكتروني..."
+               [value]="searchQuery()"
+               (input)="updateSearch($any($event.target).value)" />
+        @if (searchQuery()) {
+          <button type="button" class="clear-search-btn" (click)="clearSearch()" title="إلغاء البحث">
+            <i class="fas fa-times"></i>
+          </button>
         }
       </div>
-      
-      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
-        {{ selectedUser()?.status === 'active' ? 'تأكيد الحظر' : 'تأكيد التفعيل' }}
-      </h3>
-      
-      <p class="text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
-        هل أنت متأكد من {{ selectedUser()?.status === 'active' ? 'حظر' : 'تفعيل' }} حساب <br>
-        <span class="font-bold text-gray-900 dark:text-white text-lg mt-1 inline-block">{{ selectedUser()?.name }}</span>؟
-      </p>
 
-      <div class="flex gap-3 w-full">
-        <button (click)="cancelToggle()" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-darkest hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-          إلغاء
+      <!-- فلتر نوع الحساب -->
+      <div class="tabs-bar role-tabs">
+        <button [class.active]="roleFilter() === 'all'" (click)="changeRole('all')">
+          <i class="fas fa-users"></i> الكل
         </button>
-        <button (click)="executeToggle()" 
-                class="flex-1 px-4 py-2 rounded-lg text-sm font-bold text-white transition-colors shadow-sm"
-                [class.bg-red-600]="selectedUser()?.status === 'active'"
-                [class.hover:bg-red-700]="selectedUser()?.status === 'active'"
-                [class.bg-green-600]="selectedUser()?.status === 'banned'"
-                [class.hover:bg-green-700]="selectedUser()?.status === 'banned'">
-          تأكيد
+        <button [class.active]="roleFilter() === 'buyer'" (click)="changeRole('buyer')">
+          <i class="fas fa-shopping-bag"></i> زبائن
+        </button>
+        <button [class.active]="roleFilter() === 'seller'" (click)="changeRole('seller')">
+          <i class="fas fa-store"></i> تجار
         </button>
       </div>
+
+      <!-- فلتر حالة الحساب -->
+      <div class="tabs-bar status-tabs">
+        <button [class.active]="activeTab() === 'all'" (click)="changeTab('all')">
+          كافة الحالات
+        </button>
+        <button [class.active]="activeTab() === 'active'" (click)="changeTab('active')">
+          <i class="fas fa-check-circle"></i> نشط
+        </button>
+        <button [class.active]="activeTab() === 'banned'" (click)="changeTab('banned')">
+          <i class="fas fa-ban"></i> محظور
+        </button>
+      </div>
+
+      <!-- عدد العناصر في الصفحة -->
+      <div class="per-page-selector">
+        <label for="userPerPage">عرض:</label>
+        <select id="userPerPage" [value]="perPage()" (change)="changePerPage(+$any($event.target).value)">
+          <option [value]="15">15 في الصفحة</option>
+          <option [value]="30">30 في الصفحة</option>
+          <option [value]="50">50 في الصفحة</option>
+          <option [value]="100">100 في الصفحة</option>
+        </select>
+      </div>
     </div>
+
+    @if (isLoading()) {
+      <div class="content-loading">
+        <i class="fas fa-circle-notch fa-spin"></i>
+        <p>جاري تحميل المستخدمين...</p>
+      </div>
+    }
+
+    @if (error()) {
+      <div class="content-error">
+        <i class="fas fa-exclamation-triangle"></i>
+        <p>{{ error() }}</p>
+        <button (click)="loadUsers()"><i class="fas fa-redo"></i> إعادة المحاولة</button>
+      </div>
+    }
+
+    @if (!isLoading() && !error()) {
+      @if (allUsers().length === 0) {
+        <div class="content-empty">
+          <i class="fas fa-users-slash"></i>
+          <p>لا يوجد مستخدمون يطابقون خيارات البحث أو التصفية</p>
+        </div>
+      } @else {
+        <div class="users-table">
+          @for (user of allUsers(); track user.id) {
+            <div class="user-row">
+              <div class="user-identity">
+                <div class="user-av" [class.banned]="!user.is_active">
+                  @if (user.avatar_url) {
+                    <img [src]="user.avatar_url" [alt]="user.full_name" />
+                  } @else {
+                    <i class="fas fa-user"></i>
+                  }
+                </div>
+                <div class="user-info">
+                  <h4>{{ user.full_name }}</h4>
+                  <p>{{ user.email }}</p>
+                  @if (user.phone_number) {
+                    <span class="user-phone"><i class="fas fa-phone"></i> {{ user.phone_number }}</span>
+                  }
+                </div>
+              </div>
+              <div class="user-meta">
+                <span class="user-city"><i class="fas fa-map-marker-alt"></i> {{ user.address || '—' }}</span>
+                <span class="user-date"><i class="fas fa-calendar"></i> {{ formatDate(user.created_at) }}</span>
+              </div>
+              <div class="user-badges">
+                @if (user.role === 'seller') {
+                  <span class="role-badge seller">
+                    <i class="fas fa-store"></i> تاجر
+                    @if (user.shop?.business_name) {
+                      <small class="shop-badge-name">({{ user.shop?.business_name }})</small>
+                    }
+                  </span>
+                } @else {
+                  <span class="role-badge buyer"><i class="fas fa-shopping-bag"></i> زبون</span>
+                }
+                <span class="status-badge" [class.active]="user.is_active" [class.banned]="!user.is_active">
+                  @if (user.is_active) { <i class="fas fa-check-circle"></i> نشط } @else { <i class="fas fa-ban"></i> محظور }
+                </span>
+                <span class="verify-badge" [class.verified]="user.email_verified">
+                  @if (user.email_verified) { <i class="fas fa-shield-alt"></i> موثق } @else { <i class="fas fa-clock"></i> غير موثق }
+                </span>
+              </div>
+              <div class="user-actions">
+                <button class="action-btn view" (click)="openProfile(user)" title="عرض التفاصيل"><i class="fas fa-eye"></i></button>
+                <button class="action-btn toggle" [class.is-active]="user.is_active" [disabled]="isToggling() === user.id" (click)="toggleStatus(user)" [title]="user.is_active ? 'حظر الحساب' : 'تفعيل الحساب'">
+                  @if (isToggling() === user.id) { <i class="fas fa-spinner fa-spin"></i> } @else if (user.is_active) { <i class="fas fa-ban"></i> } @else { <i class="fas fa-check-circle"></i> }
+                </button>
+                <button class="action-btn delete" (click)="confirmDelete(user.id)" title="حذف المستخدم"><i class="fas fa-trash"></i></button>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- شريط ترقيم الصفحات (Pagination) -->
+        @if (lastPage() > 1) {
+          <div class="pagination-container">
+            <div class="pagination-info">
+              <span>{{ displayRange() }}</span>
+            </div>
+
+            <div class="pagination-controls">
+              <button class="page-btn nav-btn" 
+                      [disabled]="currentPage() === 1" 
+                      (click)="goToPage(1)" 
+                      title="الصفحة الأولى">
+                <i class="fas fa-angle-double-right"></i>
+              </button>
+
+              <button class="page-btn nav-btn" 
+                      [disabled]="currentPage() === 1" 
+                      (click)="goToPage(currentPage() - 1)" 
+                      title="الصفحة السابقة">
+                <i class="fas fa-chevron-right"></i> السابق
+              </button>
+
+              <div class="page-numbers">
+                @for (p of pages(); track p) {
+                  <button class="page-btn num-btn" 
+                          [class.active]="p === currentPage()" 
+                          (click)="goToPage(p)">
+                    {{ p }}
+                  </button>
+                }
+              </div>
+
+              <button class="page-btn nav-btn" 
+                      [disabled]="currentPage() === lastPage()" 
+                      (click)="goToPage(currentPage() + 1)" 
+                      title="الصفحة التالية">
+                التالي <i class="fas fa-chevron-left"></i>
+              </button>
+
+              <button class="page-btn nav-btn" 
+                      [disabled]="currentPage() === lastPage()" 
+                      (click)="goToPage(lastPage())" 
+                      title="الصفحة الأخيرة">
+                <i class="fas fa-angle-double-left"></i>
+              </button>
+            </div>
+          </div>
+        }
+      }
+    }
+
   </div>
-}
+
+  @if (showProfileModal() && selectedUser()) {
+    <div class="modal-backdrop" (click)="closeProfile()"></div>
+    <div class="side-modal">
+      <div class="side-modal-header">
+        <div class="modal-user-av"><i class="fas fa-user"></i></div>
+        <div>
+          <h3>{{ selectedUser()!.full_name }}</h3>
+          <p>{{ selectedUser()!.email }}</p>
+        </div>
+        <button class="close-btn" (click)="closeProfile()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="side-modal-body">
+        <div class="modal-info-row">
+          <i class="fas fa-id-badge"></i>
+          <span>نوع الحساب: <strong>{{ selectedUser()!.role === 'seller' ? 'تاجر' : 'مشتري' }}</strong></span>
+        </div>
+        @if (selectedUser()!.shop?.business_name) {
+          <div class="modal-info-row">
+            <i class="fas fa-store"></i>
+            <span>اسم المتجر: <strong>{{ selectedUser()!.shop?.business_name }}</strong></span>
+          </div>
+        }
+        <div class="modal-info-row"><i class="fas fa-phone"></i><span>{{ selectedUser()!.phone_number || '—' }}</span></div>
+        <div class="modal-info-row"><i class="fas fa-map-marker-alt"></i><span>{{ selectedUser()!.address || '—' }}</span></div>
+        <div class="modal-info-row"><i class="fas fa-calendar"></i><span>تاريخ الانضمام: {{ formatDate(selectedUser()!.created_at) }}</span></div>
+        <div class="modal-info-row"><i class="fas fa-shield-alt"></i><span>@if (selectedUser()!.email_verified) { البريد موثق } @else { البريد غير موثق }</span></div>
+        <div class="modal-status-section">
+          <span class="status-badge" [class.active]="selectedUser()!.is_active" [class.banned]="!selectedUser()!.is_active">
+            @if (selectedUser()!.is_active) { <i class="fas fa-check-circle"></i> حساب نشط } @else { <i class="fas fa-ban"></i> حساب محظور }
+          </span>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showDeleteConfirm()) {
+    <div class="modal-backdrop" (click)="cancelDelete()"></div>
+    <div class="confirm-modal">
+      <div class="confirm-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
+      <h3>تأكيد الحذف</h3>
+      <p>هل أنت متأكد؟ لا يمكن التراجع عن هذا الإجراء.</p>
+      <div class="confirm-actions">
+        <button class="btn-confirm-delete" (click)="deleteUser(showDeleteConfirm()!)" [disabled]="isDeleting()">
+          @if (isDeleting()) { <i class="fas fa-spinner fa-spin"></i> } @else { <i class="fas fa-trash"></i> } حذف نهائياً
+        </button>
+        <button class="btn-cancel" (click)="cancelDelete()">إلغاء</button>
+      </div>
+    </div>
+  }
+
+</div>
