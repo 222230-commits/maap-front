@@ -24,10 +24,12 @@ jobs:
         run: npm install
 
       - name: Build the project
-        run: npx ng build --base-href /${{ github.event.repository.name }}/
+        run: |
+          npx ng build --base-href /${{ github.event.repository.name }}/
+          cp dist/ourwebsite/browser/index.html dist/ourwebsite/browser/404.html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist/maap-front/browser
+          publish_dir: ./dist/ourwebsite/browser
