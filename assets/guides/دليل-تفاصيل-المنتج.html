@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>دليل ربط الفرونت إند - تفاصيل المنتج والسلة</title>
+<style>
+  :root{
+    --bg:#F7F6F2; --card:#FFFFFF; --border:#E3E1D8; --text:#2C2C2A; --muted:#5F5E5A;
+    --teal:#0F6E56; --teal-light:#E1F5EE; --teal-dark:#04342C;
+    --coral:#993C1D; --coral-light:#FAECE7; --coral-dark:#4A1B0C;
+    --purple:#534AB7; --purple-light:#EEEDFE; --purple-dark:#26215C;
+    --gray:#5F5E5A; --gray-light:#F1EFE8;
+    --code-bg:#1E2320; --code-text:#E1F5EE;
+    --blue:#185FA5; --blue-light:#E6F1FB;
+    --green:#3B6D11; --green-light:#EAF3DE;
+    --red:#A32D2D; --red-light:#FCEBEB;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+  code, .mono{font-family:Consolas,"Courier New",monospace}
+  code[dir="ltr"], .mono[dir="ltr"]{direction:ltr;unicode-bidi:embed}
+
+  nav.side{position:sticky;top:0;height:100vh;width:250px;flex:0 0 250px;background:var(--card);border-left:1px solid var(--border);padding:24px 16px;overflow-y:auto}
+  nav.side h4{font-size:12px;color:var(--muted);text-transform:uppercase;margin:20px 0 8px;letter-spacing:.5px}
+  nav.side a{display:block;padding:7px 10px;border-radius:8px;color:var(--text);text-decoration:none;font-size:14px;margin-bottom:2px}
+  nav.side a:hover{background:var(--teal-light);color:var(--teal-dark)}
+
+  main{flex:1;padding:40px 48px;max-width:980px}
+  .eyebrow{color:var(--teal);font-size:13px;font-weight:600;letter-spacing:.5px;margin-bottom:6px}
+  h1{font-size:28px;margin:0 0 10px}
+  .lead{color:var(--muted);font-size:15px;max-width:720px;line-height:1.7}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin:20px 0}
+  h2{font-size:20px;border-bottom:2px solid var(--teal-light);padding-bottom:10px;margin-top:48px}
+  h3{font-size:16px;color:var(--teal-dark)}
+
+  table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0}
+  th,td{border:1px solid var(--border);padding:8px 12px;text-align:right}
+  th{background:var(--teal-light);color:var(--teal-dark);font-weight:600}
+  tr:nth-child(even) td{background:#FBFAF7}
+
+  .pill{display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:600;font-family:Consolas,monospace;direction:ltr}
+  .pill-get{background:var(--blue-light);color:var(--blue)}
+  .pill-post{background:var(--teal-light);color:var(--teal-dark)}
+
+  .route-line{display:flex;align-items:center;gap:10px;margin:14px 0}
+  .route-line code{background:var(--code-bg);color:var(--code-text);padding:6px 12px;border-radius:8px;font-size:14px}
+
+  pre{background:var(--code-bg);color:var(--code-text);padding:16px;border-radius:10px;overflow-x:auto;font-size:13px;direction:ltr;text-align:left}
+
+  .callout{border-radius:10px;padding:14px 16px;margin:14px 0;font-size:14px;line-height:1.7;border-right:4px solid}
+  .callout.warn{background:var(--coral-light);border-color:var(--coral);color:var(--coral-dark)}
+  .callout.tip{background:var(--teal-light);border-color:var(--teal);color:var(--teal-dark)}
+  .callout b{display:block;margin-bottom:4px}
+
+  /* مخطط التدفق */
+  .flow{display:flex;flex-direction:column;align-items:center;gap:6px;margin:20px 0}
+  .fbox{background:var(--purple-light);color:var(--purple-dark);border:1px solid var(--purple);border-radius:10px;padding:10px 18px;font-size:13px;text-align:center;min-width:220px}
+  .fbox.gray{background:var(--gray-light);color:var(--gray);border-color:var(--border)}
+  .fbox.end-bad{background:var(--red-light);color:var(--red);border-color:var(--red)}
+  .fbox.end-good{background:var(--green-light);color:var(--green);border-color:var(--green)}
+  .arrow{font-size:18px;color:var(--muted)}
+  .branch{display:flex;gap:40px;justify-content:center;width:100%}
+  .branch .col{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .branch .label{font-size:11px;color:var(--muted)}
+
+  /* موك-أب موبايل */
+  .phone{width:280px;margin:16px auto;background:var(--card);border:8px solid #222;border-radius:32px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.15)}
+  .screen{background:var(--card)}
+  .screen .gallery{height:220px;background:var(--gray-light);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;border-bottom:1px solid var(--border)}
+  .row{display:flex;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);align-items:center}
+  .swatch{width:26px;height:26px;border-radius:50%;border:2px solid var(--border)}
+  .swatch.active{border-color:var(--teal)}
+  .content{padding:12px 14px}
+  .title-row{font-size:14px;font-weight:600;margin-bottom:4px}
+  .price-row{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
+  .price{font-size:17px;font-weight:700;color:var(--teal-dark)}
+  .old-price{font-size:12px;color:var(--muted);text-decoration:line-through}
+  .discount-badge{font-size:11px;background:var(--coral-light);color:var(--coral-dark);padding:2px 6px;border-radius:5px}
+  .size-row .size{font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:6px}
+  .size.active{border-color:var(--teal);color:var(--teal-dark)}
+  .add-btn{width:100%;background:var(--teal);color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;margin-top:6px}
+  .add-btn.disabled{background:var(--gray-light);color:var(--muted)}
+
+  .badge-endpoint{display:block;text-align:center;margin-top:10px;font-size:11px}
+  .badge-endpoint span{background:var(--blue-light);color:var(--blue);padding:3px 10px;border-radius:6px;font-family:Consolas,monospace;direction:ltr;display:inline-block}
+
+  ol.tips{margin:0;padding-inline-start:20px;font-size:14px;line-height:1.9}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--border);color:var(--muted);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+
+<nav class="side">
+  <h4>تصفح المنتج</h4>
+  <a href="#overview">نظرة عامة</a>
+  <a href="#endpoint">GET /products/{slug}</a>
+  <a href="#flow">مخطط التدفق</a>
+  <a href="#mockup">موك-أب الشاشة</a>
+
+  <h4>ربط السلة</h4>
+  <a href="#cart">من تفاصيل المنتج إلى السلة</a>
+
+  <h4>مرجع سريع</h4>
+  <a href="#errors">جدول الأخطاء</a>
+  <a href="#tips">نصائح عملية</a>
+  <a href="#backend-note">ملاحظة للباك إند</a>
+</nav>
+
+<main>
+  <div class="eyebrow">دليل ربط الفرونت إند</div>
+  <h1>صفحة تفاصيل المنتج (عرض + ألوان + صور) وربطها بالسلة</h1>
+  <p class="lead">
+    توثيق كامل لمسار <code dir="ltr">GET /products/{slug}</code> ودالة <code dir="ltr">ProductDetailResource</code>،
+    مع توضيح الفخاخ التي قد يقع فيها الفرونت إند لو اعتمد فقط على اسم الحقل أو التخمين المنطقي،
+    وكيفية استخدام هذه البيانات عند إضافة المنتج للسلة.
+  </p>
+
+  <h2 id="overview">نظرة عامة واختيار الأداة</h2>
+  <table>
+    <tr><th>الميزة</th><th>الأداة المناسبة</th><th>السبب</th></tr>
+    <tr>
+      <td>شاشة تفاصيل المنتج (معرض صور، اختيار لون/مقاس، تقييمات)</td>
+      <td>Flutter</td>
+      <td>تصفح تسلسلي وتفاعل مباشر مع الصور والألوان، لا حاجة لجداول أو تحكم متعدد العناصر</td>
+    </tr>
+    <tr>
+      <td>إضافة العنصر للسلة وتعديل الكمية</td>
+      <td>Flutter</td>
+      <td>عملية موبايل بسيطة الخطوات (اختيار → تأكيد)، لا تحتاج لوحة تحكم</td>
+    </tr>
+  </table>
+
+  <h2 id="endpoint">GET /products/{slug}</h2>
+  <div class="route-line">
+    <span class="pill pill-get">GET</span>
+    <code dir="ltr">/products/{slug}</code>
+    <span style="color:var(--muted);font-size:13px">— مسار عام، بدون <code dir="ltr">auth:sanctum</code></span>
+  </div>
+
+  <h3>مثال الاستجابة الناجحة (200)</h3>
+  <pre>{
+  "status": "success",
+  "message": "تم جلب تفاصيل المنتج بنجاح",
+  "data": {
+    "id": 12,
+    "title": "قميص قطني",
+    "slug": "cotton-shirt",
+    "price": 150.0,
+    "compare_at_price": 200.0,
+    "discount_percentage": 25,
+    "stock": 40,
+    "in_stock": true,
+    "is_active": true,
+    "primary_image": { "id": 5, "image_url": "https://.../5.jpg" },
+    "general_images": [ ... ],
+    "rating": { "average": 4.3, "count": 27 },
+    "is_favorited": false,
+    "default_color_id": 2,
+    "colors": [
+      { "id": 2, "name": "أحمر", "family": "red", "hex_code": "#D8322A",
+        "images": [ { "id": 10, "image_url": "https://.../10.jpg", "is_primary": true, "sort_order": 1 } ] },
+      { "id": 3, "name": "أسود", "family": "black", "hex_code": "#111111", "images": [] }
+    ],
+    "sizes": [ { "id": 1, "name": "M" } ],
+    "tags": [ { "id": 4, "name": "صيفي" } ],
+    "shop": { "id": 8, "name": "متجر الأناقة", "slug": "elegance", "is_active": true },
+    "category": { "id": 3, "name": "ملابس رجالية", "slug": "men-clothes" },
+    "latest_reviews": [ { "id": 90, "rating": 5, "comment": "ممتاز", "created_at": "منذ يومين",
+      "buyer": { "full_name": "أحمد", "avatar_url": "..." } } ]
+  }
+}</pre>
+
+  <h3>مثال استجابة الخطأ (404)</h3>
+  <pre>{
+  "message": "No query results for model [App\\Models\\Product]"
+}</pre>
+  <div class="callout warn">
+    <b>لا يوجد جسم خطأ موحّد لهذا المسار</b>
+    الرد 404 هنا هو استثناء Laravel الافتراضي (ModelNotFoundException) وليس شكل <code dir="ltr">{status, message}</code>
+    المستخدم في حالة النجاح. لا يعتمد الفرونت على وجود <code dir="ltr">status</code> داخل رد الخطأ — تحقق فقط من كود الحالة HTTP.
+    كذلك: نفس الرد 404 يظهر سواء كان slug غير موجود إطلاقاً، أو موجوداً لكن غير منشور (unpublished) أو غير نشط —
+    لا تمييز بينهما في الرسالة.
+  </div>
+
+  <h3>الفخاخ الخفية في ProductDetailResource</h3>
+
+  <div class="callout warn">
+    <b>is_favorited سيكون false دائماً على هذا المسار تحديداً</b>
+    الحقل موجود في الـ Resource، لكن هذا المسار (<code dir="ltr">products/{slug}</code>) غير موضوع داخل مجموعة
+    <code dir="ltr">auth:sanctum</code> في ملف الـ Routes، ولا يوجد أي كود في الـ Controller يحسب قيمة
+    <code dir="ltr">is_favorited</code> فعلياً. لا تعرض أيقونة "مفضلة" مفعّلة بناءً على هذا الحقل من هذا المسار —
+    اعتمد على مسار قائمة المفضلة (<code dir="ltr">Buyer/Wishlist</code>) لتحديد الحالة الحقيقية للمستخدم المسجّل.
+  </div>
+
+  <div class="callout warn">
+    <b>default_color_id لا يضمن وجود صور فعلياً</b>
+    التعليق البرمجي في الكود يقول "أول لون يمتلك صوراً أو أول لون في القائمة"، لكن التنفيذ الفعلي يأخذ
+    ببساطة أول عنصر في مصفوفة الألوان بلا أي فلترة على وجود صور. إن كان هذا اللون بلا صور
+    (<code dir="ltr">images: []</code>)، فيجب أن يقع الفرونت تلقائياً على <code dir="ltr">primary_image</code>
+    أو <code dir="ltr">general_images</code> لتعبئة المعرض، وليس افتراض أن اللون الافتراضي دائماً مصوَّر.
+  </div>
+
+  <div class="callout warn">
+    <b>rating.count لا يساوي طول latest_reviews</b>
+    <code dir="ltr">rating.count</code> و<code dir="ltr">rating.average</code> محسوبان على <b>كل</b> التقييمات
+    عبر <code dir="ltr">withCount</code>/<code dir="ltr">withAvg</code>، بينما <code dir="ltr">latest_reviews</code>
+    يحتوي فقط على أحدث 5 تقييمات (مقيّد بـ <code dir="ltr">limit(5)</code>). لا تستنتج عدد التقييمات من طول
+    المصفوفة — استخدم <code dir="ltr">rating.count</code> دائماً، ولا يوجد هنا مسار لجلب بقية التقييمات (صفحة كاملة).
+  </div>
+
+  <div class="callout warn">
+    <b>stock هو مخزون المنتج الكلي وليس مخزون التركيبة (لون + مقاس)</b>
+    الحقلان <code dir="ltr">stock</code> و<code dir="ltr">in_stock</code> يعبّران عن رصيد المنتج الإجمالي فقط.
+    لا يوجد في هذا الرد أي رصيد مستقل لكل تركيبة لون/مقاس. إن كان الفرونت يعطّل زر الإضافة للسلة بناءً على
+    <code dir="ltr">in_stock</code> فقط، فقد يسمح للمستخدم باختيار تركيبة غير متوفرة فعلياً — التحقق الحقيقي
+    يجب أن يحدث عند نداء مسار السلة نفسه (انظر قسم السلة أدناه).
+  </div>
+
+  <div class="callout warn">
+    <b>primary_image منفصل تماماً عن is_primary داخل الألوان/الصور العامة</b>
+    <code dir="ltr">primary_image</code> يأتي من علاقة <code dir="ltr">primaryImage</code> المستقلة، وقد لا تطابق
+    أي صورة معلّمة <code dir="ltr">is_primary: true</code> داخل <code dir="ltr">colors[].images</code> أو
+    <code dir="ltr">general_images</code>. استخدمه فقط كصورة احتياطية عند عدم توفر صور للون المختار — لا تفترض
+    أنه نفس الصورة الأساسية للون.
+  </div>
+
+  <div class="callout tip">
+    استخدم <code dir="ltr">colors[].images</code> مباشرة لتبديل المعرض عند تغيير اللون — لا حاجة لأي نداء إضافي،
+    كل الصور محمّلة مسبقاً في نفس الاستجابة.
+  </div>
+
+  <h2 id="flow">مخطط تدفق الطلب</h2>
+  <div class="flow">
+    <div class="fbox">GET /products/{slug}</div>
+    <div class="arrow">↓</div>
+    <div class="fbox gray">فلترة forPublicView (منشور + نشط) + مطابقة slug</div>
+    <div class="arrow">↓</div>
+    <div class="fbox">هل المنتج موجود؟</div>
+    <div class="branch">
+      <div class="col">
+        <div class="label">لا</div>
+        <div class="fbox end-bad">404 — رسالة Laravel الافتراضية</div>
+      </div>
+      <div class="col">
+        <div class="label">نعم</div>
+        <div class="fbox end-good">200 — بناء ProductDetailResource كاملة (ألوان، صور، تقييمات)</div>
+      </div>
+    </div>
+  </div>
+
+  <h2 id="mockup">موك-أب شاشة تفاصيل المنتج</h2>
+  <div class="phone">
+    <div class="screen">
+      <div class="gallery">معرض صور اللون المحدد — colors[].images</div>
+      <div class="row">
+        <div class="swatch active" style="background:#D8322A"></div>
+        <div class="swatch" style="background:#111"></div>
+        <div class="swatch" style="background:#999"></div>
+      </div>
+      <div class="content">
+        <div class="title-row">title</div>
+        <div class="price-row">
+          <span class="price">price</span>
+          <span class="old-price">compare_at_price</span>
+          <span class="discount-badge">discount_percentage%</span>
+        </div>
+        <div class="row size-row" style="padding:0;border:none;margin-bottom:8px">
+          <span class="size">S</span>
+          <span class="size active">M</span>
+          <span class="size">L</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px">rating.average ★ (rating.count تقييم)</div>
+        <button class="add-btn">إضافة للسلة</button>
+      </div>
+    </div>
+  </div>
+  <div class="badge-endpoint"><span>GET /products/{slug}</span></div>
+  <div class="callout tip">
+    السويتش الملوّن (اللون النشط) يُهيَّأ ابتدائياً من <code dir="ltr">default_color_id</code>، لكن يجب أن يتحقق
+    الفرونت من أن هذا اللون يملك صوراً فعلاً قبل عرضه كمحدد — وإلا يسقط تلقائياً على أول لون يملك صوراً حقيقية.
+  </div>
+
+  <h2 id="cart">من تفاصيل المنتج إلى السلة</h2>
+  <p class="lead">
+    زر "إضافة للسلة" في الشاشة أعلاه يستدعي <span class="pill pill-post">POST</span>
+    <code dir="ltr">Buyer/Cart/items</code> (مسار محمي بـ <code dir="ltr">auth:sanctum</code>).
+  </p>
+  <div class="callout warn">
+    <b>جسم الطلب لهذا المسار غير موجود في الكود المرفق</b>
+    الكود المتاح لدي يغطي فقط تعريف المسار في ملف الـ Routes، وليس محتوى <code dir="ltr">CartController::store</code>
+    ولا قواعد الـ Validation الخاصة به. لا تفترض أسماء الحقول (مثل <code dir="ltr">product_id</code>،
+    <code dir="ltr">color_id</code>، <code dir="ltr">size_id</code>، <code dir="ltr">quantity</code>) — أرسل لي
+    كود هذا الـ Controller إن أردت توثيقاً دقيقاً لشكل الطلب واستجابات الخطأ (نفاد المخزون، تركيبة غير صالحة...).
+  </div>
+  <div class="callout tip">
+    عملياً، الأكثر أماناً هو الاعتماد على استجابة مسار السلة نفسه لتحديد ما إذا كانت التركيبة (لون + مقاس)
+    متوفرة، بدل الاعتماد على <code dir="ltr">in_stock</code> من صفحة المنتج فقط — لأن الأخير لا يميّز بين التركيبات.
+  </div>
+
+  <h2 id="errors">جدول ملخص الأخطاء المتوقعة</h2>
+  <table>
+    <tr><th>الكود</th><th>يظهر في</th><th>المعنى</th><th>ماذا يفعل الفرونت</th></tr>
+    <tr><td>200</td><td>GET /products/{slug}</td><td>نجاح، المنتج منشور ونشط</td><td>يعرض بيانات المنتج كما وردت</td></tr>
+    <tr><td>404</td><td>GET /products/{slug}</td><td>slug غير موجود، أو المنتج غير منشور/غير نشط</td><td>يعرض شاشة "المنتج غير متوفر" عامة (لا تمييز عن سبب الغياب)</td></tr>
+    <tr><td>401</td><td>مسارات السلة والمفضلة</td><td>المستخدم غير مسجل دخول</td><td>يوجّه لتسجيل الدخول قبل إعادة المحاولة</td></tr>
+    <tr><td>422 (متوقع)</td><td>POST Buyer/Cart/items</td><td>بيانات الطلب غير صالحة (يحتاج تأكيد من كود الـ Controller)</td><td>يعرض رسائل الحقول إن توفرت</td></tr>
+  </table>
+
+  <h2 id="tips">نصائح عملية لتفادي الاحتكاك مع الباك إند</h2>
+  <div class="card">
+    <ol class="tips">
+      <li>لا تعرض أيقونة مفضلة مفعّلة من هذا المسار — اجلب حالة المفضلة من مسار منفصل بعد تسجيل الدخول.</li>
+      <li>تحقق برمجياً من وجود صور فعلية للون قبل اعتباره اللون المعروض، رغم قيمة default_color_id.</li>
+      <li>اعرض rating.count كمصدر وحيد لعدد التقييمات، ولا تحاول جمع عناصر latest_reviews.</li>
+      <li>لا تعطّل زر الإضافة للسلة بناءً على in_stock فقط — اعتبره فلتر أولي، والتحقق النهائي عند نداء السلة.</li>
+      <li>عامل استجابة 404 كحالة واحدة عامة "غير متاح"، لأنها تُستخدم لعدة أسباب مختلفة في الباك إند.</li>
+      <li>قبل تنفيذ شاشة إضافة للسلة، اطلب من فريق الباك إند كود Controller الخاص بها لتوثيق حقول الطلب بدقة.</li>
+    </ol>
+  </div>
+
+  <h2 id="backend-note">ملاحظة مقترحة لفريق الباك إند</h2>
+  <div class="callout tip">
+    يُستحسن مراجعة منطق <code dir="ltr">default_color_id</code> ليطابق التعليق البرمجي الموجود فعلياً في الكود
+    (اختيار أول لون يملك صوراً، وليس أول لون في المصفوفة بشكل مطلق) — تفادياً لعرض لون افتراضي بلا صور في الواجهة.
+    كذلك يفضَّل توضيح ما إذا كان مخطط لإضافة مخزون مستقل لكل تركيبة لون/مقاس مستقبلاً، لأن هذا يؤثر مباشرة على
+    تصميم شاشة اختيار المقاس في السلة.
+  </div>
+
+  <footer>دليل تقني داخلي — يُحدَّث عند تغيّر أي من المسارات أو شكل الاستجابة أعلاه.</footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دليل الفرونت إند — عرض المنتجات والبحث</title>
+<style>
+  :root{
+    --bg:#F7F6F2;
+    --card:#FFFFFF;
+    --border:#E4E1D8;
+    --text:#2C2C2A;
+    --text-soft:#5F5E5A;
+    --teal:#0F6E56;
+    --teal-bg:#E1F5EE;
+    --teal-border:#5DCAA5;
+    --coral:#993C1D;
+    --coral-bg:#FAECE7;
+    --coral-border:#F0997B;
+    --purple:#3C3489;
+    --purple-bg:#EEEDFE;
+    --purple-border:#AFA9EC;
+    --blue:#0C447C;
+    --blue-bg:#E6F1FB;
+    --green:#27500A;
+    --green-bg:#EAF3DE;
+    --code-bg:#1E1E1C;
+    --code-text:#F1EFE8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Segoe UI",Tahoma,Arial,sans-serif;
+    line-height:1.7;
+  }
+  .layout{display:flex;min-height:100vh;}
+  nav.side{
+    width:230px;
+    flex-shrink:0;
+    background:var(--card);
+    border-left:1px solid var(--border);
+    padding:24px 16px;
+    position:sticky;
+    top:0;
+    height:100vh;
+    overflow-y:auto;
+  }
+  nav.side h4{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    color:var(--text-soft);
+    margin:20px 0 8px;
+  }
+  nav.side h4:first-child{margin-top:0;}
+  nav.side a{
+    display:block;
+    padding:7px 10px;
+    border-radius:6px;
+    color:var(--text);
+    text-decoration:none;
+    font-size:13.5px;
+    margin-bottom:2px;
+  }
+  nav.side a:hover{background:var(--teal-bg);color:var(--teal);}
+  main{flex:1;padding:32px 48px;max-width:960px;}
+  header.top{margin-bottom:36px;}
+  .eyebrow{
+    font-size:12px;
+    color:var(--teal);
+    font-weight:600;
+    letter-spacing:0.5px;
+    margin-bottom:8px;
+  }
+  h1{font-size:26px;margin:0 0 10px;}
+  header.top p{color:var(--text-soft);font-size:15px;max-width:680px;margin:0;}
+  h2{
+    font-size:19px;
+    margin:44px 0 14px;
+    padding-bottom:8px;
+    border-bottom:2px solid var(--border);
+  }
+  h3{font-size:15.5px;margin:22px 0 8px;}
+  code{
+    font-family:"Consolas","Courier New",monospace;
+    direction:ltr;
+    display:inline-block;
+    font-size:13px;
+  }
+  .method-line{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:6px 0 18px;
+  }
+  .pill{
+    font-family:"Consolas",monospace;
+    font-size:12px;
+    font-weight:700;
+    padding:4px 10px;
+    border-radius:5px;
+    direction:ltr;
+  }
+  .pill-get{background:var(--blue-bg);color:var(--blue);}
+  .code-box{
+    background:var(--code-bg);
+    color:var(--code-text);
+    border-radius:8px;
+    padding:14px 16px;
+    overflow-x:auto;
+    direction:ltr;
+    text-align:left;
+    font-family:"Consolas","Courier New",monospace;
+    font-size:12.5px;
+    line-height:1.6;
+    margin:10px 0 18px;
+  }
+  .code-box .cm{color:#8a8a86;}
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:10px 0 20px;
+    font-size:13.5px;
+  }
+  table th{
+    background:var(--teal-bg);
+    color:var(--teal);
+    text-align:right;
+    padding:9px 12px;
+    border:1px solid var(--border);
+    font-weight:600;
+  }
+  table td{
+    padding:9px 12px;
+    border:1px solid var(--border);
+    vertical-align:top;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:18px 20px;
+    margin:16px 0;
+  }
+  .callout{
+    border-radius:8px;
+    padding:14px 16px;
+    margin:14px 0;
+    font-size:13.5px;
+  }
+  .callout.warn{background:var(--coral-bg);border-right:4px solid var(--coral-border);color:var(--coral);}
+  .callout.tip{background:var(--green-bg);border-right:4px solid #97C459;color:var(--green);}
+  .callout b{display:block;margin-bottom:4px;font-size:13.5px;}
+  .flow{display:flex;flex-direction:column;gap:0;margin:16px 0;}
+  .fbox{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:10px 16px;
+    font-size:13.5px;
+    position:relative;
+  }
+  .fbox.purple{background:var(--purple-bg);border-color:var(--purple-border);color:var(--purple);}
+  .fbox .sub{display:block;font-size:12px;color:inherit;opacity:0.85;margin-top:3px;font-weight:400;}
+  .arrow-down{
+    text-align:center;
+    color:var(--text-soft);
+    font-size:16px;
+    padding:2px 0;
+  }
+  .phone{
+    width:300px;
+    border:8px solid #2C2C2A;
+    border-radius:28px;
+    padding:10px;
+    background:#fff;
+    margin:16px auto;
+  }
+  .screen{background:#fff;border-radius:14px;overflow:hidden;font-size:12.5px;}
+  .screen .bar{padding:10px 12px 6px;}
+  .screen .search-input{
+    width:100%;
+    padding:7px 10px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    font-size:12px;
+    margin-bottom:8px;
+  }
+  .tabs-row{display:flex;gap:5px;flex-wrap:wrap;padding:0 12px 8px;}
+  .tab-pill{
+    font-size:10.5px;
+    padding:4px 8px;
+    border-radius:5px;
+    background:#F1EFE8;
+    color:var(--text-soft);
+  }
+  .tab-pill.active{background:var(--blue-bg);color:var(--blue);font-weight:700;}
+  .row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 12px;
+    border-top:1px solid var(--border);
+  }
+  .thumb{width:32px;height:32px;border-radius:6px;background:#F1EFE8;flex-shrink:0;}
+  .row .info{flex:1;min-width:0;}
+  .row .title{font-weight:600;font-size:12.5px;}
+  .row .meta{font-size:11px;color:var(--text-soft);}
+  .badge-status{font-size:10px;padding:2px 7px;border-radius:5px;}
+  .st-published{background:var(--teal-bg);color:var(--teal);}
+  .st-oos{background:var(--coral-bg);color:var(--coral);}
+  .badge-endpoint{
+    display:inline-block;
+    margin-top:10px;
+    font-family:"Consolas",monospace;
+    direction:ltr;
+    font-size:11px;
+    background:var(--purple-bg);
+    color:var(--purple);
+    padding:4px 10px;
+    border-radius:5px;
+  }
+  ol.tips li{margin-bottom:10px;font-size:14px;}
+  footer{
+    margin-top:60px;
+    padding-top:20px;
+    border-top:1px solid var(--border);
+    color:var(--text-soft);
+    font-size:12.5px;
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="side">
+  <h4>عرض المنتجات</h4>
+  <a href="#overview">نظرة عامة</a>
+  <a href="#endpoint">المسار والاستجابة</a>
+  <a href="#search">آلية البحث</a>
+  <a href="#stats">فخ إحصائيات التبويبات</a>
+  <a href="#category">فلتر التصنيف</a>
+  <a href="#pagination">الترقيم (Pagination)</a>
+  <h4>الواجهة</h4>
+  <a href="#mockup">نموذج الشاشة</a>
+  <a href="#angular">تطبيق Angular</a>
+  <h4>مرجع سريع</h4>
+  <a href="#errors">جدول الأخطاء</a>
+  <a href="#tips">نصائح عملية</a>
+</nav>
+
+<main>
+
+<header class="top" id="overview">
+  <div class="eyebrow">دليل تكامل الفرونت إند</div>
+  <h1>عرض قائمة منتجات التاجر وميزة البحث</h1>
+  <p>
+    شرح مركّز لمسار <code>GET /store/products</code> بعد إضافة حقل البحث،
+    مبني على كود <code>ProductService::listProducts</code> الفعلي، مع كل الفخاخ
+    الخفية التي يجب أن ينتبه لها الفرونت قبل الربط.
+  </p>
+</header>
+
+<section id="endpoint">
+<h2>المسار والاستجابة</h2>
+
+<div class="method-line">
+  <span class="pill pill-get">GET</span>
+  <code>/store/products</code>
+</div>
+
+<h3>Query Params المدعومة</h3>
+<table>
+<tr><th>الباراميتر</th><th>مطلوب</th><th>القيمة الافتراضية</th><th>الوصف</th></tr>
+<tr><td><code>tab</code></td><td>لا</td><td><code>all</code></td><td>يحدد أي مجموعة منتجات تُعرض في القائمة</td></tr>
+<tr><td><code>search</code></td><td>لا</td><td><code>null</code></td><td>بحث نصي في عنوان المنتج فقط</td></tr>
+<tr><td><code>category</code></td><td>لا</td><td><code>null</code></td><td>معرّف UUID للتصنيف، أو اسمه النصي</td></tr>
+</table>
+
+<div class="callout warn">
+<b>لا يوجد باراميتر per_page</b>
+عدد العناصر بكل صفحة مثبّت داخلياً على 15 (<code>paginate(15)</code>). أي قيمة
+ترسلها الواجهة لتغيير حجم الصفحة سيتم تجاهلها تماماً لأن الكود لا يقرأها أصلاً.
+</div>
+
+<h3>مثال الطلب</h3>
+<div class="code-box">GET /store/products?tab=all&search=قميص&category=3f1a9c2e-...
+Authorization: Bearer &lt;token&gt;</div>
+
+<h3>شكل الاستجابة الناجحة (200)</h3>
+<div class="code-box">{
+  "success": true,
+  "data": {
+    "stats": {
+      "all": 128,
+      "published": 92,
+      "out_of_stock": 6,
+      "low_stock": 9,
+      "draft": 14,
+      "unpublished": 8,
+      "blocked": 3,
+      "trashed": 4
+    },
+    "products": {
+      "current_page": 1,
+      "data": [ <span class="cm">// المنتجات الفعلية هنا</span> ],
+      "per_page": 15,
+      "total": 92,
+      "last_page": 7
+    }
+  }
+}</div>
+
+<div class="callout warn">
+<b>تعشيش مزدوج لكلمة data</b>
+لاحظ أن مصفوفة المنتجات الفعلية ليست في <code>response.data</code> مباشرة، بل
+في <code>response.data.products.data</code>، لأن Laravel Paginator يضيف طبقة
+<code>data</code> خاصة به فوق طبقة <code>data</code> التي يضيفها الـ Controller.
+الوصول الصحيح للمصفوفة هو <code>response.data.products.data</code>، وليس
+<code>response.data.products</code> ولا <code>response.data</code>.
+</div>
+
+<h3>حالة الخطأ (500)</h3>
+<div class="code-box">{
+  "success": false,
+  "message": "حدث خطأ أثناء جلب المنتجات.",
+  "error": "Internal Server Error"
+}</div>
+<div class="callout tip">
+<b>تنويه</b>
+حقل <code>error</code> يحمل تفاصيل تقنية فقط في بيئة التطوير (APP_DEBUG مفعّل).
+في بيئة الإنتاج ستكون قيمته دائماً "Internal Server Error"، لذا لا تعتمد
+الواجهة على محتواه لعرض رسالة مخصصة للمستخدم.
+</div>
+</section>
+
+<section id="search">
+<h2>آلية البحث بالتفصيل</h2>
+<p>
+البحث يُطبَّق على حقل <code>title</code> فقط باستخدام <code>ILIKE '%search%'</code>
+(بحث جزئي غير حساس لحالة الأحرف). لا يشمل البحث الوصف، الكلمات المفتاحية، أو
+المميزات.
+</p>
+
+<div class="callout warn">
+<b>لا يوجد أي تحقق (Validation) على قيمة search</b>
+القيمة تُمرر كما هي من الـ query مباشرة لطبقة الفلاتر بدون أي فحص طول أو تنقية
+للأحرف الخاصة. لا يوجد حد أقصى لطول نص البحث من جهة الباك إند حالياً، لذا يُفضّل
+أن تفرض الواجهة حداً معقولاً (مثلاً 100 حرف) لتفادي إرسال نصوص طويلة بلا داعٍ.
+</div>
+
+<div class="callout tip">
+<b>Debounce إلزامي</b>
+لا ترسل طلب مع كل حرف يكتبه المستخدم. استخدم تأخير 300-400ms بعد آخر حرف قبل
+إرسال الطلب، وألغِ أي طلب سابق لم يكتمل بعد لتفادي وصول نتيجة بحث قديمة بعد
+نتيجة أحدث منها (race condition).
+</div>
+</section>
+
+<section id="stats">
+<h2>فخ إحصائيات التبويبات (الأهم)</h2>
+<p>
+كائن <code>stats</code> يُحسب من استعلام منفصل تماماً عن استعلام قائمة المنتجات،
+وهذا يخلق سلوكاً قد يُفهم خطأً:
+</p>
+
+<div class="flow">
+  <div class="fbox purple">
+    استعلام الإحصائيات (statsQuery)
+    <span class="sub">يُطبَّق عليه فلترا search وcategory فقط</span>
+  </div>
+  <div class="arrow-down">↓</div>
+  <div class="fbox purple">
+    استعلام قائمة المنتجات (query)
+    <span class="sub">يُطبَّق عليه tab بالإضافة إلى search وcategory</span>
+  </div>
+</div>
+
+<div class="callout warn">
+<b>أرقام التبويبات لا تتغير حسب التبويب المختار</b>
+مهما كان التبويب الحالي الذي يقف عليه المستخدم (all أو published أو أي تبويب
+آخر)، فإن الأرقام الظاهرة على كل التبويبات (128، 92، 14، ...) تبقى ثابتة —
+لأنها لا تُفلتَر بـ tab إطلاقاً. التبويب يغيّر فقط القائمة المعروضة أسفل الشريط.
+
+بالمقابل، الأرقام نفسها تتغير فوراً إذا كتب المستخدم نص بحث أو اختار تصنيفاً،
+لأن هذين الفلترين يُطبَّقان على استعلام الإحصائيات أيضاً.
+
+الخلاصة للواجهة: اربط تحديث الأرقام بتغيّر <code>search</code> أو
+<code>category</code> فقط، ولا تتوقع أو تحاول إعادة حسابها عند مجرد الضغط على
+تبويب مختلف — الباك إند لن يغيّرها في هذه الحالة.
+</div>
+</section>
+
+<section id="category">
+<h2>فلتر التصنيف</h2>
+<p>يقبل باراميتر <code>category</code> شكلين مختلفين للقيمة:</p>
+<table>
+<tr><th>شكل القيمة</th><th>طريقة المطابقة</th></tr>
+<tr><td>UUID أو رقم</td><td>مطابقة مباشرة على <code>categories.id</code></td></tr>
+<tr><td>أي نص آخر</td><td>مطابقة تامة (=) على <code>categories.name</code>، وليست مطابقة جزئية</td></tr>
+</table>
+<div class="callout warn">
+<b>مطابقة الاسم حرفية وليست تقريبية</b>
+لو أرسلت الواجهة اسم تصنيف كنص (بدل الـ id) فيجب أن يكون مطابقاً تماماً بما فيه
+حالة الأحرف والمسافات، وإلا فلن يُعيد الاستعلام أي نتائج. الأسلم للواجهة أن ترسل
+دائماً <code>id</code> التصنيف الذي حصلت عليه من مسار جلب تصنيفات المتجر
+(<code>GET /store/categories</code>) بدلاً من الاسم النصي.
+</div>
+</section>
+
+<section id="pagination">
+<h2>الترقيم (Pagination)</h2>
+<p>
+النتائج مرتبة تنازلياً حسب <code>created_at</code>، وعدد كل صفحة ثابت على 15
+عنصراً. للانتقال بين الصفحات أرسل باراميتر <code>page</code> الافتراضي في
+Laravel (مثال: <code>?page=2</code>) — وهو يعمل تلقائياً لأن الكود يستخدم
+<code>paginate()</code> القياسية، رغم أنه غير مذكور صراحة في مصفوفة الفلاتر
+بالـ Controller.
+</p>
+</section>
+
+<h2 id="mockup">نموذج الشاشة</h2>
+<p style="color:var(--text-soft);font-size:13.5px;margin-top:-6px;">
+شريط بحث أعلى الشاشة، صف تبويبات بأرقام ثابتة كما شُرح أعلاه، ثم قائمة المنتجات
+التي تتغير حسب التبويب والبحث معاً.
+</p>
+
+<div class="phone">
+  <div class="screen">
+    <div class="bar">
+      <input class="search-input" placeholder="ابحث بعنوان المنتج..." disabled>
+    </div>
+    <div class="tabs-row">
+      <span class="tab-pill active">الكل 128</span>
+      <span class="tab-pill">منشور 92</span>
+      <span class="tab-pill">نفذ 6</span>
+      <span class="tab-pill">مخزون منخفض 9</span>
+      <span class="tab-pill">مسودة 14</span>
+    </div>
+    <div class="row">
+      <div class="thumb"></div>
+      <div class="info">
+        <div class="title">قميص قطني كلاسيكي</div>
+        <div class="meta">مخزون 24</div>
+      </div>
+      <span class="badge-status st-published">منشور</span>
+    </div>
+    <div class="row">
+      <div class="thumb"></div>
+      <div class="info">
+        <div class="title">حذاء رياضي أبيض</div>
+        <div class="meta">مخزون 0</div>
+      </div>
+      <span class="badge-status st-oos">نفذ المخزون</span>
+    </div>
+  </div>
+</div>
+<div style="text-align:center;">
+  <span class="badge-endpoint">GET /store/products?tab=&search=&category=</span>
+</div>
+
+<section id="angular">
+<h2>تطبيق Angular (الشاشة + خدمة البحث)</h2>
+
+<h3>الخدمة</h3>
+<div class="code-box">import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+export interface ProductListResponse {
+  success: boolean;
+  data: {
+    stats: Record&lt;string, number&gt;;
+    products: {
+      data: any[];
+      current_page: number;
+      last_page: number;
+      total: number;
+    };
+  };
+}
+
+@Injectable({ providedIn: 'root' })
+export class ProductsService {
+  constructor(private http: HttpClient) {}
+
+  listProducts(params: { tab?: string; search?: string; category?: string; page?: number })
+    : Observable&lt;ProductListResponse&gt; {
+    let httpParams = new HttpParams();
+    if (params.tab)      httpParams = httpParams.set('tab', params.tab);
+    if (params.search)   httpParams = httpParams.set('search', params.search);
+    if (params.category) httpParams = httpParams.set('category', params.category);
+    if (params.page)     httpParams = httpParams.set('page', params.page);
+
+    return this.http.get&lt;ProductListResponse&gt;('/store/products', { params: httpParams });
+  }
+}</div>
+
+<h3>الكومبوننت</h3>
+<div class="code-box">import { Component, OnInit, OnDestroy } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { ProductsService } from './products.service';
+
+@Component({ selector: 'app-product-list', templateUrl: './product-list.component.html' })
+export class ProductListComponent implements OnInit, OnDestroy {
+  searchControl = new FormControl('');
+  currentTab = 'all';
+  stats: Record&lt;string, number&gt; = {};
+  products: any[] = [];
+  private destroy$ = new Subject&lt;void&gt;();
+
+  constructor(private productsService: ProductsService) {}
+
+  ngOnInit(): void {
+    this.searchControl.valueChanges.pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(value => this.fetch({ search: value ?? '' }));
+
+    this.fetch({});
+  }
+
+  onTabChange(tab: string): void {
+    this.currentTab = tab;
+    // ملاحظة: تغيير التبويب لا يعيد حساب this.stats، فقط يعيد جلب المنتجات
+    this.fetch({ tab });
+  }
+
+  private fetch(overrides: Partial&lt;{ search: string; tab: string; category: string }&gt;): void {
+    const params = {
+      tab: overrides.tab ?? this.currentTab,
+      search: overrides.search ?? this.searchControl.value ?? '',
+      category: overrides.category
+    };
+
+    this.productsService.listProducts(params).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(res => {
+      this.stats = res.data.stats;
+      this.products = res.data.products.data; // انتبه للتعشيش المزدوج
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+}</div>
+
+<div class="callout tip">
+<b>لماذا Angular هنا تحديداً</b>
+الشاشة تجمع بين جدول بيانات، شريط تبويبات بحالات متعددة، وتحديد جماعي —
+هذا النمط (جداول + حالات فلترة متعددة) يناسب Angular/React أكثر من تجربة
+تصفح متسلسلة على الموبايل، خصوصاً أن لوحة التاجر أصلاً تُدار عبر واجهة ويب
+(<code>/store/web/dashboard</code>).
+</div>
+</section>
+
+<h2 id="errors">جدول ملخص الأخطاء المتوقعة</h2>
+<table>
+<tr><th>الكود</th><th>يظهر في</th><th>المعنى</th><th>ماذا يفعل الفرونت</th></tr>
+<tr>
+  <td>200</td>
+  <td>كل الحالات الناجحة</td>
+  <td>الطلب نجح، حتى لو كانت النتائج فارغة (مصفوفة products.data فارغة)</td>
+  <td>اعرض حالة "لا توجد نتائج" إذا كانت المصفوفة فارغة، وليس رسالة خطأ</td>
+</tr>
+<tr>
+  <td>500</td>
+  <td>أي استثناء غير متوقع داخل index()</td>
+  <td>خطأ عام في السيرفر (اتصال قاعدة بيانات، خطأ برمجي، الخ)</td>
+  <td>اعرض رسالة عامة "تعذر تحميل المنتجات، حاول لاحقاً" وأتح زر إعادة المحاولة</td>
+</tr>
+</table>
+
+<h2 id="tips">نصائح عملية لتفادي الاحتكاك مع الباك إند</h2>
+<div class="card">
+<ol class="tips">
+<li>لا تحسب أرقام التبويبات بنفسك في الفرونت — استخدم دائماً <code>data.stats</code> القادمة من السيرفر، ولا تتوقع تغيّرها عند تبديل التبويب فقط.</li>
+<li>اقرأ المنتجات من <code>data.products.data</code> وليس <code>data.products</code> مباشرة.</li>
+<li>أرسل <code>category</code> كـ id دائماً وليس كاسم نصي، لتفادي مشاكل المطابقة الحرفية.</li>
+<li>لا ترسل باراميتر لحجم الصفحة — استخدم <code>page</code> فقط للتنقل، والحجم ثابت على 15.</li>
+<li>طبّق debounce على حقل البحث (300-400ms) وألغِ الطلبات القديمة عند كتابة نص جديد.</li>
+<li>لا تعتمد على حقل <code>error</code> في رسائل الخطأ 500 لعرضه للمستخدم — استخدم <code>message</code> فقط.</li>
+</ol>
+</div>
+
+<h2>ملاحظة مقترحة لفريق الباك إند</h2>
+<div class="callout tip">
+<b>اقتراح تحسين</b>
+لو أضاف الباك إند فلترة <code>tab</code> على استعلام الإحصائيات أيضاً (أو أعاد
+كائن إحصائيات منفصل لكل تبويب)، سيصبح ممكناً عرض عدّاد "النتائج ضمن هذا
+التبويب بعد البحث" دون حسابات إضافية في الفرونت. هذا اختياري وليس عائقاً
+حالياً، لكنه يوضّح تجربة الفرز للمستخدم أكثر.
+</div>
+
+<footer>
+دليل داخلي لفريق الفرونت إند — مبني مباشرة على كود ProductService الفعلي · للاستخدام الداخلي فقط
+</footer>
+
+</main>
+</div>
+</body>
+</html>

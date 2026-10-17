@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>دليل ربط الفرونت إند - قائمة المفضلة (Wishlist)</title>
+<style>
+  :root{
+    --bg:#F7F6F2; --card:#FFFFFF; --border:#E3E1D8; --text:#2C2C2A; --muted:#5F5E5A;
+    --teal:#0F6E56; --teal-light:#E1F5EE; --teal-dark:#04342C;
+    --coral:#993C1D; --coral-light:#FAECE7; --coral-dark:#4A1B0C;
+    --purple:#534AB7; --purple-light:#EEEDFE; --purple-dark:#26215C;
+    --gray:#5F5E5A; --gray-light:#F1EFE8;
+    --code-bg:#1E2320; --code-text:#E1F5EE;
+    --blue:#185FA5; --blue-light:#E6F1FB;
+    --green:#3B6D11; --green-light:#EAF3DE;
+    --red:#A32D2D; --red-light:#FCEBEB;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+  code, .mono{font-family:Consolas,"Courier New",monospace}
+  code[dir="ltr"], .mono[dir="ltr"]{direction:ltr;unicode-bidi:embed}
+
+  nav.side{position:sticky;top:0;height:100vh;width:250px;flex:0 0 250px;background:var(--card);border-left:1px solid var(--border);padding:24px 16px;overflow-y:auto}
+  nav.side h4{font-size:12px;color:var(--muted);text-transform:uppercase;margin:20px 0 8px;letter-spacing:.5px}
+  nav.side a{display:block;padding:7px 10px;border-radius:8px;color:var(--text);text-decoration:none;font-size:14px;margin-bottom:2px}
+  nav.side a:hover{background:var(--teal-light);color:var(--teal-dark)}
+
+  main{flex:1;padding:40px 48px;max-width:980px}
+  .eyebrow{color:var(--teal);font-size:13px;font-weight:600;letter-spacing:.5px;margin-bottom:6px}
+  h1{font-size:28px;margin:0 0 10px}
+  .lead{color:var(--muted);font-size:15px;max-width:720px;line-height:1.7}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin:20px 0}
+  h2{font-size:20px;border-bottom:2px solid var(--teal-light);padding-bottom:10px;margin-top:48px}
+  h3{font-size:16px;color:var(--teal-dark)}
+
+  table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0}
+  th,td{border:1px solid var(--border);padding:8px 12px;text-align:right}
+  th{background:var(--teal-light);color:var(--teal-dark);font-weight:600}
+  tr:nth-child(even) td{background:#FBFAF7}
+
+  .pill{display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:600;font-family:Consolas,monospace;direction:ltr}
+  .pill-get{background:var(--blue-light);color:var(--blue)}
+  .pill-post{background:var(--teal-light);color:var(--teal-dark)}
+  .pill-delete{background:var(--coral-light);color:var(--coral-dark)}
+
+  .route-line{display:flex;align-items:center;gap:10px;margin:14px 0;flex-wrap:wrap}
+  .route-line code{background:var(--code-bg);color:var(--code-text);padding:6px 12px;border-radius:8px;font-size:14px}
+
+  pre{background:var(--code-bg);color:var(--code-text);padding:16px;border-radius:10px;overflow-x:auto;font-size:13px;direction:ltr;text-align:left}
+
+  .callout{border-radius:10px;padding:14px 16px;margin:14px 0;font-size:14px;line-height:1.7;border-right:4px solid}
+  .callout.warn{background:var(--coral-light);border-color:var(--coral);color:var(--coral-dark)}
+  .callout.tip{background:var(--teal-light);border-color:var(--teal);color:var(--teal-dark)}
+  .callout b{display:block;margin-bottom:4px}
+
+  .flow{display:flex;flex-direction:column;align-items:center;gap:6px;margin:20px 0}
+  .fbox{background:var(--purple-light);color:var(--purple-dark);border:1px solid var(--purple);border-radius:10px;padding:10px 18px;font-size:13px;text-align:center;min-width:220px}
+  .fbox.gray{background:var(--gray-light);color:var(--gray);border-color:var(--border)}
+  .fbox.end-bad{background:var(--red-light);color:var(--red);border-color:var(--red)}
+  .fbox.end-good{background:var(--green-light);color:var(--green);border-color:var(--green)}
+  .arrow{font-size:18px;color:var(--muted)}
+  .branch{display:flex;gap:40px;justify-content:center;width:100%;flex-wrap:wrap}
+  .branch .col{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .branch .label{font-size:11px;color:var(--muted)}
+
+  .phone{width:280px;margin:16px auto;background:var(--card);border:8px solid #222;border-radius:32px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.15)}
+  .screen{background:var(--card)}
+  .top-bar{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border)}
+  .top-bar .clear{font-size:12px;color:var(--coral)}
+  .item-row{display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);align-items:center}
+  .thumb{width:50px;height:50px;background:var(--gray-light);border-radius:8px;flex-shrink:0}
+  .item-info{flex:1}
+  .item-title{font-size:13px;font-weight:600}
+  .item-meta{font-size:11px;color:var(--muted)}
+  .heart{color:var(--coral);font-size:18px}
+
+  .modal-wrap{min-height:260px;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;border-radius:12px;margin:16px 0}
+  .modal{background:var(--card);border-radius:12px;padding:20px;width:260px;text-align:center}
+  .modal h4{margin:0 0 8px;font-size:15px}
+  .modal p{font-size:13px;color:var(--muted);margin:0 0 16px}
+  .modal .btns{display:flex;gap:8px;justify-content:center}
+  .modal button{padding:8px 16px;border-radius:8px;border:1px solid var(--border);font-size:13px;background:var(--gray-light)}
+  .modal button.danger{background:var(--coral);color:#fff;border-color:var(--coral)}
+
+  .badge-endpoint{display:block;text-align:center;margin-top:10px;font-size:11px}
+  .badge-endpoint span{background:var(--blue-light);color:var(--blue);padding:3px 10px;border-radius:6px;font-family:Consolas,monospace;direction:ltr;display:inline-block}
+
+  ol.tips{margin:0;padding-inline-start:20px;font-size:14px;line-height:1.9}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--border);color:var(--muted);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+
+<nav class="side">
+  <h4>عرض المفضلة</h4>
+  <a href="#overview">نظرة عامة</a>
+  <a href="#list">GET Wishlist</a>
+  <a href="#toggle">POST toggle</a>
+  <a href="#remove">DELETE remove</a>
+  <a href="#clear">DELETE clear</a>
+  <a href="#flow">مخطط تدفق التبديل</a>
+  <a href="#mockup">موك-أب الشاشة</a>
+
+  <h4>مرجع سريع</h4>
+  <a href="#errors">جدول الأخطاء</a>
+  <a href="#tips">نصائح عملية</a>
+  <a href="#backend-note">ملاحظة للباك إند</a>
+</nav>
+
+<main>
+  <div class="eyebrow">دليل ربط الفرونت إند</div>
+  <h1>قائمة المفضلة (Wishlist) — عرض، تبديل، إزالة، تفريغ</h1>
+  <p class="lead">
+    توثيق كامل لمسارات <code dir="ltr">Buyer/Wishlist</code> الأربعة، مع تنبيه مهم: شكل استجابة هذه المسارات
+    <b>مختلف تماماً</b> عن شكل استجابة صفحة تفاصيل المنتج (لا يوجد <code dir="ltr">colors</code> ولا
+    <code dir="ltr">discount_percentage</code> هنا)، فلا تُعيد استخدام نفس كود التحويل بين الشاشتين.
+  </p>
+
+  <h2 id="overview">نظرة عامة واختيار الأداة</h2>
+  <table>
+    <tr><th>الميزة</th><th>الأداة المناسبة</th><th>السبب</th></tr>
+    <tr>
+      <td>شاشة قائمة المفضلة (سكرول، إزالة عنصر، تفريغ الكل)</td>
+      <td>Flutter</td>
+      <td>قائمة تصفح بسيطة بحركات لمس (سحب للحذف) لا تحتاج جداول أو أشجار اختيار</td>
+    </tr>
+    <tr>
+      <td>مودال تأكيد "تفريغ الكل"</td>
+      <td>Flutter</td>
+      <td>حوار تأكيد بسيط قبل عملية غير قابلة للتراجع</td>
+    </tr>
+  </table>
+
+  <h2 id="list">GET Buyer/Wishlist</h2>
+  <div class="route-line">
+    <span class="pill pill-get">GET</span>
+    <code dir="ltr">Buyer/Wishlist</code>
+    <span style="color:var(--muted);font-size:13px">— يتطلب <code dir="ltr">auth:sanctum</code></span>
+  </div>
+
+  <h3>استجابة ناجحة (200)</h3>
+  <pre>{
+  "success": true,
+  "pagination": {
+    "total": 23,
+    "count": 15,
+    "per_page": 15,
+    "current_page": 1,
+    "total_pages": 2
+  },
+  "data": [
+    {
+      "id": 12,
+      "shop_id": 3,
+      "category_id": 5,
+      "title": "قميص قطني",
+      "slug": "cotton-shirt",
+      "description": "...",
+      "price": "150.00",
+      "compare_at_price": "200.00",
+      "stock": 40,
+      "favorited_at": "2026-07-20T10:00:00.000000Z",
+      "reviews_count": 27,
+      "average_rating": "4.3",
+      "images": [
+        { "id": 10, "color_id": 2, "image_url": "https://.../10.jpg", "is_primary": true, "sort_order": 1 }
+      ]
+    }
+  ]
+}</pre>
+
+  <h3>استجابة الخطأ (500)</h3>
+  <pre>{
+  "success": false,
+  "message": "حدث خطأ أثناء جلب قائمة المفضلة.",
+  "error": null
+}</pre>
+
+  <div class="callout tip">
+    <b>تم التعديل: per_page أصبح يعمل فعلياً</b>
+    الـ Controller أصبح يمرر <code dir="ltr">$request->input('per_page', 15)</code> إلى الخدمة، فبات بإمكان
+    الفرونت التحكم بحجم الصفحة عبر <code dir="ltr">?per_page=</code>. لا يوجد حد أعلى محدد في الكود الحالي —
+    من الأفضل عدم إرسال قيم كبيرة جداً حتى يُضاف حد أقصى من جهة الباك إند.
+  </div>
+
+  <div class="callout warn">
+    <b>شكل استجابة مختلف كلياً عن ProductDetailResource</b>
+    هذا المسار لا يمرّ عبر <code dir="ltr">ProductDetailResource</code> إطلاقاً — العناصر هنا نماذج Eloquent
+    خام مع أعمدة محددة فقط. لا يوجد <code dir="ltr">colors</code>، ولا <code dir="ltr">discount_percentage</code>،
+    ولا <code dir="ltr">in_stock</code>، ولا <code dir="ltr">primary_image</code>، ولا حتى كائن
+    <code dir="ltr">rating</code> متداخل. بدلاً من ذلك: <code dir="ltr">average_rating</code> و
+    <code dir="ltr">reviews_count</code> حقلان مسطّحان مباشرة على مستوى المنتج، و<code dir="ltr">images</code>
+    مصفوفة واحدة تضم كل الصور (مع <code dir="ltr">color_id</code> خامًا) دون تجميعها حسب اللون.
+    لا تحاول تمرير هذه البيانات لنفس ويدجت شاشة تفاصيل المنتج دون تحويل صريح.
+  </div>
+
+  <div class="callout tip">
+    استخدم <code dir="ltr">pagination.total_pages</code> و<code dir="ltr">current_page</code> للتحكم بالـ
+    infinite scroll أو أزرار الصفحات — لا تعتمد على طول <code dir="ltr">data</code> لتحديد وجود صفحة تالية.
+  </div>
+
+  <h2 id="toggle">POST Buyer/Wishlist/toggle/{productId}</h2>
+  <div class="route-line">
+    <span class="pill pill-post">POST</span>
+    <code dir="ltr">Buyer/Wishlist/toggle/{productId}</code>
+  </div>
+
+  <h3>استجابة ناجحة — تمت الإضافة (200)</h3>
+  <pre>{ "success": true, "action": "added", "message": "تم إضافة المنتج إلى قائمة المفضلة بنجاح." }</pre>
+  <h3>استجابة ناجحة — تمت الإزالة (200)</h3>
+  <pre>{ "success": true, "action": "removed", "message": "تم إزالة المنتج من قائمة المفضلة." }</pre>
+  <h3>استجابة الخطأ (404)</h3>
+  <pre>{ "success": false, "message": "المنتج غير موجود أو تم حذفه من النظام." }</pre>
+
+  <div class="callout tip">
+    <b>تم التعديل: توحيد كود الحالة إلى 404</b>
+    كان هذا المسار يرجع 400 لحالة "غير موجود"، والآن أصبح يرجع 404 مثل مسار <code dir="ltr">remove</code>،
+    فأصبح بإمكان الفرونت الاعتماد على كود 404 كمؤشر موحّد لحالة "المورد غير موجود" عبر مسارات المفضلة كلها،
+    دون الحاجة لقراءة نص الرسالة للتفريق بينها.
+  </div>
+
+  <div class="callout warn">
+    <b>يمكن تبديل منتج غير منشور أو غير نشط، لكنه لن يظهر لاحقاً في القائمة (لم يُعدَّل بعد)</b>
+    التحقق داخل <code dir="ltr">toggleWishlist</code> يتأكد فقط من أن المنتج غير محذوف (<code dir="ltr">deleted_at</code>)،
+    دون فحص <code dir="ltr">is_active</code> أو <code dir="ltr">status = published</code>. بينما
+    <code dir="ltr">GET Wishlist</code> يفلتر على كلا الشرطين. النتيجة: قد يستجيب التبديل بنجاح
+    (<code dir="ltr">action: added</code>) لمنتج غير متاح للعرض العام، فيظن الفرونت أنه أُضيف بينما لن يظهر
+    إطلاقاً في شاشة قائمة المفضلة. تعامل مع ذلك بحذر إذا كان زر "أضف للمفضلة" متاحاً على منتجات قد تُسحب من العرض.
+    ملاحظة: هذا الجزء تحديداً موجود في <code dir="ltr">WishlistServices</code> وليس الكود المحدَّث الذي وصلني
+    (وهو <code dir="ltr">WishlistController</code> فقط) — لذا لا يزال هذا التحذير قائماً حتى تأكيد إصلاحه.
+  </div>
+
+  <div class="callout tip">
+    استخدم قيمة <code dir="ltr">action</code> (وليس أي منطق محلي) لتحديد شكل أيقونة القلب بعد الاستجابة —
+    هذا الحقل مصمم خصيصاً لهذا الغرض.
+  </div>
+
+  <h2 id="remove">DELETE Buyer/Wishlist/remove/{productId}</h2>
+  <div class="route-line">
+    <span class="pill pill-delete">DELETE</span>
+    <code dir="ltr">Buyer/Wishlist/remove/{productId}</code>
+  </div>
+  <pre>{ "success": true, "message": "تم إزالة المنتج من المفضلة بنجاح." }</pre>
+  <div class="callout tip">
+    <b>مسار منفصل تماماً عن toggle، رغم تطابق كود الحالة الآن</b>
+    هذا المسار (وليس toggle) هو المناسب لزر "إزالة" الصريح داخل شاشة قائمة المفضلة نفسها. كلا المسارين يرجعان
+    404 الآن عند عدم الوجود، لكن السبب مختلف: هنا يعني "غير موجود في مفضلتك تحديداً" (رسالة
+    "المنتج غير موجود في قائمتك المفضلة")، بينما في toggle يعني "غير موجود في الكتالوج أصلاً" — استمر باستخدام
+    نص الرسالة إن احتجت التفريق الدقيق بين السببين في تسجيل الأخطاء.
+  </div>
+
+  <h2 id="clear">DELETE Buyer/Wishlist/clear</h2>
+  <div class="route-line">
+    <span class="pill pill-delete">DELETE</span>
+    <code dir="ltr">Buyer/Wishlist/clear</code>
+  </div>
+  <pre>{ "success": true, "message": "تم تفريغ قائمة المفضلة بالكامل." }</pre>
+  <div class="callout warn">
+    <b>عملية غير قابلة للتراجع</b>
+    تحذف كل سجلات المفضلة للمستخدم دفعة واحدة بلا استثناء وبلا أرشفة. يجب أن يمر هذا الزر عبر مودال تأكيد
+    صريح في الواجهة قبل الاستدعاء — لا يوجد أي "تراجع" ممكن من الباك إند بعد التنفيذ.
+  </div>
+
+  <h2 id="flow">مخطط تدفق التبديل (toggle)</h2>
+  <div class="flow">
+    <div class="fbox">POST toggle/{productId}</div>
+    <div class="arrow">↓</div>
+    <div class="fbox gray">هل المنتج موجود وغير محذوف؟ (بلا فحص is_active/published)</div>
+    <div class="branch">
+      <div class="col">
+        <div class="label">لا</div>
+        <div class="fbox end-bad">404 — غير موجود</div>
+      </div>
+      <div class="col">
+        <div class="label">نعم</div>
+        <div class="fbox gray">موجود مسبقاً في المفضلة؟</div>
+        <div class="branch">
+          <div class="col"><div class="label">نعم</div><div class="fbox end-bad" style="background:var(--coral-light);color:var(--coral-dark);border-color:var(--coral)">حذف — action: removed</div></div>
+          <div class="col"><div class="label">لا</div><div class="fbox end-good">إضافة — action: added</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 id="mockup">موك-أب شاشة قائمة المفضلة</h2>
+  <div class="phone">
+    <div class="screen">
+      <div class="top-bar">
+        <span style="font-size:13px;font-weight:600">المفضلة (pagination.total)</span>
+        <span class="clear">تفريغ الكل</span>
+      </div>
+      <div class="item-row">
+        <div class="thumb"></div>
+        <div class="item-info">
+          <div class="item-title">title</div>
+          <div class="item-meta">price · average_rating ★ (reviews_count)</div>
+        </div>
+        <span class="heart">♥</span>
+      </div>
+      <div class="item-row">
+        <div class="thumb"></div>
+        <div class="item-info">
+          <div class="item-title">title</div>
+          <div class="item-meta">price · average_rating ★ (reviews_count)</div>
+        </div>
+        <span class="heart">♥</span>
+      </div>
+    </div>
+  </div>
+  <div class="badge-endpoint"><span>GET Buyer/Wishlist</span></div>
+
+  <h3>مودال تأكيد "تفريغ الكل"</h3>
+  <div class="modal-wrap">
+    <div class="modal">
+      <h4>تفريغ قائمة المفضلة؟</h4>
+      <p>سيتم حذف جميع العناصر نهائياً، ولا يمكن التراجع عن هذا الإجراء.</p>
+      <div class="btns">
+        <button>إلغاء</button>
+        <button class="danger">تفريغ الكل</button>
+      </div>
+    </div>
+  </div>
+  <div class="badge-endpoint"><span>DELETE Buyer/Wishlist/clear</span></div>
+
+  <div class="callout tip">
+    زر القلب داخل كل صف يجب أن يستدعي <code dir="ltr">toggle</code> إن كان ظاهراً أيضاً في شاشات أخرى (تفاصيل
+    منتج، قائمة متجر)، أما زر "إزالة" الصريح المخصص لهذه الشاشة فقط فيُفضَّل ربطه بمسار
+    <code dir="ltr">remove</code> لأن رسالته أوضح عند الفشل.
+  </div>
+
+  <h2 id="errors">جدول ملخص الأخطاء المتوقعة</h2>
+  <table>
+    <tr><th>الكود</th><th>يظهر في</th><th>المعنى</th><th>ماذا يفعل الفرونت</th></tr>
+    <tr><td>200</td><td>كل المسارات الأربعة</td><td>نجاح العملية</td><td>يحدّث الحالة محلياً حسب success/action</td></tr>
+    <tr><td>404</td><td>POST toggle</td><td>المنتج غير موجود أو محذوف من الكتالوج</td><td>يعرض رسالة الخطأ كما هي</td></tr>
+    <tr><td>404</td><td>DELETE remove</td><td>المنتج غير موجود أصلاً في مفضلة هذا المستخدم</td><td>يعرض رسالة الخطأ، قد يعني أن الحالة المحلية غير متزامنة</td></tr>
+    <tr><td>401</td><td>كل المسارات الأربعة</td><td>مستخدم غير مسجل دخول</td><td>يوجّه لتسجيل الدخول</td></tr>
+    <tr><td>500</td><td>GET Wishlist / clear</td><td>خطأ داخلي غير متوقع</td><td>يعرض رسالة عامة ويسمح بإعادة المحاولة</td></tr>
+  </table>
+
+  <h2 id="tips">نصائح عملية لتفادي الاحتكاك مع الباك إند</h2>
+  <div class="card">
+    <ol class="tips">
+      <li>لا تُعِد استخدام محوّل بيانات صفحة تفاصيل المنتج لعرض عناصر هذه القائمة — الحقول مختلفة تماماً.</li>
+      <li>اعتمد على <code dir="ltr">action</code> من toggle لتحديث شكل القلب، لا على منطق تخمين محلي.</li>
+      <li>كل من toggle وremove يرجعان 404 الآن عند عدم الوجود — استخدم نص message فقط إن احتجت التفريق بين "غير موجود في الكتالوج" و"غير موجود في مفضلتك".</li>
+      <li>ضع مودال تأكيد إلزامي قبل استدعاء clear، فهي عملية نهائية بلا تراجع.</li>
+      <li>يمكنك الآن إرسال ?per_page= مع GET Wishlist والتحكم بحجم الصفحة فعلياً.</li>
+      <li>عامل نجاح toggle كإشارة إضافة/إزالة فورية في الواجهة، لكن اعرض المنتج فعلياً في القائمة فقط بعد أن يؤكد GET Wishlist ظهوره (لا يزال فحص is_active/published غير مطبّق داخل toggle حتى الآن).</li>
+    </ol>
+  </div>
+
+  <h2 id="backend-note">ملاحظة مقترحة لفريق الباك إند</h2>
+  <div class="callout tip">
+    <b>تم التنفيذ ✓</b> توحيد كود الحالة إلى 404 لحالة "المنتج غير موجود" في toggle، وتفعيل تمرير
+    <code dir="ltr">per_page</code> من الطلب في الـ Controller.
+  </div>
+  <div class="callout warn">
+    <b>لا يزال معلّقاً</b>
+    التحقق من شرطي <code dir="ltr">is_active</code> و<code dir="ltr">status = published</code> داخل
+    <code dir="ltr">toggleWishlist</code> (في <code dir="ltr">WishlistServices</code>) لم يظهر بعد في أي كود
+    وصلني — لا يزال بالإمكان تبديل منتج غير منشور بنجاح دون أن يظهر لاحقاً في القائمة. كذلك يُستحسن إضافة حد
+    أقصى لقيمة <code dir="ltr">per_page</code> القادمة من الطلب لمنع طلبات بحجم صفحة كبير جداً.
+  </div>
+
+  <footer>دليل تقني داخلي — يُحدَّث عند تغيّر أي من المسارات أو شكل الاستجابة أعلاه.</footer>
+</main>
+</body>
+</html>

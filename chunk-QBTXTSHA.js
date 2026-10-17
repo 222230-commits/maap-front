@@ -1,0 +1,1 @@
+import{e as a}from"./chunk-VSHTQCT7.js";import"./chunk-3A466B3N.js";import{Ja as o,ab as n}from"./chunk-YKBCAYVD.js";var u=class e{static \u0275fac=function(t){return new(t||e)};static \u0275cmp=o({type:e,selectors:[["app-auth-layout"]],decls:1,vars:0,template:function(t,m){t&1&&n(0,"router-outlet")},dependencies:[a],encapsulation:2})};export{u as AuthLayoutComponent};

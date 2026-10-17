@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>دليل تكامل الفرونت إند — نظام الميزات والتاغات</title>
+<style>
+:root{
+  --bg:#F4F5F3; --card-bg:#FFFFFF; --text:#1E211D; --muted:#5F6259;
+  --border:#E1E3DC; --teal:#0F6E56; --teal-bg:#E1F5EE; --teal-strong:#085041;
+  --coral:#993C1D; --coral-bg:#FAECE7; --coral-border:#F0997B;
+  --red:#791F1F; --red-bg:#FCEBEB; --red-border:#F09595;
+  --purple:#534AB7; --purple-bg:#EEEDFE; --purple-strong:#3C3489;
+  --gray-bg:#F1EFE8; --gray-strong:#5F5E5A;
+  --code-bg:#1E2521; --code-text:#E7ECE7;
+  --blue-bg:#E6F1FB; --blue-text:#0C447C;
+  --green-bg:#EAF3DE; --green-text:#27500A;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI",Tahoma,Arial,sans-serif;line-height:1.75;font-size:15px}
+code,.mono{font-family:"Consolas","Courier New",monospace}
+a{color:var(--teal)}
+.layout{display:flex;min-height:100vh}
+nav.side{width:270px;flex:0 0 270px;background:var(--card-bg);border-left:1px solid var(--border);padding:22px 18px;position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto}
+nav.side h4{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:22px 0 8px}
+nav.side h4:first-child{margin-top:0}
+nav.side a{display:block;padding:6px 8px;border-radius:6px;color:var(--text);text-decoration:none;font-size:13.5px}
+nav.side a:hover{background:var(--teal-bg);color:var(--teal-strong)}
+main{flex:1;padding:36px 48px;max-width:1050px}
+.eyebrow{color:var(--teal);font-size:13px;font-weight:700;letter-spacing:.4px;margin-bottom:6px}
+h1{font-size:28px;margin:0 0 10px}
+.lead{color:var(--muted);font-size:15.5px;max-width:760px;margin-bottom:34px}
+h2{font-size:21px;margin:44px 0 6px;padding-top:10px;border-top:1px solid var(--border)}
+h2:first-of-type{border-top:none}
+h3{font-size:16px;margin:22px 0 8px}
+.card{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin:14px 0}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0}
+th,td{border:1px solid var(--border);padding:8px 10px;text-align:right;vertical-align:top}
+th{background:var(--teal-bg);color:var(--teal-strong);font-weight:600}
+.route-line{display:flex;align-items:center;gap:10px;margin:10px 0 16px;flex-wrap:wrap}
+.pill{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:20px;font-family:monospace;direction:ltr}
+.pill-get{background:var(--blue-bg);color:var(--blue-text)}
+.pill-post{background:var(--teal-bg);color:var(--teal-strong)}
+.pill-put{background:var(--purple-bg);color:var(--purple-strong)}
+.pill-delete{background:var(--red-bg);color:var(--red)}
+.path{font-family:monospace;direction:ltr;text-align:left;display:inline-block;font-size:13.5px}
+.scope{margin-inline-start:auto;font-size:11.5px;background:var(--gray-bg);color:var(--gray-strong);padding:3px 10px;border-radius:20px}
+pre{background:var(--code-bg);color:var(--code-text);border-radius:8px;padding:14px 16px;overflow-x:auto;font-size:12.8px;direction:ltr;text-align:left;margin:10px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.callout{border-radius:8px;padding:12px 16px;margin:12px 0;font-size:13.8px;border:1px solid}
+.callout.warn{background:var(--coral-bg);border-color:var(--coral-border);color:var(--coral)}
+.callout.danger{background:var(--red-bg);border-color:var(--red-border);color:var(--red)}
+.callout.tip{background:var(--teal-bg);border-color:#9FE1CB;color:var(--teal-strong)}
+.callout b{display:block;margin-bottom:3px}
+/* flow diagram */
+.flow{display:flex;flex-direction:column;align-items:center;gap:0;margin:22px 0}
+.fbox{background:var(--purple-bg);color:var(--purple-strong);border:1px solid #CECBF6;border-radius:8px;padding:10px 18px;font-size:13.5px;text-align:center;min-width:260px}
+.fbox.gray{background:var(--gray-bg);color:var(--gray-strong);border-color:#D3D1C7}
+.fbox.success{background:var(--teal-bg);color:var(--teal-strong);border-color:#9FE1CB}
+.arrow{width:1px;height:22px;background:var(--muted);position:relative}
+.arrow::after{content:"";position:absolute;bottom:-1px;right:-4px;border:5px solid transparent;border-top-color:var(--muted)}
+.branch{display:flex;justify-content:center;gap:60px;width:100%;margin:0}
+.branch .col{display:flex;flex-direction:column;align-items:center}
+.bfail{background:var(--coral-bg);color:var(--coral);border:1px solid var(--coral-border);border-radius:8px;padding:8px 14px;font-size:12.5px;text-align:center;min-width:170px}
+/* phone mockup */
+.phone{width:300px;background:#fff;border:10px solid #2C2C2A;border-radius:32px;padding:14px;margin:16px auto 6px}
+.screen{background:#FAFAF8;border-radius:14px;padding:14px;min-height:420px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.chip{display:inline-block;font-size:11px;padding:4px 10px;border-radius:14px;margin:3px}
+.chip.sys{background:var(--blue-bg);color:var(--blue-text)}
+.chip.merch{background:var(--green-bg);color:var(--green-text)}
+/* tree */
+.tree{margin:14px 0}
+.tnode{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;margin-bottom:6px;background:#fff;font-size:13.5px}
+.tnode input{margin:0}
+/* modal */
+.modal-wrap{background:#2C2C2A0d;border:1px dashed var(--border);border-radius:10px;padding:30px;display:flex;justify-content:center}
+.modal{background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.12);padding:20px;width:320px}
+.modal h4{margin:0 0 8px;font-size:15px}
+.badge-endpoint{display:block;text-align:center;margin-top:10px}
+.badge-endpoint span{font-size:11px;background:var(--gray-bg);color:var(--gray-strong);padding:4px 12px;border-radius:20px;font-family:monospace;direction:ltr}
+footer{margin-top:60px;padding:20px 0;border-top:1px solid var(--border);color:var(--muted);font-size:12.5px;text-align:center}
+ol.tips li{margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="side">
+  <h4>نظرة عامة</h4>
+  <a href="#overview">اختيار الأداة</a>
+  <a href="#null-issue">مشكلة shop_id = null</a>
+
+  <h4>تصفح المستخدم (Seller)</h4>
+  <a href="#seller-index">GET تصفح + بحث</a>
+  <a href="#seller-show">GET تفاصيل عنصر</a>
+  <a href="#seller-create">POST إنشاء/إضافة سريعة</a>
+  <a href="#seller-attach">POST ربط متعدد</a>
+  <a href="#seller-detach">DELETE فك ربط متعدد</a>
+  <a href="#seller-update">PUT تعديل</a>
+  <a href="#seller-destroy">DELETE حذف</a>
+  <a href="#seller-sync">PUT مزامنة شاملة (تنبيه)</a>
+
+  <h4>إدارة الطرف الآخر (Admin — Angular فقط)</h4>
+  <a href="#admin-index">GET فهرسة + type + بحث + Pagination</a>
+  <a href="#admin-store">POST إضافة عنصر نظام</a>
+  <a href="#admin-update">PUT تعديل عنصر نظام</a>
+  <a href="#admin-destroy">DELETE حذف عادي (نظام فقط)</a>
+  <a href="#admin-force">DELETE حذف بالقوة (أي نوع)</a>
+  <a href="#admin-attach">POST ربط مباشر بمنتج</a>
+
+  <h4>مرجع سريع</h4>
+  <a href="#flow">مخطط التدفق</a>
+  <a href="#mockups">الشاشات المقترحة</a>
+  <a href="#errors">جدول الأخطاء</a>
+  <a href="#tips">نصائح عملية</a>
+  <a href="#backend-note">ملاحظة للباك إند</a>
+</nav>
+
+<main>
+  <div class="eyebrow">دليل تكامل الفرونت إند</div>
+  <h1>نظام الميزات والتاغات (Features &amp; Tags)</h1>
+  <p class="lead">
+    توثيق كامل لمسارات إدارة الميزات (Features) والكلمات الدلالية (Tags) من جهتين: واجهة التاجر (Seller —
+    Flutter/Angular) ولوحة تحكم الإدارة (Admin — Angular حصراً). يغطي شكل كل طلب، كل استجابة ممكنة بكودها الفعلي،
+    والفخاخ الخفية التي قد يقع فيها الفرونت إند لو اعتمد على التخمين بدل قراءة الكود.
+  </p>
+
+  <h2 id="overview">نظرة عامة واختيار الأداة</h2>
+  <table>
+    <tr><th>الميزة</th><th>الأداة المناسبة</th><th>السبب</th></tr>
+    <tr><td>تصفح واختيار الميزات/التاغات على منتج (Seller)</td><td>Flutter</td><td>تجربة موبايل متسلسلة: بحث → اختيار شرائح (chips) → تأكيد. عدد العناصر محدود (≤10) فلا حاجة لجدول ثقيل.</td></tr>
+    <tr><td>إدارة ميزات/تاغات النظام (Admin)</td><td>Angular</td><td>جدول بترقيم صفحات حقيقي (paginate)، فلاتر متعددة (type + search)، وإجراءات متفرعة (delete عادي مقابل force-delete) — هذا نمط لوحة تحكم كلاسيكي.</td></tr>
+    <tr><td>ربط/فك ربط متعدد على منتج (Seller)</td><td>Angular أو Flutter</td><td>يعتمد على سياق الشاشة الأم: لو ضمن تطبيق موبايل التاجر → Flutter بشجرة اختيار (checklist)؛ لو ضمن لوحة ويب للتاجر → Angular بمودال جدول.</td></tr>
+    <tr><td>ربط عنصر بمنتج من لوحة الأدمن</td><td>Angular</td><td>عملية إدارية نادرة الاستخدام، تحتاج بحث عن product_id و feature_id/tag_id يدوياً — تناسب فورم إداري بسيط لا تطبيق موبايل.</td></tr>
+  </table>
+
+  <h2 id="null-issue">مشكلة shop_id = null — كيف يتفاداها الفرونت</h2>
+  <div class="callout warn">
+    <b>الفخ</b>
+    لا تفحص الواجهة "هل shop_id فارغ؟" لتقرير إظهار أزرار التعديل/الحذف. المصدر الصحيح للحقيقة هو
+    <code>from</code> — أي من أي مصفوفة أتى العنصر: <code>system_features</code> أو <code>merchant_features</code>
+    (وبالمثل <code>system_tags</code>/<code>merchant_tags</code>). الباك إند نفسه يفصلهم بهذا الأساس في
+    <code>getSeparatedFeatures</code>/<code>getSeparatedTags</code>، وأي عملية تعديل/حذف من طرف التاجر مقيّدة فعلياً
+    بـ <code>where('shop_id', $merchantShopId)</code> — فلو مررت ID لعنصر نظامه <code>shop_id = null</code>، الباك إند
+    يرجع خطأ منطقي (404/400) وليس خطأ null.
+  </div>
+  <div class="callout tip">
+    <b>التوصية</b>
+    عند جلب البيانات، أضف حقلاً مشتقاً في نموذج الفرونت مثل <code>isEditable = (source === 'merchant')</code> بدل تمرير
+    <code>shop_id</code> الخام إلى منطق العرض. هذا يمنع أي انزلاق مستقبلي لو الباك إند غيّر شكل الحقل.
+  </div>
+
+  <!-- ===================== SELLER ===================== -->
+  <h2 id="seller-index">تصفح الميزات/التاغات + البحث (Seller)</h2>
+  <div class="route-line">
+    <span class="pill pill-get">GET</span><span class="path">/store/features?search=شاشة</span>
+    <span class="scope">وبالمثل /store/tags</span>
+  </div>
+  <p>يرجع دائماً كائنين منفصلين — لا قائمة واحدة مدموجة — والبحث اختياري عبر query param واحد فقط.</p>
+  <pre>// نموذج الاستجابة — 200
+{
+  "success": true,
+  "data": {
+    "system_features":   [ { "id": "uuid", "name": "شاشة لمس", "shop_id": null } ],
+    "merchant_features":[ { "id": "uuid", "name": "توصيل مجاني", "shop_id": "shop-uuid" } ]
+  }
+}</pre>
+  <div class="callout warn">
+    <b>فرق جوهري عن Admin</b>
+    هذا المسار <b>بدون pagination</b> — يرجع array كامل. لا تفترض وجود <code>current_page</code>/<code>last_page</code>
+    هنا كما في لوحة الأدمن، وإلا كودك الموحّد بين الشاشتين سينكسر.
+  </div>
+  <div class="callout danger">
+    <b>فشل صامت في try/catch العام</b>
+    أي استثناء غير متوقع هنا يرجع رسالة عامة ثابتة "حدث خطأ أثناء جلب الميزات الفنية" بكود 500 — لن ترى تفاصيل الخطأ
+    الحقيقي إطلاقاً من هذا الـ endpoint، فلا تعتمد على نص الرسالة لتشخيص مشاكل الشبكة/الفلترة أثناء التطوير.
+  </div>
+
+  <h2 id="seller-show">تفاصيل عنصر واحد</h2>
+  <div class="route-line">
+    <span class="pill pill-get">GET</span><span class="path">/store/features/{featureId}</span>
+  </div>
+  <pre>// نجاح — 200
+{ "success": true, "data": { "id": "uuid", "name": "شاشة لمس", "shop_id": null } }
+
+// فشل — 404 (غير موجود، أو خارج نطاقك)
+{ "success": false, "message": "Feature not found or you do not have permission to access it." }</pre>
+  <div class="callout warn">
+    <b>رسالة إنجليزية وسط تطبيق عربي</b>
+    لاحظ أن <code>getFeatureById</code>/<code>getTagById</code> يرميان رسالة استثناء بالإنجليزية بينما باقي الرسائل في
+    النظام كلها عربية. لا تعرض هذه الرسالة مباشرة للمستخدم النهائي — اعرض رسالة عربية ثابتة من الفرونت لهذه الحالة تحديداً
+    ("العنصر غير موجود أو لا تملك صلاحية الوصول إليه").
+  </div>
+
+  <h2 id="seller-create">إضافة سريعة (إنشاء أو ربط باسم نصي)</h2>
+  <div class="route-line">
+    <span class="pill pill-post">POST</span><span class="path">/store/features/create/{productId}</span>
+    <span class="scope">body: { name }</span>
+  </div>
+  <pre>// نجاح — 200
+{ "success": true, "message": "تم إضافة الميزة للمنتج بنجاح." }
+
+// فشل — 400 (مثال: تجاوز 10 ميزات)
+{ "success": false, "message": "لا يمكن إضافة أكثر من 10 ميزة للمنتج الواحد." }</pre>
+  <div class="callout warn">
+    <b>سلوك ضمني: بحث ثم إنشاء (find-or-create)</b>
+    هذا المسار لا يتحقق من وجود الاسم مسبقاً على مستوى الفرونت — الباك إند يبحث عن اسم مطابق ضمن (نظام + متجرك)، فإن لم
+    يجده ينشئ ميزة جديدة بـ <code>shop_id</code> الخاص بمتجرك تلقائياً. يعني: كتابة اسم موجود فعلاً بالنظام سيربطه
+    مباشرة دون تكرار، بينما اسم جديد كلياً سينشئ سجلاً دائماً في جدول الميزات حتى لو حذفت الربط لاحقاً بمنتج آخر —
+    السجل نفسه لا يُحذف تلقائياً إلا عبر <code>destroy</code> صراحة.
+  </div>
+  <div class="callout tip">
+    <b>توصية عرض</b>
+    اجعل حقل الإدخال autocomplete يبحث في نفس الوقت ضمن <code>system_features</code>/<code>merchant_features</code>
+    المحمّلة مسبقاً (من endpoint الفهرسة) بدل الاعتماد فقط على منطق find-or-create في الباك إند — لتفادي إنشاء أسماء
+    مكررة بصياغة مختلفة (مثال: "شاشة لمس" و"شاشة اللمس").
+  </div>
+
+  <h2 id="seller-attach">ربط متعدد بمعرّفات جاهزة (attach)</h2>
+  <div class="route-line">
+    <span class="pill pill-post">POST</span><span class="path">/store/features/{productId}/attach-feature</span>
+    <span class="scope">body: { feature_ids: [uuid,...] }</span>
+  </div>
+  <pre>// نجاح — 200
+{ "success": true, "message": "تم ربط الميزات بالمنتج بنجاح." }
+
+// فشل تحقق الحقول — 422 (Laravel validation)
+{ "message": "...", "errors": { "feature_ids": ["لا يمكنك ربط أكثر من 10 ميزات في المرة الواحدة."] } }
+
+// فشل منطق عمل — 400
+{ "success": false, "message": "واحدة أو أكثر من الميزات المحددة مرتبطة مسبقاً بهذا المنتج." }</pre>
+  <table>
+    <tr><th>القاعدة</th><th>التفاصيل</th></tr>
+    <tr><td>الحد الأقصى للطلب الواحد</td><td>10 عناصر</td></tr>
+    <tr><td>التكرار داخل المصفوفة</td><td>مرفوض (distinct)</td></tr>
+    <tr><td>التكرار مع الروابط الحالية</td><td><b>العملية بأكملها تُرفض</b> لو أي عنصر واحد مرتبط مسبقاً — وليس تجاهله فقط</td></tr>
+    <tr><td>الحد الإجمالي على المنتج</td><td>10 كحد أقصى (الحالي + الجديد)</td></tr>
+  </table>
+  <div class="callout danger">
+    <b>فخ: العملية Atomic بالكامل — كل أو لا شيء</b>
+    <code>attachMultipleFeatures</code> تُنفَّذ داخل <code>DB::transaction</code>. لو من ضمن 5 ميزات مرسلة، ميزة واحدة
+    مرتبطة مسبقاً بالمنتج، <b>الطلب كله يفشل ولا يُربط ولا ميزة واحدة</b> — حتى الأربعة الصالحة. لا تصمّم الواجهة على
+    افتراض "سيتم ربط اللي ينجح وتجاهل الباقي". اعرض رسالة الخطأ وحدد بوضوح للمستخدم أن عليه إزالة العناصر المكررة من
+    التحديد قبل إعادة المحاولة.
+  </div>
+
+  <h2 id="seller-detach">فك ربط متعدد (detach)</h2>
+  <div class="route-line">
+    <span class="pill pill-delete">DELETE</span><span class="path">/store/features/{productId}/detach-feature</span>
+    <span class="scope">body: { feature_ids: [uuid,...] }</span>
+  </div>
+  <div class="callout danger">
+    <b>عملية لا رجعة فيها + Atomic أيضاً</b>
+    فك الربط نهائي (لا Soft Delete). ونفس منطق "الكل أو لا شيء": لو عنصر واحد من المصفوفة غير مرتبط أصلاً بالمنتج،
+    الطلب كامل يُرفض بـ400 قبل حذف أي شيء. اعرض تأكيداً صريحاً (confirm dialog) قبل الإرسال دائماً.
+  </div>
+
+  <h2 id="seller-update">تعديل عنصر يملكه التاجر</h2>
+  <div class="route-line">
+    <span class="pill pill-put">PUT</span><span class="path">/store/features/update/{id}</span>
+    <span class="scope">body: { name }</span>
+  </div>
+  <div class="callout warn">
+    <b>تطبيع صامت على اسم الميزة (وليس التاغ)</b>
+    فقط في <code>updateMerchantFeature</code>: الاسم يُمرّر عبر <code>strip_tags</code> ثم كل التكرارات المتتالية من
+    المسافات تُستبدل بشرطة واحدة <code>-</code> عبر <code>preg_replace</code>. يعني لو المستخدم كتب
+    "شاشة لمس عالية الدقة"، القيمة المخزَّنة فعلياً هي <code dir="ltr">شاشة-لمس-عالية-الدقة</code>. هذا التطبيع غير
+    موجود إطلاقاً في <code>updateMerchantTag</code> (تعديل التاغ يُبقي المسافات كما هي). اعرض في الفرونت معاينة فورية
+    للاسم بعد هذا التحويل قبل الحفظ حتى لا يفاجأ التاجر بالنتيجة.
+  </div>
+  <div class="callout tip">
+    <b>تأثير جانبي مقصود</b>
+    الرسالة توضحه صراحة: "تم تحديث اسم الميزة بنجاح <b>وتعديلها في كافة المنتجات المرتبطة</b>" — لأن التعديل هنا على
+    سجل الميزة نفسه في جدول <code>features</code> وليس نسخة لكل منتج. حدّث أي كاش محلي لكل المنتجات المرتبطة بهذه
+    الميزة، لا شاشة المنتج الحالية فقط.
+  </div>
+
+  <h2 id="seller-destroy">حذف عنصر يملكه التاجر</h2>
+  <div class="route-line">
+    <span class="pill pill-delete">DELETE</span><span class="path">/store/features/delete/{id}</span>
+  </div>
+  <div class="callout danger">
+    <b>حذف نهائي متسلسل على كل المنتجات</b>
+    <code>deleteMerchantFeature</code> تحذف أولاً كل الروابط في <code>product_features</code> ثم تحذف الميزة نفسها —
+    داخل معاملة واحدة. لا يوجد استرجاع. اعرض تحذيراً يذكر عدد المنتجات المتأثرة إن كان بالإمكان جلبه مسبقاً، لا مجرد
+    "هل أنت متأكد؟" عامة.
+  </div>
+
+  <h2 id="seller-sync">مزامنة شاملة على المنتج (تنبيه نطاق)</h2>
+  <div class="route-line">
+    <span class="pill pill-put">PUT</span><span class="path">/store/products/{id}/features</span>
+    <span class="scope">Validation عبر SyncProductFeaturesRequest</span>
+  </div>
+  <div class="callout warn">
+    <b>الكنترولر الفعلي لهذا المسار (SellerProductController::syncFeatures) غير متاح في الملفات المرفقة</b>
+    ما هو مؤكد من <code>SyncProductFeaturesRequest</code>: الطلب يقبل <code>existing_features[]</code> (UUIDs يجب أن
+    تكون موجودة فعلاً في <code>app.features</code>) و<code>new_features[]</code> (نصوص جديدة، حتى 10 لكل مصفوفة،
+    والمجموع الكلي ≤ 10 عبر تحقق إضافي في <code>withValidator</code>). لكن شكل الاستجابة الدقيق ومنطق "هل يستبدل كل
+    الميزات أم يضيف فقط" غير موثّق هنا لعدم توفر كود الكنترولر/الخدمة الفعلي. لا تفترض أنه يطابق سلوك
+    <code>updateProductFeatures</code> في <code>FeatureService</code> (الذي يستبدل فقط ميزات التاجر نفسه ويُبقي ميزات
+    النظام كما هي على المنتج) — <b>أكّد هذا مع فريق الباك إند قبل بناء منطق "استبدال شامل" في الواجهة.</b>
+  </div>
+  <div class="callout warn">
+    <b>فخ إضافي داخل SyncProductTagsRequest نفسه</b>
+    ملف تحقق التاغات فيه مفاتيح رسائل خطأ ميتة (<code>tags.array</code>, <code>tags.*.required</code>...) لا تطابق أسماء
+    الحقول الفعلية (<code>existing_tags</code>/<code>new_tags</code>) — أي أن Laravel لن يستخدمها أبداً وسيعرض رسائله
+    الافتراضية الإنجليزية بدلاً منها عند فشل هذه القواعد تحديداً. كذلك <code>existing_tags.*</code> لا تحمل قاعدة
+    <code>required</code> (بعكس existing_features) فقيمة null داخل المصفوفة قد تمر من قاعدة uuid. تحقق من الحقول على
+    مستوى الفرونت بنفسك ولا تعتمد فقط على رسائل 422 القادمة من هذا الـ Request تحديداً.
+  </div>
+
+  <!-- ===================== ADMIN ===================== -->
+  <h2 id="admin-index">فهرسة الأدمن — type + search + Pagination</h2>
+  <div class="route-line">
+    <span class="pill pill-get">GET</span><span class="path">/admin/features?type=merchant&search=شحن&per_page=50</span>
+    <span class="scope">Angular فقط</span>
+  </div>
+  <pre>// نجاح — 200 (شكل paginate() الافتراضي من Laravel)
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [ { "id":"uuid","name":"...","shop_id":null } ],
+    "last_page": 6,
+    "per_page": 50,
+    "total": 268
+  }
+}</pre>
+  <table>
+    <tr><th>Query Param</th><th>القيم</th><th>ملاحظة</th></tr>
+    <tr><td>type</td><td>system / merchant / (بدون)</td><td>أي قيمة أخرى غير هاتين تُتجاهل تماماً وتُعامل كأنها "بدون فلتر" — لا خطأ 422</td></tr>
+    <tr><td>search</td><td>نص</td><td>LIKE %search% على name فقط، بعد trim</td></tr>
+    <tr><td>per_page</td><td>رقم</td><td>الافتراضي 50 لو غير مُرسل</td></tr>
+  </table>
+  <div class="callout warn">
+    <b>فخ: الاستجابة مُغلّفة داخل data.data</b>
+    بعكس مسار Seller، هنا القائمة الفعلية داخل <code>response.data.data</code> وليس <code>response.data</code> مباشرة
+    (لأن Laravel يضع مفاتيح الـ pagination في نفس المستوى). لا تكتب دالة parsing واحدة مشتركة بين شاشة Seller وشاشة
+    Admin دون مراعاة هذا الفرق في العمق.
+  </div>
+
+  <h2 id="admin-store">إضافة عنصر نظام جديد</h2>
+  <div class="route-line">
+    <span class="pill pill-post">POST</span><span class="path">/admin/features/store</span>
+    <span class="scope">body: { name }</span>
+  </div>
+  <pre>// نجاح — 200
+{ "success": true, "message": "تم إضافة الميزة للنظام بنجاح." }
+// فشل تكرار — 400
+{ "success": false, "message": "الميزة موجودة مسبقاً." }</pre>
+  <div class="callout warn">
+    <b>فحص التكرار محصور في نطاق النظام فقط</b>
+    الفحص هو <code>where('name', $name)-&gt;whereNull('shop_id')</code> — يعني إمكانية وجود اسم مطابق حرفياً بين ميزة
+    نظام وميزة تاجر في نفس الوقت دون أي تعارض. هذا سلوك مقصود من الباك إند وليس خللاً، لكن يستحق تنبيه المستخدم في
+    الواجهة عند البحث لتجنب الخلط البصري بين الاثنين إن ظهرا بنفس الاسم.
+  </div>
+
+  <h2 id="admin-update">تعديل عنصر نظام</h2>
+  <div class="route-line">
+    <span class="pill pill-put">PUT</span><span class="path">/admin/features/{id}/update</span>
+  </div>
+  <pre>// نجاح — 200
+{ "success": true, "message": "تم التحديث بنجاح." }
+// فشل — 404
+{ "success": false, "message": "الميزة غير موجودة." }</pre>
+  <div class="callout warn">
+    <b>محاولة تعديل ميزة تاجر من هذا المسار تُرجع 404 وليس 403</b>
+    لأن الشرط <code>whereNull('shop_id')</code> يمنع مطابقة أي صف مملوك لتاجر، فتُقرأ النتيجة كـ"صفر صفوف محدّثة" وتُترجم
+    لرسالة "غير موجودة" — رغم أن الميزة موجودة فعلياً في قاعدة البيانات. لا تعرض هذه الرسالة حرفياً لو كنت متأكداً من
+    السياق أن العنصر ملك تاجر؛ اعرض بدلاً منها "هذا العنصر يخص أحد التجار، استخدم force-delete/الحذف الخاص به" إن كان
+    بالإمكان تمييز الحالتين مسبقاً من عمود "النوع" في الجدول.
+  </div>
+
+  <h2 id="admin-destroy">حذف عادي (نظام فقط)</h2>
+  <div class="route-line">
+    <span class="pill pill-delete">DELETE</span><span class="path">/admin/features/{id}/delete</span>
+  </div>
+  <div class="callout danger">
+    <b>فخ حرج: يرجع 200 نجاح دائماً حتى لو لم يُحذف شيء</b>
+    <code>destroy</code> العادي لا يتحقق من نتيجة الحذف إطلاقاً — يستدعي <code>DB::transaction</code> ثم يرجع
+    <code>{"success": true, "message": "تم الحذف بنجاح."}</code> بشكل غير مشروط، حتى لو مررت ID لميزة تاجر (فلن تُحذف
+    فعلياً بسبب <code>whereNull('shop_id')</code>) أو ID غير موجود أصلاً. <b>لا تثق باستجابة 200 هنا كدليل على أن
+    العنصر اختفى فعلاً</b> — إن أردت تأكيد الحذف، أعد جلب القائمة أو تحقق أن العنصر من نوع "نظام" قبل استدعاء هذا
+    المسار أصلاً.
+  </div>
+
+  <h2 id="admin-force">حذف بالقوة (أي نوع — نظام أو تاجر)</h2>
+  <div class="route-line">
+    <span class="pill pill-delete">DELETE</span><span class="path">/admin/features/{id}/force-delete</span>
+  </div>
+  <pre>// نجاح — 200
+{ "success": true, "message": "تم حذف الميزة وفك ارتباطها من كافة المنتجات بنجاح." }
+// فشل — 404
+{ "success": false, "message": "الميزة غير موجودة." }</pre>
+  <div class="callout danger">
+    <b>لا سقف نوع — أخطر مسار في هذا الدليل</b>
+    هذا المسار الوحيد القادر فعلياً على حذف ميزة/تاغ تاجر من لوحة الأدمن، ويحذف كل روابطها بجميع منتجات كل التجار دفعة
+    واحدة، بلا استرجاع. اربطه بمودال تأكيد صريح يذكر اسم العنصر ونوعه (نظام/تاجر) بوضوح، ولا تضعه كإجراء افتراضي بجانب
+    زر "حذف" العادي دون تمييز بصري قوي (لون أحمر أغمق + أيقونة تحذير).
+  </div>
+
+  <h2 id="admin-attach">ربط مباشر بمنتج من لوحة الأدمن</h2>
+  <div class="route-line">
+    <span class="pill pill-post">POST</span><span class="path">/admin/features/attach-to-product</span>
+    <span class="scope">body: { product_id, feature_id }</span>
+  </div>
+  <div class="callout warn">
+    <b>عنصر واحد فقط لكل طلب، وبدون سقف 10</b>
+    بعكس مسارات attachFeatures/attachTags للتاجر (max 10 عبر مصفوفة)، هذا المسار الإداري يقبل معرّفاً واحداً فقط في كل
+    استدعاء ولا يتحقق من عدد الميزات الحالية على المنتج إطلاقاً — يمكن نظرياً تجاوز حد الـ10 الذي يفرضه الباك إند على
+    التاجر لو استُخدم هذا المسار بشكل متكرر. صمّم الواجهة الإدارية كحلقة واحدة تلو الأخرى (loop) إن احتجت ربط عدة عناصر،
+    وليس كطلب واحد بمصفوفة.
+  </div>
+
+  <h2 id="flow">مخطط تدفق ربط الميزات المتعدد</h2>
+  <p>يوضح تسلسل التحقق داخل <code>attachMultipleFeatures</code>/<code>attachMultipleTags</code>، حيث كل فرع فشل يوقف العملية بالكامل قبل أي إدراج.</p>
+  <div class="flow">
+    <div class="fbox gray">طلب POST + مصفوفة feature_ids</div>
+    <div class="arrow"></div>
+    <div class="fbox">التحقق الهيكلي: array · max 10 · uuid · distinct</div>
+    <div class="arrow"></div>
+    <div class="fbox">هل المنتج يخص المتجر الحالي؟</div>
+    <div class="branch">
+      <div class="col"><div class="bfail">لا → 400 المنتج غير موجود</div></div>
+    </div>
+    <div class="arrow"></div>
+    <div class="fbox">هل كل المعرّفات ضمن (نظام + متجرك)؟</div>
+    <div class="branch">
+      <div class="col"><div class="bfail">لا → 400 غير مصرح بها</div></div>
+    </div>
+    <div class="arrow"></div>
+    <div class="fbox">لا تكرار مع الروابط الحالية، والإجمالي ≤ 10</div>
+    <div class="branch">
+      <div class="col"><div class="bfail">لا → 400 (الكل أو لا شيء)</div></div>
+    </div>
+    <div class="arrow"></div>
+    <div class="fbox success">إدراج الروابط داخل معاملة واحدة → 200</div>
+  </div>
+
+  <h2 id="mockups">الشاشات المقترحة</h2>
+
+  <h3>1) شاشة الاختيار (Flutter — موبايل التاجر)</h3>
+  <div class="phone"><div class="screen">
+    <div class="row"><b>إضافة ميزات للمنتج</b><i>✕</i></div>
+    <div class="row" style="border:none;padding-top:10px">🔍 <span style="color:var(--muted)">ابحث... (?search=)</span></div>
+    <div style="font-size:12px;color:var(--muted);margin-top:10px">ميزات النظام</div>
+    <div><span class="chip sys">شاشة لمس</span><span class="chip sys">مقاوم للماء</span></div>
+    <div style="font-size:12px;color:var(--muted);margin-top:10px">ميزات متجري</div>
+    <div><span class="chip merch">توصيل مجاني ✎</span></div>
+    <div class="row" style="border:none;margin-top:16px;color:var(--muted);font-size:12px">محدد 1 من 10</div>
+  </div></div>
+  <div class="badge-endpoint"><span>GET /store/features?search= · POST .../attach-feature</span></div>
+  <p>الشرائح (chips) من مصدر <code>system_features</code> بدون أيقونة تعديل؛ من <code>merchant_features</code> مع أيقونة تعديل. زر "ربط المحدد" يبقى معطلاً حتى اختيار عنصر واحد على الأقل، ويُقفل تلقائياً عند بلوغ 10.</p>
+
+  <h3>2) شجرة الاختيار (Angular — لوحة ويب التاجر)</h3>
+  <div class="tree">
+    <div class="tnode"><input type="checkbox" checked> شاشة لمس <span class="chip sys" style="margin-inline-start:auto">نظام</span></div>
+    <div class="tnode"><input type="checkbox"> توصيل مجاني <span class="chip merch" style="margin-inline-start:auto">متجري</span></div>
+    <div class="tnode"><input type="checkbox" disabled> ضمان سنتين (محدد بمنتج آخر مسبقاً) <span class="chip merch" style="margin-inline-start:auto">متجري</span></div>
+  </div>
+  <div class="badge-endpoint"><span>POST /store/features/{productId}/attach-feature</span></div>
+  <p>عطّل مربع أي عنصر مرتبط مسبقاً بنفس المنتج قبل الإرسال — لأن الباك إند سيرفض الطلب بأكمله (لا يتجاهل العنصر المكرر فقط) لو وصل ضمن المصفوفة.</p>
+
+  <h3>3) مودال تأكيد الحذف بالقوة (Admin)</h3>
+  <div class="modal-wrap"><div class="modal">
+    <h4 style="color:var(--red)">حذف نهائي</h4>
+    <p style="font-size:13px;color:var(--muted)">سيتم حذف "توصيل مجاني" (تاجر) وفك ارتباطها من كل المنتجات في كل المتاجر. هذا الإجراء لا رجعة فيه.</p>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button style="flex:1;padding:8px;border-radius:6px;border:1px solid var(--border);background:#fff">إلغاء</button>
+      <button style="flex:1;padding:8px;border-radius:6px;border:none;background:var(--red);color:#fff">حذف نهائياً</button>
+    </div>
+  </div></div>
+  <div class="badge-endpoint"><span>DELETE /admin/features/{id}/force-delete</span></div>
+
+  <h2 id="errors">جدول ملخص لكل الأخطاء المتوقعة</h2>
+  <table>
+    <tr><th>الكود</th><th>يظهر في</th><th>المعنى</th><th>ماذا يفعل الفرونت</th></tr>
+    <tr><td>200</td><td>كل المسارات</td><td>نجاح — لكن راجع فخ destroy العادي أعلاه</td><td>حدّث الحالة المحلية / أعد الجلب</td></tr>
+    <tr><td>400</td><td>كل عمليات السيرفس (Exception عام)</td><td>فشل منطق عمل: ملكية، تكرار، حد أقصى، تكرار اسم</td><td>اعرض <code>message</code> كما هي (عربية جاهزة)</td></tr>
+    <tr><td>404</td><td>show الخاص بـSeller، update/destroy العادي في Admin</td><td>غير موجود ضمن نطاقك تحديداً — وليس بالضرورة غير موجود إطلاقاً</td><td>لا تفترض العنصر محذوف فعلياً في حالة Admin destroy/update</td></tr>
+    <tr><td>422</td><td>attachFeatures/detachFeatures/attachTags/detachTags + كل Requests</td><td>فشل تحقق هيكلي (Laravel Validation)</td><td>اربط كل مفتاح خطأ بحقله في الفورم عبر <code>errors</code></td></tr>
+    <tr><td>500</td><td>index الخاص بـSeller فقط</td><td>خطأ غير متوقع، رسالة عامة ثابتة بلا تفاصيل</td><td>اعرض رسالة عامة + زر إعادة المحاولة، لا تعتمد على النص للتشخيص</td></tr>
+  </table>
+
+  <h2 id="tips">نصائح عملية لتفادي الاحتكاك مع الباك إند</h2>
+  <div class="card">
+    <ol class="tips">
+      <li>لا تبني منطق "نجاح جزئي" لعمليات attach/detach المتعددة — كل عملية Atomic بالكامل (كل أو لا شيء) لأنها داخل <code>DB::transaction</code>.</li>
+      <li>اعتمد على مصدر القائمة (<code>system_*</code> مقابل <code>merchant_*</code>) لتقرير قابلية التعديل، لا على فحص <code>shop_id === null</code> مباشرة.</li>
+      <li>لا تشارك نفس دالة parsing الاستجابة بين شاشة Seller (بدون pagination) وشاشة Admin (<code>data.data</code> مع pagination).</li>
+      <li>عطّل عناصر مختارة مسبقاً في واجهة الاختيار المتعدد بدل الاعتماد فقط على رسالة الخطأ اللاحقة.</li>
+      <li>ميّز بصرياً بين "حذف عادي" (نظام فقط، صامت الفشل) و"حذف بالقوة" (أي نوع، لا رجعة) في لوحة الأدمن — لا تضعهما بنفس شكل الزر.</li>
+      <li>لتعديل اسم ميزة (وليس تاغ)، اعرض معاينة فورية للتحويل التلقائي للمسافات إلى شرطات قبل الحفظ.</li>
+      <li>لمسار المزامنة الشاملة (<code>/products/{id}/features</code> و<code>/tags</code>)، أكّد مع الباك إند شكل الاستجابة الفعلي قبل البناء عليه — الكود المتاح يغطي التحقق فقط وليس التنفيذ.</li>
+    </ol>
+  </div>
+
+  <h2 id="backend-note">ملاحظة مقترحة لفريق الباك إند</h2>
+  <div class="callout tip">
+    <b>توحيد سلوك destroy عبر AdminFeatureController وAdminTagController</b>
+    الدالتان الحاليتان لا تتحقق من <code>affected rows</code> قبل إرجاع <code>success: true</code>. اقتراح: التحقق من
+    قيمة <code>->delete()</code> المرجعة (عدد الصفوف المتأثرة) وإرجاع 404 برسالة واضحة لو كانت صفراً — بنفس النمط
+    المستخدم فعلياً في <code>update()</code> بنفس الملف. هذا سيمنع الفرونت من الاعتماد على استجابة 200 خادعة.
+  </div>
+  <div class="callout tip">
+    <b>توحيد رسائل validation في SyncProductTagsRequest</b>
+    مفاتيح <code>messages()</code> الحالية (<code>tags.array</code>, <code>tags.*.required</code>...) لا تطابق أسماء
+    الحقول الفعلية في <code>rules()</code> (<code>existing_tags</code>/<code>new_tags</code>) فلا تُستخدم أبداً. تحديثها
+    لتطابق أسماء الحقول الحقيقية يوفر رسائل عربية متسقة مع باقي النظام بدل رسائل Laravel الإنجليزية الافتراضية.
+  </div>
+
+  <footer>دليل تكامل داخلي — يعكس حالة الكود وقت إعداد هذا الملف. أي تعديل لاحق في Controllers/Services يجب أن يُتبع بتحديث هذا الدليل.</footer>
+</main>
+</div>
+</body>
+</html>

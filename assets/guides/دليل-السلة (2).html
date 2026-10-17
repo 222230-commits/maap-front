@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>دليل ربط الفرونت إند بمسارات السلة (Cart)</title>
+<style>
+:root{
+  --bg:#F7F6F2; --card:#FFFFFF; --border:#E4E2D8; --text:#26251F; --muted:#6B6A62;
+  --teal:#0F6E56; --teal-light:#E1F5EE; --teal-dark:#085041;
+  --coral:#D85A30; --coral-light:#FAECE7; --coral-dark:#712B13;
+  --purple:#534AB7; --purple-light:#EEEDFE; --purple-dark:#3C3489;
+  --gray:#5F5E5A; --gray-light:#F1EFE8;
+  --code-bg:#1E1D19; --code-text:#F1EFE8;
+  --get:#185FA5; --get-bg:#E6F1FB; --post:#0F6E56; --post-bg:#E1F5EE;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI",Tahoma,Arial,sans-serif;line-height:1.8}
+code,pre{font-family:"Consolas","Courier New",monospace;direction:ltr;text-align:left}
+a{color:var(--teal)}
+.wrap{display:flex;min-height:100vh}
+nav.side{position:sticky;top:0;align-self:flex-start;width:250px;height:100vh;overflow-y:auto;background:var(--card);border-left:1px solid var(--border);padding:20px 16px}
+nav.side .grp{margin-bottom:22px}
+nav.side .grp h4{font-size:12px;color:var(--muted);text-transform:uppercase;margin:0 0 8px;letter-spacing:.5px}
+nav.side a{display:block;font-size:14px;color:var(--text);text-decoration:none;padding:6px 8px;border-radius:6px}
+nav.side a:hover{background:var(--gray-light);color:var(--teal)}
+main{flex:1;padding:36px 44px;max-width:980px}
+.eyebrow{color:var(--teal);font-size:13px;font-weight:bold;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+h1{font-size:30px;margin:0 0 10px}
+h2{font-size:22px;margin:44px 0 14px;border-bottom:2px solid var(--border);padding-bottom:8px}
+h3{font-size:17px;margin:26px 0 10px;color:var(--teal-dark)}
+p.desc{color:var(--muted);font-size:15px;max-width:680px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin:16px 0}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px}
+th{background:var(--teal-light);color:var(--teal-dark);text-align:right;padding:9px 10px;border:1px solid var(--border)}
+td{padding:9px 10px;border:1px solid var(--border);vertical-align:top}
+.route-line{display:flex;align-items:center;gap:10px;margin:14px 0}
+.pill{display:inline-block;font-size:12px;font-weight:bold;padding:4px 10px;border-radius:20px;direction:ltr}
+.pill-get{background:var(--get-bg);color:var(--get)}
+.pill-post{background:var(--post-bg);color:var(--post)}
+.pill-put{background:#FAEEDA;color:#854F0B}
+.pill-del{background:#FCEBEB;color:#A32D2D}
+pre.code{background:var(--code-bg);color:var(--code-text);padding:14px 16px;border-radius:8px;overflow-x:auto;font-size:13px;direction:ltr;text-align:left;margin:10px 0}
+.callout{border-radius:10px;padding:12px 16px;margin:12px 0;font-size:14px}
+.callout.warn{background:var(--coral-light);border:1px solid #F0997B;color:var(--coral-dark)}
+.callout.tip{background:var(--teal-light);border:1px solid #5DCAA5;color:var(--teal-dark)}
+.callout b{display:block;margin-bottom:4px}
+.flow{display:flex;flex-direction:column;align-items:center;gap:0;margin:18px 0}
+.fbox{background:var(--card);border:2px solid var(--purple);color:var(--purple-dark);border-radius:10px;padding:10px 18px;font-size:14px;text-align:center;min-width:260px}
+.fbox.gray{border-color:var(--gray);color:var(--gray)}
+.fbox.end-ok{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark)}
+.fbox.end-err{border-color:var(--coral);background:var(--coral-light);color:var(--coral-dark)}
+.arrow{width:2px;height:22px;background:var(--border);position:relative}
+.arrow:after{content:"";position:absolute;bottom:-1px;left:-4px;border:5px solid transparent;border-top-color:var(--border)}
+.branch{display:flex;justify-content:center;gap:60px;width:100%;margin-top:4px}
+.branch .col{display:flex;flex-direction:column;align-items:center}
+.branch label{font-size:12px;color:var(--muted);margin-bottom:6px}
+.phone{width:300px;margin:14px auto;background:var(--gray-light);border-radius:26px;padding:14px;border:1px solid var(--border)}
+.screen{background:#fff;border-radius:16px;padding:10px;font-size:12px}
+.shopcard{background:var(--gray-light);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden}
+.shopcard .shead{display:flex;justify-content:space-between;padding:6px 8px;font-weight:bold;background:#fff;border-bottom:1px solid var(--border)}
+.row{display:flex;gap:6px;padding:6px 8px;border-bottom:1px solid var(--border);align-items:center}
+.row .thumb{width:34px;height:34px;background:#ddd;border-radius:6px;flex-shrink:0}
+.row .info{flex:1;font-size:11px}
+.sfoot{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:#fff}
+.sfoot button{background:var(--teal);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:11px}
+.badge-endpoint{display:inline-block;margin-top:8px;background:var(--purple-light);color:var(--purple-dark);font-size:12px;padding:4px 10px;border-radius:6px;direction:ltr}
+footer{margin-top:60px;padding:20px 0;border-top:1px solid var(--border);color:var(--muted);font-size:13px;text-align:center}
+ol.tips li{margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="side">
+  <div class="grp">
+    <h4>تصفح الميزة</h4>
+    <a href="#overview">نظرة عامة واختيار الأداة</a>
+    <a href="#flow">مخطط تدفق الإضافة/التعديل</a>
+  </div>
+  <div class="grp">
+    <h4>مسارات API</h4>
+    <a href="#get-cart">GET السلة</a>
+    <a href="#post-item">POST إضافة عنصر</a>
+    <a href="#put-item">PUT تعديل عنصر</a>
+    <a href="#del-item">DELETE حذف عنصر</a>
+    <a href="#del-clear">DELETE تفريغ السلة</a>
+  </div>
+  <div class="grp">
+    <h4>الشاشات</h4>
+    <a href="#screen-cart">شاشة السلة مقسّمة حسب المتجر</a>
+  </div>
+  <div class="grp">
+    <h4>مرجع سريع</h4>
+    <a href="#errors">جدول الأخطاء</a>
+    <a href="#tips">نصائح عملية</a>
+    <a href="#backend-note">ملاحظة للباك إند</a>
+  </div>
+</nav>
+
+<main>
+  <div class="eyebrow">دليل ربط الفرونت إند</div>
+  <h1>ميزة السلة (Cart)</h1>
+  <p class="desc">هذا الدليل يشرح كل مسارات السلة (GET / POST / PUT / DELETE) بالتفصيل: شكل الطلب، كل احتمالات الاستجابة، وأهم الفخاخ التي قد تسبب مشاكل في الربط لو تم الاعتماد فقط على اسم الدالة.</p>
+
+  <h2 id="overview">1. نظرة عامة واختيار الأداة</h2>
+  <table>
+    <tr><th>الميزة</th><th>الأداة المقترحة</th><th>السبب</th></tr>
+    <tr><td>عرض السلة وتعديل الكميات (تجربة تصفح متسلسلة)</td><td>Flutter</td><td>تفاعل لمسي مباشر (سحب، أزرار +/-)، وقرب أكبر من تجربة موبايل المستخدم النهائي</td></tr>
+    <tr><td>اختيار اللون/المقاس عند الإضافة (مودال متعدد الخيارات)</td><td>Flutter</td><td>تجربة اختيار بصرية بسيطة مناسبة لمودال موبايل، لا تحتاج جدول أو شجرة معقدة</td></tr>
+    <tr><td>لوحة تحكم بائع/إدارة لمراجعة سلال المستخدمين (إن وُجدت لاحقاً)</td><td>Angular / React</td><td>تحتاج جداول وفرز وفلترة، وهذا أنسب للوحات تحكم على شاشات كبيرة</td></tr>
+  </table>
+
+  <h2 id="flow">2. مخطط تدفق: إضافة عنصر / التعديل مع الدمج</h2>
+  <p class="desc">أهم نقطة هنا: عند تعديل عنصر (PUT) بحيث يصبح لونه/مقاسه مطابقاً لعنصر آخر موجود مسبقاً في نفس المنتج، يتم <b>دمج</b> العنصرين والاحتفاظ بمعرّف العنصر الآخر، ويُحذف العنصر الأصلي. أي أن <code>cartItemId</code> الذي تعمل عليه قد يختفي بعد نجاح الطلب!</p>
+  <div class="flow">
+    <div class="fbox gray">إرسال الطلب (POST/PUT)</div>
+    <div class="arrow"></div>
+    <div class="fbox">التحقق من الحقول (Validation)</div>
+    <div class="arrow"></div>
+    <div class="fbox">هل يوجد عنصر آخر بنفس المنتج+اللون+المقاس؟</div>
+    <div class="branch">
+      <div class="col">
+        <label>نعم — يوجد تطابق</label>
+        <div class="fbox">دمج الكميات في العنصر الآخر، وحذف الحالي</div>
+      </div>
+      <div class="col">
+        <label>لا يوجد تطابق</label>
+        <div class="fbox">تحديث/إنشاء العنصر كما هو</div>
+      </div>
+    </div>
+    <div class="arrow"></div>
+    <div class="fbox">فحص المخزون (stock) مقابل الكمية النهائية</div>
+    <div class="branch">
+      <div class="col">
+        <label>الكمية أكبر من المخزون</label>
+        <div class="fbox end-err">خطأ 400 — رسالة نصية فقط</div>
+      </div>
+      <div class="col">
+        <label>الكمية متاحة</label>
+        <div class="fbox end-ok">نجاح — أعد جلب GET /Cart كاملة</div>
+      </div>
+    </div>
+  </div>
+  <div class="callout warn"><b>فخ: لا يوجد endpoint لإزالة اللون/المقاس</b>
+  عند إرسال <code>color_id: null</code> صراحةً في PUT، الكود يستخدم <code>$colorId ?? $cartItem->color_id</code>، وفي PHP القيمة null تُعامل معاملة "غير مُرسلة"، فتبقى القيمة القديمة كما هي. لا توجد طريقة حالياً لإلغاء اللون/المقاس المختار مسبقاً عبر هذا المسار — فقط تغييره لقيمة أخرى غير فارغة.</div>
+
+  <h2>3. مسارات API بالتفصيل</h2>
+
+  <h3 id="get-cart">3.1 جلب السلة كاملة</h3>
+  <div class="route-line"><span class="pill pill-get">GET</span><code>/buyer/cart</code></div>
+  <div class="card">
+    <b>الطلب:</b> بدون body، فقط رأس التوثيق:
+    <pre class="code">Authorization: Bearer {token}</pre>
+    <b>الاستجابة (200):</b>
+    <pre class="code">{
+  "cart_id": "uuid",
+  "total_items_count": 5,
+  "grand_total": 91.00,
+  "shops": [
+    {
+      "shop_id": "uuid",
+      "shop_name": "SHEGLAM",
+      "shop_slug": "sheglam",
+      "shop_logo_url": "https://...",
+      "subtotal": 51.00,
+      "items_count": 2,
+      "items": [
+        {
+          "cart_item_id": "uuid",
+          "product_id": "uuid",
+          "title": "قلم تمويه الشفاه",
+          "slug": "product-slug",
+          "quantity": 1,
+          "price": 200,
+          "compare_at_price": 200,
+          "discount_percentage": 0,
+          "color_id": "uuid|null",
+          "size_id": "uuid|null",
+          "color_name": "Dream Date",
+          "size_name": null,
+          "total_price": 17.00,
+          "stock": 200,
+          "is_available": true,
+          "image_url": "https://..."
+        }
+      ]
+    }
+  ]
+}</pre>
+    <table>
+      <tr><th>الحقل</th><th>النوع</th><th>ملاحظة</th></tr>
+      <tr><td><code>price</code></td><td>number</td><td>السعر الحالي الفعلي (المستخدم فعلاً في حساب <code>total_price</code>)</td></tr>
+      <tr><td><code>compare_at_price</code></td><td>number أو <code>null</code></td><td>السعر "قبل الخصم" لعرضه مشطوباً — <code>null</code> إن لم يكن للمنتج سعر مقارنة أصلاً</td></tr>
+      <tr><td><code>discount_percentage</code></td><td>integer</td><td>نسبة الخصم، محسوبة دائماً رياضياً من <code>compare_at_price</code> و<code>price</code> — مضمونة كعدد صحيح</td></tr>
+    </table>
+    <div class="callout tip"><b>تحديث: تم توحيد مصدر الخصم</b>
+    <code>discount_percentage</code> أصبح الآن يُحسب دائماً رياضياً من الفرق بين <code>compare_at_price</code> و<code>price</code>، ولم يعد يُقرأ من أي حقل مخزَّن منفصل بالمنتج. النتيجة: الحقلان أصبحا مترابطين بشكل مضمون —
+    <code>discount_percentage > 0</code> يعني بالضرورة أن <code>compare_at_price</code> ليست <code>null</code> وأكبر من <code>price</code>، والعكس صحيح. يمكنك الآن الاعتماد على أي منهما لتفعيل شارة الخصم أو السعر المشطوب دون قلق من تعارضهما.</div>
+    <div class="callout tip"><b>تحديث: النوع أصبح int مضموناً</b>
+    الكود يستخدم الآن <code>(int) round(...)</code> صراحة، أي أن <code>discount_percentage</code> سيصلك دائماً كعدد صحيح (مثل <code>25</code> وليس <code>25.0</code>) — يمكنك التعامل معه كـ int بثقة في لغات صارمة الأنواع.</div>
+    <div class="callout warn"><b>فخ: تسمية متشابهة بمعنى مختلف</b>
+    <code>items_count</code> داخل كل متجر = عدد الأسطر (عدد أنواع المنتجات المختلفة)، بينما <code>total_items_count</code> على مستوى السلة الكلي = مجموع الكميات (quantity) لكل العناصر. لا يصح جمع قيم <code>items_count</code> من كل المتاجر وتوقع أن تساوي <code>total_items_count</code> — إحداهما تعدّ الأسطر والأخرى تعدّ القطع.</div>
+    <div class="callout warn"><b>فخ: عناصر تختفي دون تنبيه</b>
+    إذا حُذف منتج من النظام (product = null)، يتم استبعاد عنصر السلة المرتبط به بالكامل من الاستجابة بصمت، دون أي رسالة أو حقل يوضح أن هناك عنصراً محذوفاً. إن كانت واجهتك تعرض عداد السلة من طلب سابق (مثلاً badge على أيقونة السلة) وقارنته بهذه الاستجابة، قد يظهر تناقض غير مفسَّر للمستخدم.</div>
+    <div class="callout warn"><b>فخ: is_available لا يمنع شيئاً تلقائياً</b>
+    الحقل <code>is_available</code> محسوب فقط للعرض (نشط + منشور + المخزون كافٍ للكمية الحالية). الباك إند لا يحذف أو يعدّل العنصر تلقائياً إن أصبح غير متوفر — يبقى في السلة بكميته القديمة. الفرونت إند مسؤول عن تعطيل زر "اطلب" لأي متجر يحتوي عنصراً واحداً على الأقل بـ <code>is_available: false</code>.</div>
+  </div>
+
+  <h3 id="post-item">3.2 إضافة عنصر للسلة</h3>
+  <div class="route-line"><span class="pill pill-post">POST</span><code>/buyer/cart/items</code></div>
+  <div class="card">
+    <b>الطلب:</b>
+    <pre class="code">{
+  "product_id": "uuid",       // مطلوب
+  "quantity": 1,               // اختياري، افتراضي 1، حد أدنى 1
+  "color_id": "uuid",          // اختياري إلا إذا كان المنتج متعدد الألوان بلا صورة عامة
+  "size_id": "uuid"            // اختياري
+}</pre>
+    <b>الاستجابة عند النجاح (201) — تم تحديثها الآن لترجع السلة كاملة:</b>
+    <pre class="code">{
+  "message": "تمت إضافة المنتج إلى السلة بنجاح.",
+  "data": {
+    "cart_id": "uuid",
+    "total_items_count": 5,
+    "grand_total": 91.00,
+    "shops": [ ... نفس شكل GET بالكامل ... ]
+  }
+}</pre>
+    <div class="callout tip"><b>تحديث مهم منذ آخر نسخة</b>
+    شكل الاستجابة أصبح الآن مطابقاً تماماً لما يرجعه PUT: <code>data</code> هي السلة الكاملة عبر <code>CartResource</code> وليست سجل CartItem الخام كما كانت سابقاً. هذا يلغي الحاجة لاستدعاء GET إضافي بعد الإضافة — اعرض <code>response.data</code> مباشرة بعد نجاح الإضافة.</div>
+    <b>حالات الخطأ (400) — Business Exceptions:</b>
+    <table>
+      <tr><th>الحالة</th><th>مثال رسالة</th></tr>
+      <tr><td>المنتج غير موجود أو غير منشور</td><td>"المنتج المطلوب غير موجود في النظام."</td></tr>
+      <tr><td>محاولة شراء من متجرك الخاص</td><td>رسالة تتضمن اسم متجرك</td></tr>
+      <tr><td>اللون مطلوب ولم يُرسل</td><td>"هذا المنتج متوفر بألوان محددة فقط..."</td></tr>
+      <tr><td>الكمية أكبر من المخزون المتاح</td><td>رسالة نصية، مع حقل <code>available_stock</code> رقمي أحياناً (انظر التحذير التالي)</td></tr>
+    </table>
+    <pre class="code">// شكل خطأ نفاد المخزون المتوقّع (قد لا يحتوي available_stock دائماً)
+{
+  "error": "الكمية المطلوبة أكبر من المخزون المتاح لمنتج ...",
+  "available_stock": 3
+}</pre>
+    <div class="callout warn"><b>فخ: حقل available_stock غير مضمون الظهور</b>
+    الكود الجديد يحاول إضافة <code>available_stock</code> فقط عندما يتحقق شرطان معاً: أن يكون الاستثناء من نوع <code>BusinessException</code> وأن يكون <code>getCode()</code> يساوي نص <code>'INSUFFICIENT_STOCK'</code> بالضبط. دالة <code>getCode()</code> في استثناءات PHP القياسية ترجع رقماً افتراضياً وليس نصاً، فإن لم تكن <code>BusinessException</code> تخصّص هذا السلوك صراحةً، الشرط لن يتحقق أبداً وسيغيب الحقل بصمت دون أي خطأ ظاهر. <b>لا تعتمد بشكل حصري على وجود <code>available_stock</code></b> — اجعل الفرونت يعرض دائماً نص <code>error</code> كخيار احتياطي، ويستخدم <code>available_stock</code> فقط إن وُجد فعلياً في الاستجابة.</div>
+    <div class="callout warn"><b>فخ حرج: احتمال استجابة 500 بدل 400</b>
+    الكود المرفق لا يستورد <code>use App\Exceptions\BusinessException;</code> في أعلى ملف <code>CartController</code>، بينما يستخدم <code>instanceof BusinessException</code> داخل catch. في PHP هذا يجعل الفحص يشير لكلاس غير موجود ضمن نيمسبيس الكنترولر نفسه، ما قد يسبب خطأ فادح (Fatal Error) بدل إرجاع استجابة 400 المتوقعة. <b>الأثر على الفرونت:</b> قد تصل أحياناً استجابة 500 بمحتوى غير متوقع (صفحة خطأ HTML أو JSON مختلف الشكل) بدل رسالة الخطأ العربية المنسّقة، حتى في حالات طبيعية تماماً مثل نفاد المخزون. تأكد أن معالج الأخطاء لديك يتحمّل حالة 500 بشكل لائق (رسالة عامة "حدث خطأ غير متوقع") بدل الافتراض أن كل خطأ سيصل بصيغة <code>{"error": "..."}</code>. تم إبلاغ فريق الباك إند بهذه النقطة (انظر القسم الأخير).</div>
+    <div class="callout warn"><b>فخ: كودان مختلفان للخطأ</b>
+    أخطاء التحقق من الحقول (uuid غير صالح، الحقل فارغ) تُرجَع بكود <code>422</code> وبصيغة Laravel القياسية <code>{"errors": {"field": ["..."]}}</code>، بينما أخطاء منطق العمل (نفاد المخزون، منتج غير متاح...) من المفترض أن تُرجَع بكود <code>400</code> وبصيغة <code>{"error": "...", "available_stock"?: number}</code>. صمّم معالج أخطاء موحد في الفرونت يفرّق بين الشكلين، مع مسار احتياطي ثالث لأي كود آخر (500 وغيره).</div>
+  </div>
+
+  <h3 id="put-item">3.3 تعديل عنصر (كمية/لون/مقاس)</h3>
+  <div class="route-line"><span class="pill pill-put">PUT</span><code>/buyer/cart/items/{cartItemId}</code></div>
+  <div class="card">
+    <b>الطلب:</b>
+    <pre class="code">{
+  "quantity": 2,        // مطلوب، حد أدنى 1
+  "color_id": "uuid",   // اختياري
+  "size_id": "uuid"     // اختياري
+}</pre>
+    <b>الاستجابة عند النجاح (200):</b>
+    <pre class="code">{
+  "message": "تم تحديث السلة بنجاح.",
+  "data": {
+    "cart_id": "...",
+    "total_items_count": ...,
+    "grand_total": ...,
+    "shops": [ ... نفس شكل GET بالكامل ... ]
+  }
+}</pre>
+    <div class="callout tip"><b>توصية تصميم</b>
+    نفّذ الشاشة بحيث تعيد رسم كامل السلة من <code>response.data</code> مباشرة بعد كل تعديل، بدل تحديث العنصر محلياً فقط بالـ id القديم — لأن العنصر قد يكون اندمج مع آخر واختفى id كما ذكرنا في المخطط أعلاه.</div>
+    <b>أخطاء (400):</b> نفس أنواع أخطاء الإضافة (<code>insufficientStock</code>، <code>invalidQuantity</code>) بالإضافة إلى <code>unauthorizedAction</code> إذا لم يكن العنصر ملكاً للمستخدم أو غير موجود أصلاً — نفس رسالة الخطأ في الحالتين، فلا يمكن تمييز "العنصر غير موجود" عن "العنصر ليس لك" من نص الرسالة وحده.
+    <div class="callout warn"><b>نفس فخاخ POST تنطبق هنا</b>
+    حقل <code>available_stock</code> عند خطأ نفاد المخزون شرطي وغير مضمون لنفس السبب (استيراد <code>BusinessException</code> المفقود)، وهناك احتمال استجابة 500 غير متوقعة بدل 400 في أي حالة يُرمى فيها استثناء. استخدم نفس معالج الأخطاء الموحّد المذكور في قسم POST.</div>
+  </div>
+
+  <h3 id="del-item">3.4 حذف عنصر واحد</h3>
+  <div class="route-line"><span class="pill pill-del">DELETE</span><code>/buyer/cart/items/{cartItemId}</code></div>
+  <div class="card">
+    <b>الاستجابة (200) — تم تحديثها الآن لترجع السلة كاملة:</b>
+    <pre class="code">{
+  "message": "تم إزالة المنتج من السلة.",
+  "data": {
+    "cart_id": "uuid",
+    "total_items_count": 3,
+    "grand_total": 68.00,
+    "shops": [ ... نفس شكل GET، محدَّث بعد الحذف ... ]
+  }
+}</pre>
+    <div class="callout tip"><b>تحديث مهم منذ آخر نسخة</b>
+    مسارات الإضافة (POST) والتعديل (PUT) والحذف (DELETE) أصبحت الثلاثة الآن متسقة تماماً: كل واحد منها يرجع <code>data</code> بنفس شكل <code>CartResource</code> الكامل. اعتمد نمطاً واحداً في الفرونت: بعد أي نجاح من الثلاثة، استبدل حالة السلة المحلية بالكامل بـ <code>response.data</code> دون تمييز خاص لكل مسار.</div>
+    <div class="callout warn"><b>ملاحظة: كود الخطأ هنا لا يزال بلا حقل data</b>
+    عند فشل الحذف (400 - <code>unauthorizedAction</code>)، الاستجابة لا تزال <code>{"error": "..."}</code> فقط بدون بيانات سلة — هذا طبيعي ومتوقع لأن العملية لم تُنفَّذ أصلاً، فلا داعي لتحديث الحالة المحلية في حالة الفشل.</div>
+  </div>
+
+  <h3 id="del-clear">3.5 تفريغ السلة بالكامل</h3>
+  <div class="route-line"><span class="pill pill-del">DELETE</span><code>/buyer/cart/clear</code></div>
+  <div class="card">
+    <b>الاستجابة (200) دائماً:</b>
+    <pre class="code">{ "message": "تم تفريغ السلة بنجاح." }</pre>
+    <div class="callout warn"><b>فخ: عملية غير قابلة للتراجع، ولا تنتظر خطأ أبداً</b>
+    هذا المسار لا يرمي أي استثناء حتى لو كانت السلة فارغة أصلاً، ودائماً يرجع 200. لكنه يحذف كل عناصر السلة نهائياً من قاعدة البيانات دون تأكيد إضافي من الباك إند — التأكيد يجب أن يكون بالكامل من مسؤولية الفرونت (نافذة تأكيد قبل الاستدعاء).</div>
+  </div>
+
+  <h2 id="screen-cart">4. شاشة السلة — التقسيم حسب المتجر</h2>
+  <p class="desc">بما أن استجابة GET/PUT ترجع السلة مقسّمة مسبقاً داخل مصفوفة <code>shops</code>، لا حاجة للفرونت لتجميع العناصر يدوياً — فقط اعرض كل عنصر في المصفوفة كبطاقة متجر منفصلة، مع مجموع كل متجر وزر طلب خاص به.</p>
+  <div class="phone">
+    <div class="screen">
+      <div style="font-weight:bold;margin-bottom:8px">سلتي</div>
+      <div class="shopcard">
+        <div class="shead"><span>SHEGLAM</span><span>عنصران</span></div>
+        <div class="row"><div class="thumb"></div><div class="info">قلم تمويه Dream Date 004<br>اللون: Dream Date · الكمية: 1</div></div>
+        <div class="row"><div class="thumb"></div><div class="info">قلم تمويه Soft Bounce 032<br>اللون: ارتداد ناعم · الكمية: 2</div></div>
+        <div class="sfoot"><span>المجموع: 51.00</span><button>اطلب من هذا المتجر</button></div>
+      </div>
+      <div class="shopcard">
+        <div class="shead"><span>متجر آخر</span><span>عنصر واحد</span></div>
+        <div class="row" style="opacity:.55"><div class="thumb"></div><div class="info">منتج غير متوفر حالياً<br>الكمية أكبر من المخزون</div></div>
+        <div class="sfoot"><span>المجموع: 40.00</span><button disabled style="background:#ccc">راجع الكمية أولاً</button></div>
+      </div>
+    </div>
+  </div>
+  <div style="text-align:center"><span class="badge-endpoint">GET|PUT /buyer/cart → shops[]</span></div>
+  <div class="callout warn"><b>فخ: لا يوجد مسار جاهز لطلب متجر واحد فقط</b>
+  الأكواد المرفقة لا تحتوي على أي endpoint لإنشاء طلب مرتبط بمتجر واحد تحديداً من السلة — فقط تعريف مسار عام <code>POST /buyer/orders</code> غير مرفق كوده. زر "اطلب من هذا المتجر" في الشاشة أعلاه يفترض أن هذا المسار يقبل <code>shop_id</code> لتصفية عناصر السلة عند إنشاء الطلب. يجب تأكيد هذا مع فريق الباك إند قبل البناء عليه فعلياً (انظر الملاحظة أدناه).</div>
+  <div class="callout tip"><b>توصية تصميم</b>
+  عطّل زر الطلب لأي بطاقة متجر تحتوي عنصراً واحداً على الأقل بـ <code>is_available: false</code>، واعرض نص توضيحي تحت الزر بدل تركه مفعّلاً ويفشل الطلب لاحقاً في السيرفر.</div>
+
+  <h2 id="errors">5. جدول ملخص لكل الأخطاء المتوقعة</h2>
+  <table>
+    <tr><th>الكود</th><th>يظهر في</th><th>المعنى</th><th>ماذا يفعل الفرونت</th></tr>
+    <tr><td>422</td><td>POST items, PUT items</td><td>فشل التحقق من الحقول (uuid غير صالح، حقل مفقود)</td><td>اعرض الخطأ تحت الحقل المعني من <code>errors.field[0]</code></td></tr>
+    <tr><td>400 - invalidQuantity</td><td>POST/PUT items</td><td>كمية غير صالحة (نادر الحدوث لأن Validation يمنعها مسبقاً)</td><td>اعرض رسالة عامة، تحقق من قيمة حقل الكمية في الواجهة</td></tr>
+    <tr><td>400 - productNotAvailable</td><td>POST items</td><td>المنتج محذوف أو غير منشور أو غير نشط</td><td>أزل المنتج من واجهة العرض، اعرض رسالة السيرفر كما هي</td></tr>
+    <tr><td>400 - cannotBuyFromOwnShop</td><td>POST items</td><td>المستخدم بائع المنتج نفسه</td><td>أخفِ زر الإضافة للسلة أصلاً إن كان المستخدم هو صاحب المتجر</td></tr>
+    <tr><td>400 - colorRequired</td><td>POST items</td><td>المنتج يتطلب اختيار لون قبل الإضافة</td><td>افتح مودال اختيار اللون بدل محاولة الإرسال مباشرة</td></tr>
+    <tr><td>400 - insufficientStock</td><td>POST/PUT items</td><td>الكمية المطلوبة أكبر من المخزون المتاح، مع <code>available_stock</code> رقمي أحياناً</td><td>اعرض رسالة السيرفر، واستخدم <code>available_stock</code> إن وُجد فقط كتحسين إضافي وليس كاعتماد أساسي</td></tr>
+    <tr><td>400 - unauthorizedAction</td><td>PUT/DELETE items</td><td>العنصر غير موجود أو لا يملكه المستخدم</td><td>أعد جلب GET /cart فوراً لتحديث الحالة المحلية</td></tr>
+    <tr><td>401</td><td>كل المسارات</td><td>عدم إرسال Bearer token صالح</td><td>أعد توجيه المستخدم لتسجيل الدخول</td></tr>
+    <tr><td>500 (غير متوقع)</td><td>POST/PUT items خصوصاً</td><td>خطأ محتمل في الباك إند بسبب استيراد ناقص لكلاس BusinessException (انظر ملاحظة الباك إند)</td><td>اعرض رسالة عامة "حدث خطأ غير متوقع، حاول مجدداً" ولا تفترض شكل JSON محدد</td></tr>
+  </table>
+
+  <h2 id="tips">6. نصائح عملية لتفادي الاحتكاك مع الباك إند</h2>
+  <div class="card">
+    <ol class="tips">
+      <li>وحّد استخدام مسار واحد فقط من بين <code>/Buyer/Cart</code> و <code>/buyer/cart</code> (المسجّلان مكرَّرين بنفس الوظيفة) — يُفضّل الأحرف الصغيرة لتفادي مشاكل الكاش أو الحساسية لحالة الأحرف على بعض الخوادم.</li>
+      <li>لا تخزّن نسخة محلية من السلة أطول من مدة الجلسة الحالية دون مزامنة — الاختفاء الصامت للعناصر المحذوفة من الكتالوج يجعل أي كاش قديم مضللاً.</li>
+      <li>بعد نجاح POST أو PUT أو DELETE على عناصر السلة، اعتمد نمطاً موحداً: استبدل حالة السلة بالكامل بـ <code>response.data</code> مباشرة — الثلاثة يرجعون الآن نفس شكل <code>CartResource</code>.</li>
+      <li>اجعل معالج الأخطاء لديك يتحقق أولاً من الكود (422 / 400 / أي كود آخر مثل 500) قبل قراءة شكل الحمولة، لأن المفتاح يختلف (<code>errors</code> مقابل <code>error</code>)، وقد لا تصل أي حمولة JSON متوقعة في حالة 500.</li>
+      <li>عامل حقل <code>available_stock</code> في أخطاء نفاد المخزون كحقل اختياري دائماً (<code>error.available_stock ?? null</code>) وليس حقلاً مضموناً.</li>
+      <li>اعرض شارة الخصم والسعر المشطوب معاً بثقة الآن — <code>discount_percentage</code> و<code>compare_at_price</code> مترابطان رياضياً ومضمونان بعد توحيد مصدر الحساب.</li>
+      <li>عند حساب مجموع "اطلب من هذا المتجر"، استخدم <code>subtotal</code> الجاهز من الاستجابة بدل إعادة حسابه من العناصر لتفادي فروقات تقريب.</li>
+      <li>تحقق من عمود <code>is_available</code> على مستوى كل عنصر داخل المتجر، وليس فقط على مستوى وجود stock رقمي، لأن التوفر يعتمد أيضاً على حالة نشر المنتج.</li>
+    </ol>
+  </div>
+
+  <h2 id="backend-note">7. ملاحظة مقترحة لفريق الباك إند</h2>
+  <div class="callout warn"><b>مشكلة حرجة يُنصح بإصلاحها قبل النشر</b>
+  <ul style="margin:6px 0 0;padding-inline-start:20px">
+    <li><code>CartController.php</code> يستخدم <code>instanceof BusinessException</code> و<code>$e->getCode() === 'INSUFFICIENT_STOCK'</code> داخل catch في <code>store()</code> و<code>update()</code>، لكن لا يوجد <code>use App\Exceptions\BusinessException;</code> في أعلى الملف. هذا يجعل الفحص يشير لكلاس غير معروف ضمن نيمسبيس <code>App\Http\Controllers\Buyer</code>، وقد يسبب خطأ فادح (Fatal Error → استجابة 500) بدل استجابة 400 المقصودة، في أي حالة عادية مثل نفاد المخزون أو محاولة شراء من متجر خاص. يُنصح بإضافة الاستيراد المفقود واختبار كل حالات BusinessException فعلياً قبل الإطلاق.</li>
+    <li>يفترض الكود أن <code>BusinessException::getCode()</code> يرجع نصاً مثل <code>'INSUFFICIENT_STOCK'</code>، بينما التوقيع القياسي لـ<code>Exception::getCode()</code> في PHP يرجع عدداً صحيحاً. إن لم تكن <code>BusinessException</code> تُخصّص هذا صراحة، فحقل <code>available_stock</code> لن يظهر أبداً في الاستجابة رغم وجود الكود المخصص له.</li>
+  </ul>
+  </div>
+  <div class="callout tip"><b>نقاط تحسين تم تنفيذها بالفعل منذ آخر مراجعة</b>
+  <ul style="margin:6px 0 0;padding-inline-start:20px">
+    <li>مسار POST لإضافة عنصر أصبح الآن يرجع CartResource كاملة بدل سجل CartItem الخام — جيد، ويطابق الآن سلوك PUT.</li>
+    <li>مسار DELETE لحذف عنصر أصبح يرجع الآن الإجماليات المحدثة أيضاً — الاتساق بين المسارات الثلاثة (POST/PUT/DELETE) أصبح تاماً.</li>
+    <li>أُضيف حقل <code>available_stock</code> اختيارياً في خطأ نفاد المخزون — بمجرد إصلاح مشكلة الاستيراد أعلاه سيعمل هذا الحقل كما هو مخطط له.</li>
+    <li>حقل <code>discount_percentage</code> أصبح يُحسب الآن من مصدر واحد فقط (رياضياً من <code>compare_at_price</code> و<code>price</code>) بدل مصدرين متعارضين محتملين — تم حل مشكلة التناقض المذكورة سابقاً.</li>
+  </ul>
+  </div>
+  <div class="callout tip"><b>نقاط لا تزال قائمة</b>
+  <ul style="margin:6px 0 0;padding-inline-start:20px">
+    <li>وجود نسخة مكررة تماماً من مجموعة مسارات <code>/Cart</code> و <code>/cart</code> يستحق التوحيد لتفادي التباس مستقبلي.</li>
+    <li>ملف الراوتس يستخدم <code>BuyerOrderController::class</code> ضمن مسارات <code>buyer/orders</code> دون استيراد الكلاس (لا يوجد <code>use</code> مقابل له في أعلى الملف)، بنفس نمط مشكلة BusinessException — يستحق المراجعة أيضاً لأنه سيمنع عمل مسارات الطلبات بالكامل عند استدعائها.</li>
+    <li>لا يوجد حالياً مسار مؤكد لإنشاء طلب مقتصر على متجر واحد من السلة — إن كانت ميزة "اطلب من هذا المتجر" مطلوبة فعلاً في الواجهة، يلزم تأكيد أو إضافة دعم <code>shop_id</code> في <code>POST /buyer/orders</code>.</li>
+  </ul>
+  </div>
+
+  <footer>دليل ربط داخلي — تم إنشاؤه من تحليل أكواد CartController / CartService / CartResource ومسارات routes/api.php الخاصة بالسلة.</footer>
+</main>
+</div>
+</body>
+</html>

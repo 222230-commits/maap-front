@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>دليل ربط الفرونت إند - تقييم المنتج بالنجوم</title>
+<style>
+  :root{
+    --bg:#F6F5F1;
+    --card-bg:#FFFFFF;
+    --border:#E1DFD6;
+    --text:#2C2C2A;
+    --text-muted:#6B6A63;
+    --teal:#0F6E56;
+    --teal-light:#E1F5EE;
+    --teal-dark:#085041;
+    --coral:#D85A30;
+    --coral-light:#FAECE7;
+    --coral-dark:#712B13;
+    --purple:#534AB7;
+    --purple-light:#EEEDFE;
+    --purple-dark:#3C3489;
+    --gray:#5F5E5A;
+    --gray-light:#F1EFE8;
+    --code-bg:#2B2B29;
+    --code-text:#E8E6DD;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:"Segoe UI", Tahoma, Arial, sans-serif;
+    line-height:1.8;
+  }
+  .layout{display:flex; align-items:flex-start; max-width:1180px; margin:0 auto;}
+  nav.side{
+    position:sticky; top:0; height:100vh; overflow-y:auto;
+    width:230px; flex-shrink:0; padding:24px 16px; background:var(--card-bg);
+    border-left:1px solid var(--border);
+  }
+  nav.side h3{font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px; margin:20px 0 8px;}
+  nav.side h3:first-child{margin-top:0;}
+  nav.side a{
+    display:block; padding:6px 8px; font-size:14px; color:var(--text);
+    text-decoration:none; border-radius:6px;
+  }
+  nav.side a:hover{background:var(--teal-light); color:var(--teal-dark);}
+  main{flex:1; padding:32px 40px; min-width:0;}
+  .eyebrow{color:var(--teal); font-size:13px; font-weight:bold; letter-spacing:.5px;}
+  h1{font-size:28px; margin:6px 0 10px;}
+  .lede{color:var(--text-muted); font-size:15px; max-width:720px;}
+  h2{font-size:20px; margin:40px 0 14px; border-bottom:2px solid var(--border); padding-bottom:8px;}
+  h3{font-size:16px; margin:20px 0 8px;}
+  .card{background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:18px 20px; margin:14px 0;}
+  table{width:100%; border-collapse:collapse; font-size:13.5px; margin:12px 0;}
+  th, td{border:1px solid var(--border); padding:8px 10px; text-align:right; vertical-align:top;}
+  th{background:var(--teal-light); color:var(--teal-dark); font-weight:bold;}
+  code{
+    direction:ltr; unicode-bidi:embed; font-family:"Consolas","Courier New",monospace;
+    font-size:13px; background:var(--gray-light); padding:2px 6px; border-radius:4px;
+  }
+  pre{
+    direction:ltr; unicode-bidi:embed; background:var(--code-bg); color:var(--code-text);
+    font-family:"Consolas","Courier New",monospace; font-size:13px;
+    padding:14px 16px; border-radius:8px; overflow-x:auto; margin:10px 0;
+  }
+  .route-line{display:flex; align-items:center; gap:10px; margin:10px 0 16px;}
+  .pill{
+    display:inline-block; font-size:12px; font-weight:bold; padding:3px 10px;
+    border-radius:20px; direction:ltr;
+  }
+  .pill-post{background:var(--teal-light); color:var(--teal-dark);}
+  .pill-get{background:#E6F1FB; color:#0C447C;}
+  .pill-patch{background:var(--purple-light); color:var(--purple-dark);}
+  .callout{border-radius:8px; padding:12px 16px; margin:12px 0; font-size:14px;}
+  .callout.warn{background:var(--coral-light); border-right:4px solid var(--coral); color:var(--coral-dark);}
+  .callout.tip{background:var(--teal-light); border-right:4px solid var(--teal); color:var(--teal-dark);}
+  .callout b{display:block; margin-bottom:4px;}
+
+  /* flow diagram */
+  .flow{display:flex; flex-direction:column; align-items:center; gap:6px; margin:20px 0;}
+  .fbox{
+    background:var(--card-bg); border:1px solid var(--border); border-radius:8px;
+    padding:10px 18px; font-size:14px; text-align:center; min-width:220px;
+  }
+  .fbox.step{border-color:var(--purple); background:var(--purple-light); color:var(--purple-dark);}
+  .fbox.ok{border-color:var(--teal); background:var(--teal-light); color:var(--teal-dark);}
+  .fbox small{display:block; color:inherit; opacity:.85; font-size:12px; margin-top:2px;}
+  .arrow{font-size:18px; color:var(--text-muted);}
+  .branch{display:flex; gap:16px; align-items:flex-start; justify-content:center; width:100%;}
+  .branch .col{display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .fbox.err{border-color:var(--coral); background:var(--coral-light); color:var(--coral-dark); min-width:200px;}
+
+  /* mockups */
+  .phone{
+    width:280px; background:var(--gray-light); border-radius:32px; padding:14px;
+    margin:16px auto; border:1px solid var(--border);
+  }
+  .screen{background:var(--card-bg); border-radius:20px; padding:18px 14px;}
+  .screen .title{font-size:14px; font-weight:bold; margin:0 0 2px;}
+  .screen .sub{font-size:12px; color:var(--text-muted); margin:0 0 14px;}
+  .stars{display:flex; gap:6px; justify-content:center; margin-bottom:14px; font-size:24px; color:var(--teal);}
+  .stars .off{color:var(--border);}
+  .btn-primary{
+    display:block; width:100%; background:var(--teal); color:#fff; border:none;
+    border-radius:8px; padding:10px; font-size:14px; font-weight:bold; text-align:center;
+  }
+  .hint{
+    display:flex; gap:8px; align-items:center; background:var(--gray-light); border-radius:10px;
+    padding:10px 12px; font-size:12px; color:var(--text-muted); margin-top:10px;
+  }
+  .badge-endpoint{
+    display:block; text-align:center; font-size:11px; color:var(--text-muted);
+    margin-top:8px; direction:ltr;
+  }
+  .row{display:flex; justify-content:space-between; font-size:13px; padding:6px 0; border-bottom:1px solid var(--border);}
+
+  footer{
+    margin-top:50px; padding:20px 0; border-top:1px solid var(--border);
+    text-align:center; color:var(--text-muted); font-size:12.5px;
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="side">
+  <h3>تصفح المستخدم</h3>
+  <a href="#overview">نظرة عامة واختيار الأداة</a>
+  <a href="#flow">مخطط تدفق التقييم</a>
+  <a href="#mockup">شاشة التقييم</a>
+
+  <h3>مسار الـ API</h3>
+  <a href="#rate-endpoint">POST rate</a>
+  <a href="#eligibility">شروط الأحقية</a>
+
+  <h3>مرجع سريع</h3>
+  <a href="#errors">جدول الأخطاء</a>
+  <a href="#tips">نصائح عملية</a>
+  <a href="#backend-note">ملاحظة للباك إند</a>
+</nav>
+
+<main>
+  <div class="eyebrow">دليل ربط الفرونت إند</div>
+  <h1>تقييم المنتج بالنجوم (Rate)</h1>
+  <p class="lede">
+    هذا الدليل يغطي مسار تقييم المنتج بالنجوم فقط (<code>POST rate</code>) من
+    <code>ReviewController</code>. لا يغطي مسار التعليق النصي (<code>comment</code>) بحسب الطلب.
+  </p>
+
+  <h2 id="overview">1. نظرة عامة واختيار الأداة</h2>
+  <table>
+    <tr><th>الميزة</th><th>الأداة المقترحة</th><th>السبب</th></tr>
+    <tr>
+      <td>شاشة تقييم المنتج بالنجوم</td>
+      <td>Flutter (تطبيق الموبايل)</td>
+      <td>تفاعل بسيط ومتسلسل (اختيار نجوم ثم إرسال) داخل رحلة تصفح المنتج على الموبايل، لا يحتاج جداول أو لوحة تحكم.</td>
+    </tr>
+  </table>
+  <div class="callout tip">
+    <b>لماذا ليست Angular/React؟</b>
+    هذه الميزة ليست لوحة تحكم فيها جداول أو تعديل جماعي، بل إجراء واحد بسيط ضمن رحلة المستخدم على تطبيق الموبايل، لذلك Flutter أنسب.
+  </div>
+
+  <h2 id="flow">2. مخطط تدفق التقييم</h2>
+  <div class="flow">
+    <div class="fbox">طلب <code>POST rate</code><small>rating: عدد صحيح 1-5</small></div>
+    <div class="arrow">↓</div>
+    <div class="fbox step">فحص الملكية<small>هل المنتج تابع لمتجر المستخدم؟</small></div>
+    <div class="arrow">↓</div>
+    <div class="branch">
+      <div class="col">
+        <div class="fbox err">403<small>منتج تابع لمتجرك</small></div>
+      </div>
+      <div class="col">
+        <div class="fbox step">فحص الشراء<small>أحدث طلب completed لهذا المنتج</small></div>
+        <div class="arrow">↓</div>
+        <div class="branch">
+          <div class="col"><div class="fbox err">403<small>لم يُشترَ/يُستلم بعد</small></div></div>
+          <div class="col">
+            <div class="fbox ok">حفظ التقييم (Upsert)<small>إنشاء أو تحديث حسب buyer_id + product_id</small></div>
+            <div class="arrow">↓</div>
+            <div class="fbox ok">200 نجاح<small>إرجاع سجل التقييم</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 id="rate-endpoint">3. المسار: تقييم المنتج بالنجوم</h2>
+  <div class="route-line">
+    <span class="pill pill-post">POST</span>
+    <code>/Buyer/review/products/{product}/rate</code>
+  </div>
+  <p>محمي بـ <code>auth:sanctum</code> — يتطلب Bearer Token. <code>{product}</code> يُربط تلقائياً عبر Route Model Binding.</p>
+
+  <h3>مثال الطلب</h3>
+  <pre>{
+  "rating": 4
+}</pre>
+
+  <table>
+    <tr><th>الحقل</th><th>القاعدة</th></tr>
+    <tr><td><code>rating</code></td><td>required, integer, min:1, max:5</td></tr>
+  </table>
+
+  <h3>أشكال الاستجابة</h3>
+  <p><b>200 - نجاح (إنشاء أو تحديث)</b></p>
+  <pre>{
+  "message": "تم حفظ التقييم بنجاح.",
+  "data": {
+    "id": 12,
+    "buyer_id": 55,
+    "product_id": 9,
+    "order_item_id": 301,
+    "rating": 4,
+    "comment": null,
+    "created_at": "...",
+    "updated_at": "..."
+  }
+}</pre>
+
+  <p><b>422 - فشل التحقق (Laravel القياسي)</b></p>
+  <pre>{
+  "message": "The rating field is required.",
+  "errors": {
+    "rating": ["The rating field is required."]
+  }
+}</pre>
+
+  <p><b>403 - محاولة تقييم منتج تابع للمستخدم نفسه</b></p>
+  <pre>{
+  "error": "عملية غير مصرح بها: لا يمكنك تقييم منتج تابع لمتجرك."
+}</pre>
+
+  <p><b>403 - المستخدم لم يشترِ / يستلم المنتج</b></p>
+  <pre>{
+  "error": "عفواً، يجب عليك شراء وتجربة هذا المنتج أولاً لتتمكن من إعطاء رأيك فيه."
+}</pre>
+
+  <div class="callout warn">
+    <b>فخ: شكلا استجابة خطأ مختلفان تماماً</b>
+    أخطاء التحقق (422) تأتي بمفتاح <code>errors</code> (كائن فيه مصفوفات)، بينما أخطاء منطق العمل (403) تأتي بمفتاح مسطح <code>error</code> (نص واحد). لا تفترض شكلاً واحداً للأخطاء في الفرونت — تحقق أولاً من الحالة (status code) ثم اقرأ المفتاح المناسب.
+  </div>
+
+  <div class="callout warn">
+    <b>فخ: نفس status code (403) لسببين مختلفين</b>
+    الحالتان (منتج المستخدم نفسه / لم يشترِ المنتج) ترجعان 403 بالضبط. لا يمكن التمييز بينهما من الكود وحده، بل يجب قراءة نص <code>error</code> نفسه لعرض الرسالة الصحيحة أو اتخاذ إجراء مختلف (مثال: إخفاء زر التقييم بالكامل في الحالة الأولى، توجيه المستخدم لصفحة الطلب في الحالة الثانية).
+  </div>
+
+  <div class="callout warn">
+    <b>فخ: لا وسيلة لمعرفة "إنشاء" أم "تحديث" من الرد</b>
+    الباك إند يستخدم <code>updateOrCreate</code> فيحسب داخلياً إن كان السجل جديداً أم موجوداً، لكنه لا يُعيد أي حقل يوضح ذلك في الـ JSON. إن احتجت تمييز "أول تقييم" عن "تعديل تقييم"، قارن ببيانات سبق أن جلبتها (مثال: هل كان عندك تقييم محفوظ مسبقاً في الشاشة) بدلاً من الاعتماد على الاستجابة.
+  </div>
+
+  <h2 id="eligibility">شروط الأحقية (checkEligibilityAndGetOrderItem)</h2>
+  <table>
+    <tr><th>الشرط</th><th>التفصيل</th></tr>
+    <tr><td>ليس صاحب المنتج</td><td>يُقارن <code>product.shop.seller_id</code> بمعرف المستخدم الحالي</td></tr>
+    <tr><td>اشترى واستلم المنتج فعلياً</td><td>يجب وجود <code>order_item</code> ضمن طلب حالته <code>completed</code> بالضبط لهذا المنتج تحديداً لهذا المشتري</td></tr>
+    <tr><td>ربط أحدث طلب</td><td>عند وجود أكثر من طلب <code>completed</code> لنفس المنتج، يُربط التقييم دائماً بأحدث <code>order_item_id</code> (الأحدث حسب تاريخ الطلب)</td></tr>
+  </table>
+  <div class="callout warn">
+    <b>فخ: حالات الطلب الأخرى لا تكفي</b>
+    وجود طلب بحالة "قيد الشحن" أو "تم التسليم لشركة الشحن" (أي شيء غير <code>completed</code> حرفياً) لا يمنح أحقية التقييم. يجب أن تُظهر شاشة الطلب في التطبيق أن التقييم متاح فقط بعد أن يصبح الطلب <code>completed</code> (بعد تأكيد الاستلام)، وليس فقط بعد الشراء.
+  </div>
+  <div class="callout warn">
+    <b>فخ: إعادة التقييم قد تغيّر ربط الطلب دون إشعار</b>
+    إن اشترى المستخدم نفس المنتج مرة أخرى وأكمل طلباً جديداً، ثم عدّل تقييمه القديم، سيُعاد ربط التقييم بـ <code>order_item_id</code> الجديد تلقائياً دون أي إشارة في الاستجابة تفيد بأن الربط تغيّر.
+  </div>
+
+  <h2 id="mockup">4. شاشة التقييم (موك-أب)</h2>
+  <div class="phone">
+    <div class="screen">
+      <p class="title">قيّم هذا المنتج</p>
+      <p class="sub">سماعة لاسلكية X200</p>
+      <div class="stars">★ ★ ★ ★ <span class="off">★</span></div>
+      <button class="btn-primary">حفظ التقييم</button>
+      <div class="hint">زر التقييم يظهر فقط بعد أن تصبح حالة الطلب "مكتمل" (بعد تأكيد الاستلام)</div>
+    </div>
+  </div>
+  <div class="badge-endpoint">POST /Buyer/review/products/{product}/rate</div>
+  <p>
+    عنصر النجوم تحديداً هو حقل <code>rating</code> في جسم الطلب. زر "حفظ التقييم" معطّل/مخفي
+    ما لم تتأكد الشاشة مسبقاً (من بيانات الطلب) أن حالته <code>completed</code> — وإلا سيصطدم المستخدم
+    بخطأ 403 غير متوقع بعد الضغط.
+  </p>
+
+  <h2 id="errors">5. جدول ملخص لكل الأخطاء المتوقعة</h2>
+  <table>
+    <tr><th>الكود</th><th>يظهر في</th><th>المعنى</th><th>ماذا يفعل الفرونت</th></tr>
+    <tr><td>422</td><td>rate</td><td>قيمة <code>rating</code> غير صالحة أو مفقودة</td><td>اقرأ <code>errors.rating</code> واعرض الرسالة تحت عنصر النجوم مباشرة</td></tr>
+    <tr><td>403</td><td>rate</td><td>المستخدم هو صاحب المنتج (تاجر)</td><td>اقرأ نص <code>error</code>، وأخفِ زر التقييم لهذا المستخدم مستقبلاً بدل إعادة عرضه</td></tr>
+    <tr><td>403</td><td>rate</td><td>لا يوجد طلب مكتمل لهذا المنتج لهذا المشتري</td><td>اقرأ نص <code>error</code>، ووجّه المستخدم لصفحة طلباته أو اربط الزر بحالة الطلب مسبقاً</td></tr>
+    <tr><td>404</td><td>rate</td><td>معرف المنتج في المسار غير موجود (سلوك Route Model Binding الافتراضي في Laravel)</td><td>اعرض رسالة عامة "المنتج غير موجود" وارجع للصفحة السابقة</td></tr>
+    <tr><td>401</td><td>rate</td><td>لا يوجد توكن صالح (middleware auth:sanctum)</td><td>أعد المستخدم لتسجيل الدخول</td></tr>
+  </table>
+
+  <h2 id="tips">6. نصائح عملية لتفادي الاحتكاك مع الباك إند</h2>
+  <div class="card">
+    <ol>
+      <li>لا تعتمد على status code وحده للتفريق بين نوعي خطأ 403 — اعرض نص <code>error</code> كما هو من الخادم.</li>
+      <li>فعّل زر/عنصر التقييم في واجهة المستخدم فقط بعد التأكد من أن حالة الطلب <code>completed</code>، لتقليل عدد أخطاء 403 غير الضرورية.</li>
+      <li>عامل استجابة 200 دائماً كـ "أحدث نسخة من التقييم" — لا تحتفظ بنسخة محلية قديمة من <code>order_item_id</code> بعد أي عملية حفظ ناجحة.</li>
+      <li>تعامل مع شكل الاستجابة 422 (بمفتاح <code>errors</code>) بشكل منفصل تماماً عن شكل 403 (بمفتاح <code>error</code>) في طبقة معالجة الأخطاء بالتطبيق.</li>
+      <li>لا تستنتج من الاستجابة ما إذا كانت العملية "إنشاء" أم "تعديل" — إن احتجت هذا الفرق، اعتمد على ما إذا كانت الشاشة تعرض تقييماً محفوظاً مسبقاً قبل الإرسال.</li>
+    </ol>
+  </div>
+
+  <h2 id="backend-note">7. ملاحظة مقترحة لفريق الباك إند</h2>
+  <div class="card">
+    <p>
+      الحالتان الحاليتان لخطأ 403 في دالة <code>checkEligibilityAndGetOrderItem</code> تتشابهان تماماً في status code،
+      مما يجبر الفرونت إند على المطابقة النصية لرسالة الخطأ لتمييز السببين. يُفضّل إضافة حقل <code>error_code</code>
+      ثابت (مثال: <code>OWN_PRODUCT_REVIEW_FORBIDDEN</code> و <code>PURCHASE_REQUIRED</code>) بجانب رسالة <code>error</code>
+      النصية، ليتعامل الفرونت مع الحالتين برمجياً دون الاعتماد على نص قابل للتغيير مستقبلاً.
+    </p>
+  </div>
+
+  <footer>
+    دليل داخلي لفريق الفرونت إند — يغطي مسار <code>rate</code> فقط ضمن ReviewController.
+  </footer>
+</main>
+</div>
+</body>
+</html>

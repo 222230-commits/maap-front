@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>دليل عرض كل منتجات المنصة (Public Products)</title>
+<style>
+  :root{
+    --bg:#F7F8F6;
+    --card:#FFFFFF;
+    --border:#E2E5E0;
+    --text:#1E2620;
+    --text-soft:#5B6660;
+    --teal:#0F6E56;
+    --teal-light:#E1F5EE;
+    --teal-lighter:#F0FAF6;
+    --coral:#993C1D;
+    --coral-light:#FAECE7;
+    --purple:#534AB7;
+    --purple-light:#EEEDFE;
+    --gray-mid:#5F5E5A;
+    --gray-light:#F1EFE8;
+    --code-bg:#1E2620;
+    --code-text:#E7EFEA;
+    --blue:#185FA5;
+    --blue-light:#E6F1FB;
+    --green:#0F6E56;
+    --green-light:#E1F5EE;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Segoe UI",Tahoma,Arial,sans-serif;
+    line-height:1.75;
+    display:flex;
+    min-height:100vh;
+  }
+  code, .mono{
+    font-family:"Consolas","Courier New",monospace;
+  }
+  code{
+    direction:ltr;
+    unicode-bidi:embed;
+    background:var(--gray-light);
+    padding:2px 6px;
+    border-radius:4px;
+    font-size:13px;
+  }
+  a{color:var(--teal);}
+
+  /* ===== Sidebar ===== */
+  nav.side{
+    width:250px;
+    flex-shrink:0;
+    position:sticky;
+    top:0;
+    height:100vh;
+    overflow-y:auto;
+    background:var(--card);
+    border-left:1px solid var(--border);
+    padding:24px 18px;
+  }
+  nav.side .brand{
+    font-size:13px;
+    font-weight:600;
+    color:var(--teal);
+    margin-bottom:20px;
+    letter-spacing:.5px;
+  }
+  nav.side h4{
+    font-size:11px;
+    text-transform:uppercase;
+    color:var(--text-soft);
+    margin:22px 0 8px;
+    letter-spacing:.5px;
+  }
+  nav.side a{
+    display:block;
+    padding:7px 10px;
+    border-radius:8px;
+    color:var(--text);
+    text-decoration:none;
+    font-size:14px;
+    margin-bottom:2px;
+  }
+  nav.side a:hover{background:var(--teal-lighter);color:var(--teal);}
+
+  main{flex:1; padding:40px 48px; max-width:980px;}
+
+  /* ===== Header ===== */
+  .eyebrow{
+    font-size:12px;
+    color:var(--teal);
+    font-weight:600;
+    letter-spacing:.6px;
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  h1{font-size:28px; margin:0 0 10px;}
+  .lead{color:var(--text-soft); font-size:15px; max-width:720px; margin:0 0 36px;}
+  h2{font-size:21px; margin:44px 0 14px; padding-top:8px; border-top:1px solid var(--border); padding-top:28px;}
+  h3{font-size:16px; margin:22px 0 10px;}
+  section:first-of-type h2:first-of-type{border-top:none; padding-top:0;}
+
+  /* ===== Cards / tables ===== */
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:20px 22px;
+    margin-bottom:18px;
+  }
+  table{width:100%; border-collapse:collapse; font-size:13.5px; margin:14px 0;}
+  th, td{padding:10px 12px; border:1px solid var(--border); text-align:right; vertical-align:top;}
+  th{background:var(--teal-lighter); color:var(--teal); font-weight:600; font-size:12.5px;}
+  tr:nth-child(even) td{background:#FBFCFA;}
+
+  /* ===== Method badges ===== */
+  .route-line{display:flex; align-items:center; gap:10px; margin:6px 0 18px;}
+  .pill{
+    display:inline-block;
+    font-size:12px;
+    font-weight:700;
+    padding:4px 10px;
+    border-radius:6px;
+    font-family:"Consolas","Courier New",monospace;
+  }
+  .pill-get{background:var(--blue-light); color:var(--blue);}
+  .pill-post{background:var(--green-light); color:var(--green);}
+  .route-path{font-family:"Consolas","Courier New",monospace; direction:ltr; unicode-bidi:embed; font-size:14.5px;}
+
+  /* ===== Code blocks ===== */
+  pre{
+    background:var(--code-bg);
+    color:var(--code-text);
+    padding:16px 18px;
+    border-radius:10px;
+    overflow-x:auto;
+    direction:ltr;
+    unicode-bidi:embed;
+    font-family:"Consolas","Courier New",monospace;
+    font-size:13px;
+    line-height:1.6;
+    margin:10px 0 18px;
+  }
+  .code-label{font-size:12px; color:var(--text-soft); font-weight:600; margin:14px 0 4px;}
+
+  /* ===== Callouts ===== */
+  .callout{
+    border-radius:10px;
+    padding:14px 16px;
+    margin:14px 0;
+    font-size:14px;
+    border-inline-start:4px solid;
+  }
+  .callout.warn{background:var(--coral-light); border-color:var(--coral); color:#5A2410;}
+  .callout.tip{background:var(--teal-light); border-color:var(--teal); color:#0A3F32;}
+  .callout b{display:block; margin-bottom:4px; font-size:13px;}
+
+  /* ===== Flow diagram (kept for design-system consistency, unused fully here) ===== */
+  .flow{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:20px 0;}
+  .fbox{
+    background:var(--purple-light);
+    color:#26215C;
+    border-radius:10px;
+    padding:12px 16px;
+    font-size:13px;
+    min-width:130px;
+    text-align:center;
+    border:1px solid #CECBF6;
+  }
+  .fbox.gray{background:var(--gray-light); color:var(--gray-mid); border-color:#D3D1C7;}
+  .arrow{color:var(--text-soft); font-size:18px;}
+  .branch{display:flex; flex-direction:column; gap:8px;}
+
+  /* ===== Phone mockup ===== */
+  .phone-wrap{display:flex; justify-content:center; padding:20px 0;}
+  .phone{
+    width:270px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:22px;
+    overflow:hidden;
+    box-shadow:0 2px 10px rgba(0,0,0,.05);
+  }
+  .screen-head{
+    padding:12px 14px;
+    border-bottom:1px solid var(--border);
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:14px; font-weight:600;
+  }
+  .chips{display:flex; gap:8px; padding:10px 14px; overflow-x:auto;}
+  .chip{font-size:11px; padding:4px 10px; border-radius:20px; border:1px solid var(--border); color:var(--text-soft); white-space:nowrap;}
+  .chip.active{background:var(--teal-light); color:var(--teal); border-color:var(--teal);}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 14px 14px;}
+  .row{background:var(--gray-light); border-radius:8px; padding:8px;}
+  .row .thumb{height:60px; background:#E4E7E1; border-radius:6px; margin-bottom:6px;}
+  .row .pname{font-size:11.5px; margin:0 0 2px;}
+  .row .pprice{font-size:11.5px; font-weight:700; color:var(--teal); margin:0;}
+  .screen-foot{padding:10px 14px 16px; text-align:center; font-size:11px; color:var(--text-soft);}
+
+  /* ===== Category tree (Angular admin filter) ===== */
+  .tree{background:var(--card); border:1px solid var(--border); border-radius:10px; padding:10px;}
+  .tnode{padding:6px 8px; font-size:13.5px; display:flex; align-items:center; gap:8px; border-radius:6px;}
+  .tnode:hover{background:var(--teal-lighter);}
+  .tnode.child{padding-inline-start:28px; color:var(--text-soft); font-size:13px;}
+  .tnode input{accent-color:var(--teal);}
+
+  /* ===== Modal ===== */
+  .modal-wrap{background:#EDEFEA; border-radius:12px; padding:36px 20px; display:flex; justify-content:center;}
+  .modal{
+    width:340px; background:var(--card); border-radius:14px; border:1px solid var(--border);
+    padding:18px 20px; box-shadow:0 6px 24px rgba(0,0,0,.08);
+  }
+  .modal h4{margin:0 0 4px; font-size:15px;}
+  .modal p.desc{font-size:12.5px; color:var(--text-soft); margin:0 0 14px;}
+  .modal .actions{display:flex; gap:8px; margin-top:16px;}
+  .btn{
+    flex:1; text-align:center; padding:9px; border-radius:8px; font-size:13px; font-weight:600; cursor:default;
+  }
+  .btn.primary{background:var(--teal); color:#fff;}
+  .btn.secondary{background:var(--gray-light); color:var(--text);}
+
+  .badge-endpoint{
+    display:inline-block; margin:10px auto 0; font-size:11.5px;
+    background:var(--purple-light); color:#3C3489;
+    padding:4px 10px; border-radius:6px; font-family:"Consolas","Courier New",monospace;
+    direction:ltr; unicode-bidi:embed;
+  }
+  .badge-wrap{text-align:center;}
+
+  footer{margin-top:60px; padding:22px 0 40px; border-top:1px solid var(--border); color:var(--text-soft); font-size:12.5px;}
+
+  ol.tips li{margin-bottom:10px;}
+</style>
+</head>
+<body>
+
+<nav class="side">
+  <div class="brand">توثيق API · المتاجر والمنتجات</div>
+  <h4>تصفح المستخدم</h4>
+  <a href="#overview">نظرة عامة واختيار الأداة</a>
+  <a href="#endpoint">تفاصيل المسار</a>
+  <a href="#mockups">شاشات مقترحة</a>
+  <h4>مرجع سريع</h4>
+  <a href="#errors">جدول الأخطاء</a>
+  <a href="#tips">نصائح عملية</a>
+  <a href="#backend-note">ملاحظة لفريق الباك إند</a>
+</nav>
+
+<main>
+
+  <section id="overview">
+    <div class="eyebrow">توثيق API — عام (بدون مصادقة إلزامية)</div>
+    <h1>عرض جميع منتجات المنصة (Public Products)</h1>
+    <p class="lead">
+      دليل شامل لمسار <code>GET /productsAll</code> — يجلب كل منتجات المنصة عبر كل المتاجر
+      دون شرط انتماء لمتجر معين، بنفس شكل استجابة منتجات المتجر الواحد. موجّه لفرق
+      Flutter وAngular.
+    </p>
+
+    <h2 style="border-top:none; padding-top:0;">نظرة عامة واختيار الأداة</h2>
+    <div class="card">
+      <table>
+        <tr><th>الميزة</th><th>الأداة المقترحة</th><th>السبب</th></tr>
+        <tr>
+          <td>شاشة تصفح كل المنتجات (Infinite scroll)</td>
+          <td>Flutter</td>
+          <td>تجربة موبايل تصفح متسلسل بطاقات، وتحميل تدريجي عبر <code>per_page</code> و<code>current_page</code> يناسب PageView/ListView.builder.</td>
+        </tr>
+        <tr>
+          <td>لوحة إدارة/مراجعة المنتجات مع فلترة متعددة الأقسام</td>
+          <td>Angular</td>
+          <td>جدول بيانات + شجرة اختيار أقسام متعددة (multi-select tree) لتوليد <code>category_id</code> مفصول بفواصل — أنسب لواجهة سطح مكتب فيها تحكم دقيق بالفلاتر.</td>
+        </tr>
+      </table>
+    </div>
+  </section>
+
+  <section id="endpoint">
+    <h2>تفاصيل المسار</h2>
+
+    <div class="route-line">
+      <span class="pill pill-get">GET</span>
+      <span class="route-path">/productsAll</span>
+    </div>
+    <p style="color:var(--text-soft); font-size:14px;">
+      لا يتطلب توكن. إن كان المستخدم مسجّل دخول عبر Sanctum يُمرَّر <code>userId</code> داخلياً
+      إلى الخدمة (تأثيره الفعلي على الاستجابة غير موضّح في الكود المرفق — لا تفترضه في الفرونت
+      دون تأكيد من الباك إند).
+    </p>
+
+    <h3>معاملات الطلب (Query Parameters)</h3>
+    <table>
+      <tr><th>الاسم</th><th>النوع</th><th>إلزامي؟</th><th>ملاحظات</th></tr>
+      <tr><td><code>per_page</code></td><td>int</td><td>لا (افتراضي 20)</td><td>حجم الصفحة</td></tr>
+      <tr>
+        <td><code>category_id</code> / <code>category_ids</code></td>
+        <td>string | array</td>
+        <td>لا</td>
+        <td>ID واحد، أو مصفوفة، أو نص مفصول بفواصل <code>"1,2,3"</code></td>
+      </tr>
+    </table>
+
+    <div class="callout warn">
+      <b>فخ — أولوية المعامل</b>
+      إن أرسلت <code>category_id</code> و<code>category_ids</code> معاً، الكود يعتمد <code>category_id</code>
+      فقط (<code>??</code>) ويتجاهل <code>category_ids</code> نهائياً. لا تصمم فرونت يرسل الاثنين متوقعاً دمجهما.
+    </div>
+
+    <div class="code-label">مثال Request</div>
+    <pre>GET /productsAll?per_page=15&category_id=3,7,12</pre>
+
+    <div class="code-label">Response — نجاح (200)</div>
+    <pre>{
+  "success": true,
+  "pagination": {
+    "total": 128,
+    "count": 15,
+    "per_page": 15,
+    "current_page": 1,
+    "total_pages": 9
+  },
+  "data": [
+    { "id": 1, "name": "...", "...": "حقول ProductDetailResource" }
+  ]
+}</pre>
+
+    <div class="code-label">Response — خطأ (500)</div>
+    <pre>{
+  "success": false,
+  "message": "حدث خطأ أثناء تحميل المنتجات."
+}</pre>
+
+    <div class="callout warn">
+      <b>فخ — لا يوجد حقل error هنا</b>
+      بخلاف دالة <code>index</code> في نفس الكونترولر التي تُعيد <code>error: $e-&gt;getMessage()</code>،
+      هذه الدالة لا تُعيد سوى <code>message</code> عند الفشل. أي معالج أخطاء عام (generic error handler)
+      في الفرونت يفترض وجود <code>error</code> دائماً سيفشل بصمت هنا.
+    </div>
+
+    <div class="callout warn">
+      <b>فخ — لا يوجد 404</b>
+      لا شرط وجود متجر هنا (بخلاف <code>showShopProductsById</code>)، فمصفوفة <code>data</code> فارغة
+      تعني ببساطة "لا نتائج مطابقة" وليست خطأ — لا تعامل الاستجابة الفارغة كحالة فشل.
+    </div>
+
+    <div class="callout tip">
+      <b>توصية تصميم</b>
+      اعتمد على <code>pagination.total_pages</code> مقابل <code>current_page</code> لإخفاء
+      مؤشر "تحميل المزيد" تلقائياً بدل الاعتماد على طول <code>data</code> فقط.
+    </div>
+  </section>
+
+  <section id="mockups">
+    <h2>شاشات مقترحة</h2>
+    <p style="color:var(--text-soft); font-size:14px; max-width:680px;">
+      لا يوجد هنا عملية متعددة الخطوات أو تعارض يستدعي مخطط تدفق — المسار طلب واحد مباشر.
+      الشاشتان أدناه توضحان كيف يستهلك كل من Flutter وAngular نفس الـ Endpoint بشكلين مختلفين.
+    </p>
+
+    <h3>شاشة الموبايل (Flutter) — تصفح متسلسل</h3>
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen-head">
+          <span>كل المنتجات</span>
+          <span style="font-size:12px; color:var(--text-soft);">⋮</span>
+        </div>
+        <div class="chips">
+          <span class="chip active">الكل</span>
+          <span class="chip">قسم 3</span>
+          <span class="chip">قسم 7</span>
+          <span class="chip">قسم 12</span>
+        </div>
+        <div class="grid2">
+          <div class="row"><div class="thumb"></div><p class="pname">منتج تجريبي</p><p class="pprice">120 د.ل</p></div>
+          <div class="row"><div class="thumb"></div><p class="pname">منتج آخر</p><p class="pprice">75 د.ل</p></div>
+          <div class="row"><div class="thumb"></div><p class="pname">منتج ثالث</p><p class="pprice">40 د.ل</p></div>
+          <div class="row"><div class="thumb"></div><p class="pname">منتج رابع</p><p class="pprice">210 د.ل</p></div>
+        </div>
+        <div class="screen-foot">تحميل المزيد عند التمرير</div>
+      </div>
+    </div>
+    <div class="badge-wrap"><span class="badge-endpoint">GET /productsAll?per_page=…&category_id=…</span></div>
+    <p style="font-size:13.5px; color:var(--text-soft); max-width:680px;">
+      الشرائح العلوية (chips) تُبنى من قائمة أقسام يجلبها الفرونت من مسار أقسام منفصل (غير
+      موجود في هذا الكود)، والاختيار يُرسل كـ <code>category_id</code> نصياً مفصولاً بفواصل.
+      "تحميل المزيد" يستدعي نفس المسار بـ <code>current_page + 1</code> ويدمج النتائج بدل استبدالها.
+    </p>
+
+    <h3>لوحة الإدارة (Angular) — فلترة بشجرة أقسام</h3>
+    <div class="modal-wrap">
+      <div class="modal">
+        <h4>تصفية حسب الأقسام</h4>
+        <p class="desc">اختر قسماً أو أكثر لتضييق نتائج المنتجات</p>
+        <div class="tree">
+          <div class="tnode"><input type="checkbox" checked disabled> أزياء</div>
+          <div class="tnode child"><input type="checkbox" checked disabled> رجالي</div>
+          <div class="tnode child"><input type="checkbox" disabled> نسائي</div>
+          <div class="tnode"><input type="checkbox" disabled> إلكترونيات</div>
+        </div>
+        <div class="actions">
+          <span class="btn secondary">مسح</span>
+          <span class="btn primary">تطبيق</span>
+        </div>
+      </div>
+    </div>
+    <div class="badge-wrap"><span class="badge-endpoint">GET /productsAll?category_id=1,2</span></div>
+    <p style="font-size:13.5px; color:var(--text-soft); max-width:680px;">
+      عند "تطبيق"، يجمع الفرونت IDs المحددة فقط (وليس عناصر الأب/الابن معاً إن كان الاختيار
+      جزئياً) في نص مفصول بفواصل ويُعاد استدعاء المسار من الصفحة الأولى.
+    </p>
+  </section>
+
+  <section id="errors">
+    <h2>جدول ملخص الأخطاء المتوقعة</h2>
+    <table>
+      <tr><th>الكود</th><th>يظهر في</th><th>المعنى</th><th>ماذا يفعل الفرونت</th></tr>
+      <tr>
+        <td>200</td>
+        <td>نجاح، حتى مع <code>data: []</code></td>
+        <td>الطلب تم بنجاح — قد لا توجد نتائج مطابقة للفلترة</td>
+        <td>اعرض حالة "لا توجد منتجات" وليس رسالة خطأ</td>
+      </tr>
+      <tr>
+        <td>500</td>
+        <td>أي استثناء غير متوقع في الخادم</td>
+        <td>خطأ عام في الخادم أثناء التحميل</td>
+        <td>اعرض <code>message</code> فقط (لا يوجد <code>error</code>) واسمح بإعادة المحاولة</td>
+      </tr>
+    </table>
+  </section>
+
+  <section id="tips">
+    <h2>نصائح عملية لتفادي الاحتكاك مع الباك إند</h2>
+    <div class="card">
+      <ol class="tips">
+        <li>لا تعتمد على وجود حقل <code>error</code> في أي استجابة فشل من هذا المسار تحديداً — تحقق من توفره لكل Endpoint على حدة قبل بناء معالج أخطاء عام موحّد.</li>
+        <li>أرسل <code>category_id</code> فقط (وليس <code>category_ids</code>) لضمان تطبيق الفلترة، بصرف النظر عن اسم المتغير الذي تستخدمه داخلياً في الفرونت.</li>
+        <li>عامل <code>data: []</code> كحالة "فارغة" وليست خطأ — لا يوجد 404 لهذا المسار.</li>
+        <li>اعتمد ترقيم الصفحات من كائن <code>pagination</code> المُعاد وليس من طول مصفوفة <code>data</code> فقط، لتفادي حسابات خاطئة عند آخر صفحة.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="backend-note">
+    <h2>ملاحظة مقترحة لفريق الباك إند</h2>
+    <div class="callout tip">
+      <b>توحيد شكل رسائل الخطأ</b>
+      دالة <code>index()</code> في نفس الكونترولر تُعيد <code>error: $e-&gt;getMessage()</code> عند الفشل،
+      بينما <code>showAllPublicProducts()</code> لا تُعيده. يُفضّل توحيد شكل استجابة الخطأ بين كل
+      دوال الكونترولر لتقليل الحالات الخاصة التي يجب على الفرونت التعامل معها يدوياً.
+    </div>
+  </section>
+
+  <footer>
+    دليل توثيق داخلي — مسار <code>GET /productsAll</code> · تم إعداده لفرق Flutter وAngular.
+  </footer>
+
+</main>
+</body>
+</html>
