@@ -40,8 +40,15 @@ export class ColorsComponent implements OnInit {
     this.isLoading.set(true);
     this.adminService.getColors().subscribe({
       next: (res) => {
-        const list = res?.data ?? res ?? [];
-        this.colors.set(Array.isArray(list) ? list : []);
+        const raw = res?.data ?? res;
+        const list = Array.isArray(raw)
+          ? raw
+          : Array.isArray(raw?.data)
+            ? raw.data
+            : Array.isArray(res?.colors)
+              ? res.colors
+              : [];
+        this.colors.set(list);
         this.isLoading.set(false);
       },
       error: () => this.isLoading.set(false)

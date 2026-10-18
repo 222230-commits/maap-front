@@ -38,8 +38,15 @@ export class SizesComponent implements OnInit {
     this.isLoading.set(true);
     this.adminService.getSizes().subscribe({
       next: (res) => {
-        const list = res?.data ?? res ?? [];
-        this.sizes.set(Array.isArray(list) ? list : []);
+        const raw = res?.data ?? res;
+        const list = Array.isArray(raw)
+          ? raw
+          : Array.isArray(raw?.data)
+            ? raw.data
+            : Array.isArray(res?.sizes)
+              ? res.sizes
+              : [];
+        this.sizes.set(list);
         this.isLoading.set(false);
       },
       error: () => this.isLoading.set(false)

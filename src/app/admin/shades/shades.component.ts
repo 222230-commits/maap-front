@@ -38,8 +38,15 @@ export class ShadesComponent implements OnInit {
     this.isLoading.set(true);
     this.adminService.getShades().subscribe({
       next: (res) => {
-        const list = res?.data ?? res ?? [];
-        this.shades.set(Array.isArray(list) ? list : []);
+        const raw = res?.data ?? res;
+        const list = Array.isArray(raw)
+          ? raw
+          : Array.isArray(raw?.data)
+            ? raw.data
+            : Array.isArray(res?.shades)
+              ? res.shades
+              : [];
+        this.shades.set(list);
         this.isLoading.set(false);
       },
       error: () => this.isLoading.set(false)

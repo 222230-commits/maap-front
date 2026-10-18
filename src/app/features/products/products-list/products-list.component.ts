@@ -51,7 +51,17 @@ export class ProductsListComponent implements OnInit, OnDestroy {
   // Debounce timer
   private searchTimer: any;
 
-  selectedCategory = computed(() => this.selectedCategories()[0] ?? null);
+  selectedCategory = computed(() => {
+    const sel = this.selectedCategories()[0];
+    if (!sel) return null;
+    const found = this.categories().find(c =>
+      String(c.id) === String(sel) ||
+      c.name === sel ||
+      c.nameAr === sel ||
+      c.slug === sel
+    );
+    return found ? found.id : sel;
+  });
 
   filteredProducts = computed(() => {
     let list = this.products();
@@ -143,6 +153,9 @@ export class ProductsListComponent implements OnInit, OnDestroy {
           slug:   cat.slug
         }));
         this.categories.set(mapped);
+        if (this.selectedCategories().length > 0) {
+          this.doSearch();
+        }
       },
       error: () => {}
     });
@@ -202,8 +215,19 @@ export class ProductsListComponent implements OnInit, OnDestroy {
     this.searchState.set('loading');
     this.aiError.set('');
 
+    // تحويل معرّفات أو slugs التصنيفات إلى أسمائها النصية الفعلية لأن محرك البحث في الباكيند يطابق بالاسم العربي
+    const resolvedCats = cats.map(catVal => {
+      const found = this.categories().find(c =>
+        String(c.id) === String(catVal) ||
+        c.name === catVal ||
+        c.nameAr === catVal ||
+        c.slug === catVal
+      );
+      return found ? found.name : catVal;
+    });
+
     this.aiService.searchProducts({
-      q, categories: cats, colors: cols,
+      q, categories: resolvedCats, colors: cols,
       sizes, minPrice: minP ?? undefined,
       maxPrice: maxP ?? undefined
     }).subscribe({

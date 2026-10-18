@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, catchError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface DashboardResponse {
@@ -440,9 +440,11 @@ export class AdminService {
 
   // ── Admin Shades ───────────────────────────────────────────────
 
-  // GET /admin/shades
+  // GET /admin/shades (مع احتياطي لـ /store/shades وفقاً للدليل)
   getShades(): Observable<any> {
-    return this.http.get<any>(`${this.BASE}/admin/shades`);
+    return this.http.get<any>(`${this.BASE}/admin/shades`).pipe(
+      catchError(() => this.http.get<any>(`${this.BASE}/store/shades`))
+    );
   }
 
   // GET /admin/shades/{id}/show
@@ -467,9 +469,11 @@ export class AdminService {
 
   // ── Admin Colors ──────────────────────────────────────────────
 
-  // GET /admin/colors
+  // GET /admin/colors (مع احتياطي لـ /store/colors وفقاً للدليل)
   getColors(): Observable<any> {
-    return this.http.get<any>(`${this.BASE}/admin/colors`);
+    return this.http.get<any>(`${this.BASE}/admin/colors`).pipe(
+      catchError(() => this.http.get<any>(`${this.BASE}/store/colors`))
+    );
   }
 
   // GET /admin/colors/{id}/show
@@ -494,9 +498,11 @@ export class AdminService {
 
   // ── Admin Sizes ───────────────────────────────────────────────
 
-  // GET /admin/sizes
+  // GET /admin/sizes (مع احتياطي لـ /store/sizes وفقاً للدليل)
   getSizes(): Observable<any> {
-    return this.http.get<any>(`${this.BASE}/admin/sizes`);
+    return this.http.get<any>(`${this.BASE}/admin/sizes`).pipe(
+      catchError(() => this.http.get<any>(`${this.BASE}/store/sizes`))
+    );
   }
 
   // GET /admin/sizes/{id}/show
