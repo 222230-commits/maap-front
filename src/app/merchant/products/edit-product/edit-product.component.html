@@ -98,64 +98,102 @@
           </div>
         </div>
 
-        <!-- التصنيف الرئيسي -->
-        <div class="form-group">
-          <label>التصنيف الرئيسي</label>
-          <select [value]="selectedRootCategoryId()"
-                  (change)="onRootCategoryChange($any($event.target).value)">
-            <option value="">{{ currentCategoryName() ? 'التصنيف الحالي: ' + currentCategoryName() + ' (انقر للتغيير)' : 'اختر التصنيف الرئيسي' }}</option>
-            @for (cat of rootCategories(); track cat.id) {
-              <option [value]="cat.id">{{ cat.name }}</option>
+        <!-- تصنيف المنتج (قائمة واحدة تتنقل بالمستوى حتى العقدة الأخيرة) -->
+        <div class="form-group category-picker-group">
+          <label class="label-with-hint">
+            <span>تصنيف المنتج * <span class="required-tag">العقدة الأخيرة فقط</span></span>
+            @if (isLoadingCategories()) {
+              <span class="loading-sub"><i class="fas fa-circle-notch fa-spin"></i> جاري فحص تصنيفات المتجر...</span>
             }
-          </select>
-        </div>
+          </label>
 
-        <!-- التصنيف الفرعي (المطلوب للمنتج) -->
-        @if (selectedRootCategoryId()) {
-          <div class="form-group">
-            <label class="flex items-center justify-between">
-              <span>التصنيف الفرعي * <span class="text-xs text-red-500 font-bold">(مطلوب)</span></span>
-              @if (isLoadingSubCategories()) {
-                <span class="text-xs text-primary"><i class="fas fa-circle-notch fa-spin"></i> جاري التحميل...</span>
-              }
-            </label>
-            @if (!isLoadingSubCategories() && subCategories().length === 0) {
-              <div class="p-3 bg-amber-50 text-amber-800 text-xs rounded-lg border border-amber-200">
-                لا توجد تصنيفات فرعية مسجلة تحت هذا القسم. اختر قسماً رئيسياً آخر.
+          @if (!isChangingCategory()) {
+            <!-- بطاقة عرض التصنيف الحالي المحدد للمنتج -->
+            <div class="selected-category-card">
+              <div class="selected-cat-info">
+                <i class="fas fa-check-circle leaf-check"></i>
+                <div class="cat-details">
+                  <span class="cat-label">التصنيف الحالي للمنتج:</span>
+                  <strong class="cat-path">{{ currentCategoryName() || 'تم ربط المنتج بتصنيف نهائي' }}</strong>
+                </div>
               </div>
-            } @else {
-              <select [value]="selectedSubCategoryId()"
-                      [disabled]="isLoadingSubCategories()"
-                      (change)="onSubCategoryChange($any($event.target).value)">
-                <option value="">اختر التصنيف الفرعي للمنتج</option>
-                @for (sub of subCategories(); track sub.id) {
-                  <option [value]="sub.id">{{ sub.name }}</option>
+              <button type="button" class="btn-change-cat" (click)="startCategoryChange()" title="تغيير التصنيف">
+                <i class="fas fa-edit"></i>
+                <span>تغيير التصنيف</span>
+              </button>
+            </div>
+          } @else {
+            <!-- شاشة التنقل في المستويات حتى العقدة الأخيرة -->
+            <div class="cat-picker-container">
+              <div class="cat-nav-bar">
+                @if (categoryBreadcrumb().length > 0) {
+                  <button type="button" class="btn-step-back" (click)="goBackCategoryLevel()" title="الرجوع للمستوى السابق">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>رجوع للخلف</span>
+                  </button>
+                  <div class="breadcrumb-trail">
+                    <span class="trail-root" (click)="resetCategorySelection()">تصنيفات المتجر</span>
+                    @for (b of categoryBreadcrumb(); track b.id; let last = $last) {
+                      <span class="trail-sep">›</span>
+                      <span class="trail-node" [class.current]="last">{{ b.name }}</span>
+                    }
+                  </div>
+                } @else {
+                  <span class="picker-step-title"><i class="fas fa-sitemap"></i> اختر من تصنيفات متجرك:</span>
                 }
-              </select>
-            }
-          </div>
-        }
 
-        <!-- تصنيف تفصيلي إضافي -->
-        @if (selectedSubCategoryId() && (isLoadingChildCategories() || childCategories().length > 0)) {
-          <div class="form-group">
-            <label class="flex items-center justify-between">
-              <span>تصنيف إضافي (اختياري)</span>
-              @if (isLoadingChildCategories()) {
-                <span class="text-xs text-primary"><i class="fas fa-circle-notch fa-spin"></i> جاري الفحص...</span>
-              }
-            </label>
-            @if (childCategories().length > 0) {
-              <select [value]="selectedChildCategoryId()"
-                      (change)="onChildCategoryChange($any($event.target).value)">
-                <option value="">(اختياري) اختر تصنيفاً أدق</option>
-                @for (child of childCategories(); track child.id) {
-                  <option [value]="child.id">{{ child.name }}</option>
+                <button type="button" class="btn-cancel-cat" (click)="cancelCategoryChange()" title="إلغاء التغيير">
+                  <i class="fas fa-times"></i>
+                  <span>إلغاء</span>
+                </button>
+              </div>
+
+              <!-- القائمة المنسدلة الواحدة (Dropdown) -->
+              <select class="single-cat-select"
+                      [disabled]="isLoadingCategories()"
+                      (change)="onCategoryDropdownChange($any($event.target).value)">
+                <option value="">
+                  {{ categoryBreadcrumb().length === 0 ? 'اختر تصنيف المتجر' : 'اختر التفرع التالي أو العقدة الأخيرة' }}
+                </option>
+                @for (cat of currentLevelCategories(); track cat.id) {
+                  <option [value]="cat.id">
+                    {{ cat.name }} {{ cat.is_leaf ? '✓ (عقدة أخيرة)' : '‹ (يحتوي تفرعات)' }}
+                  </option>
                 }
               </select>
-            }
-          </div>
-        }
+
+              <!-- أزرار الاختيار السريع للبطاقات -->
+              <div class="cat-chips-list">
+                @for (cat of currentLevelCategories(); track cat.id) {
+                  <button type="button" 
+                          class="cat-chip-btn" 
+                          [class.is-leaf]="cat.is_leaf"
+                          (click)="onSelectCategory(cat)">
+                    <i [class]="cat.is_leaf ? 'fas fa-tag' : 'fas fa-folder-open'"></i>
+                    <span class="chip-name">{{ cat.name }}</span>
+                    @if (cat.is_leaf) {
+                      <span class="leaf-tag"><i class="fas fa-check"></i> اختيار نهائي</span>
+                    } @else {
+                      <span class="arrow-tag">تفرعات <i class="fas fa-chevron-left"></i></span>
+                    }
+                  </button>
+                } @empty {
+                  @if (!isLoadingCategories()) {
+                    <div class="sub-alert-box">
+                      <i class="fas fa-info-circle"></i>
+                      <span>لا توجد تصنيفات مسجلة في هذا المستوى.</span>
+                    </div>
+                  }
+                }
+              </div>
+
+              <p class="field-sub-note">
+                <i class="fas fa-info-circle"></i>
+                يجب التنقل حتى اختيار العقدة الأخيرة (الفرع النهائي) لربط المنتج بها.
+              </p>
+            </div>
+          }
+        </div>
 
         <div class="form-group">
           <label>الألوان</label>
@@ -213,11 +251,16 @@
           <h3><i class="fas fa-palette"></i> رفع صور مرتبطة بلون</h3>
 
           <div class="form-group">
-            <label>اختر اللون</label>
+            <label>اختر اللون (من ألوان المنتج المحددة)</label>
+            @if (selectedColorIds().length === 0) {
+              <p class="text-xs text-amber-600 mb-2">
+                <i class="fas fa-info-circle"></i> يمكنك اختيار وتحديد ألوان المنتج أولاً من تبويب "معلومات المنتج".
+              </p>
+            }
             <select [value]="selectedColorForUpload()"
                     (change)="selectedColorForUpload.set($any($event.target).value)">
               <option value="">اختر اللون</option>
-              @for (color of colors(); track color.id) {
+              @for (color of productColors(); track color.id) {
                 <option [value]="color.id">{{ color.name }}</option>
               }
             </select>

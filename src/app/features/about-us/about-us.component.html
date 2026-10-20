@@ -1,0 +1,106 @@
+<div class="about-page">
+  <!-- خلفية زخرفية ناعمة -->
+  <div class="ambient-glow glow-top"></div>
+  <div class="ambient-glow glow-bottom"></div>
+
+  <div class="about-container">
+
+    <!-- الترويسة الرئيسية -->
+    <header class="about-header animate-fade-down text-center">
+      <h1 class="page-title">من نحن</h1>
+    </header>
+
+    <!-- شبكة فريق العمل (3 صور متساوية الحجم ومسافات متناظرة) -->
+    <section class="team-section" aria-label="فريق العمل">
+      <div class="team-grid">
+        @for (member of teamMembers; track member.name; let idx = $index) {
+          <article class="team-card animate-card" [style.animation-delay]="(idx * 0.15 + 0.2) + 's'">
+            <div class="card-inner">
+              <div class="avatar-frame">
+                <img [src]="member.image"
+                     [alt]="member.alt"
+                     class="member-photo"
+                     loading="lazy" />
+                <div class="frame-ring"></div>
+              </div>
+
+              <div class="member-meta">
+                <h3 class="member-name">{{ member.name }}</h3>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+
+    <!-- بطاقة تفاصيل المشروع والإشراف الأكاديمي -->
+    <section class="details-section animate-fade-up">
+      <div class="info-card">
+        <div class="supervisor-badge">
+          <i class="fas fa-award"></i>
+          <span>تحت إشراف الأستاذة الفاضلة: <strong>مريم عمرو موسى</strong></span>
+        </div>
+
+        <div class="card-body-text">
+          <p class="lead-text">
+            يأتي تطوير <strong>منصة مآب</strong> ضمن مشروع تخرج لنيل درجة البكالوريوس في تخصص 
+            <strong>هندسة البرمجيات وتطوير النظم</strong> لعام <strong>2026</strong>، وذلك تحت إشراف 
+            الأستاذة الفاضلة <strong>مريم عمرو موسى</strong>.
+          </p>
+
+          <div class="text-divider">
+            <span class="divider-dot"></span>
+            <span class="divider-line"></span>
+            <span class="divider-dot"></span>
+          </div>
+
+          <p class="secondary-text">
+            يمثل المشروع تطبيقًا عمليًا للمعارف والمهارات المكتسبة خلال فترة الدراسة، من خلال تحليل وتصميم 
+            وتطوير منصة رقمية تهدف إلى تلبية احتياجات التجار والحرفيين والعملاء، وفق أسس 
+            <strong>هندسة البرمجيات وتطوير النظم</strong> في <strong>كلية تقنية الحاسوب طرابلس</strong>.
+          </p>
+        </div>
+
+        <!-- أوسمة القيم الأكاديمية والهندسية -->
+        <div class="highlights-row">
+          <div class="highlight-item">
+            <div class="icon-wrap"><i class="fas fa-university"></i></div>
+            <div class="highlight-info">
+              <span class="hl-label">الصرح الأكاديمي</span>
+              <strong class="hl-val">كلية تقنية الحاسوب طرابلس</strong>
+            </div>
+          </div>
+
+          <div class="highlight-item">
+            <div class="icon-wrap"><i class="fas fa-code-branch"></i></div>
+            <div class="highlight-info">
+              <span class="hl-label">التخصص</span>
+              <strong class="hl-val">هندسة البرمجيات وتطوير النظم</strong>
+            </div>
+          </div>
+
+          <div class="highlight-item">
+            <div class="icon-wrap"><i class="fas fa-chalkboard-teacher"></i></div>
+            <div class="highlight-info">
+              <span class="hl-label">المشرف الأكاديمي</span>
+              <strong class="hl-val">أ. مريم عمرو موسى</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- زر العودة واستكشاف المنصة -->
+        <div class="card-actions">
+          <a routerLink="/" class="btn-primary-glow">
+            <i class="fas fa-store"></i>
+            <span>استكشاف منصة مآب</span>
+          </a>
+          <a routerLink="/products" class="btn-outline-soft">
+            <i class="fas fa-box-open"></i>
+            <span>تصفح المنتجات</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>

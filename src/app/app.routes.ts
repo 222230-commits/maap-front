@@ -95,6 +95,13 @@ export const routes: Routes = [
         ).then(c => c.SupportComponent)
       },
       {
+        path: 'about-us',
+        canActivate: [guestGuard],
+        loadComponent: () => import(
+          './features/about-us/about-us.component'
+        ).then(c => c.AboutUsComponent)
+      },
+      {
         path: 'faq',
         redirectTo: 'support',
         pathMatch: 'full'

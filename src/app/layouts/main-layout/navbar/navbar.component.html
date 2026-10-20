@@ -16,6 +16,7 @@
         <a routerLink="/products" routerLinkActive="active">المنتجات</a>
         <a routerLink="/stores" routerLinkActive="active">المتاجر</a>
         <a href="#about" (click)="scrollTo('about', $event)">عن المنصة</a>
+        <a href="#about-us" (click)="scrollTo('about-us', $event)">من نحن</a>
       </div>
     }
 
@@ -313,8 +314,11 @@
         }
       }
       @if (!authService.isLoggedIn()) {
-        <a href="#about" (click)="scrollTo('about', $event); showMobile.set(false)">
+        <a href="#about" (click)="scrollTo('about', $event)">
           <i class="fas fa-info-circle"></i> عن المنصة
+        </a>
+        <a href="#about-us" (click)="scrollTo('about-us', $event)">
+          <i class="fas fa-users"></i> من نحن
         </a>
         <div class="mobile-auth">
           <a routerLink="/auth/login" class="btn-login" (click)="showMobile.set(false)">دخول</a>

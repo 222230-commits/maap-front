@@ -93,6 +93,35 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-sync-ai {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #F8FAFC;
+  color: #475569;
+  border: 1px solid #CBD5E1;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background: #EDE9FE;
+    color: var(--primary);
+    border-color: #DDD6FE;
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
 
 .btn-trash {

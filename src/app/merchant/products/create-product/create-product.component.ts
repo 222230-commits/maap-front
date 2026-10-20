@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ProductService, Color, Size, Category } from '../../../core/services/product.service';
+import { AiService } from '../../../core/services/ai.service';
 
 @Component({
   selector: 'app-create-product',  templateUrl: './create-product.component.html',
@@ -9,6 +10,7 @@ import { ProductService, Color, Size, Category } from '../../../core/services/pr
 })
 export class CreateProductComponent implements OnInit {
   private productService = inject(ProductService);
+  private aiService      = inject(AiService);
   public router = inject(Router);
 
   currentStep = signal<'info'|'attributes'|'images'|'publish'>('info');
@@ -30,88 +32,109 @@ export class CreateProductComponent implements OnInit {
 
   colors = signal<Color[]>([]);
   sizes = signal<Size[]>([]);
-  categories = signal<Category[]>([]);
-  rootCategories = signal<Category[]>([]);
-  selectedRootCategoryId = signal('');
-
-  subCategories = signal<Category[]>([]);
-  selectedSubCategoryId = signal('');
-  isLoadingSubCategories = signal(false);
-
-  childCategories = signal<Category[]>([]);
-  selectedChildCategoryId = signal('');
-  isLoadingChildCategories = signal(false);
+  
+  // تصنيف واحد يتنقل بالمستوى حتى العقدة الأخيرة
+  currentLevelCategories = signal<Category[]>([]);
+  isLoadingCategories = signal(false);
+  categoryBreadcrumb = signal<{ id: string; name: string }[]>([]);
+  selectedCategoryPath = signal('');
 
   generalFiles = signal<File[]>([]);
   generalPreviews = signal<string[]>([]);
   isUploadingImages = signal(false);
 
   ngOnInit(): void {
-    forkJoin({
-      colors: this.productService.getColors(),
-      sizes: this.productService.getSizes(),
-      cats: this.productService.getCategories()
-    }).subscribe({
-      next: ({ colors, sizes, cats }) => {
-        this.colors.set(colors.data);
-        this.sizes.set(sizes.data);
-        this.rootCategories.set(cats.data);
-        this.categories.set(cats.data);
+    // تحميل المستوى الأول من تصنيفات المتجر بالمستوى
+    this.loadCategoryLevel();
+
+    // تحميل الألوان
+    this.productService.getColors().subscribe({
+      next: (res) => {
+        const list = Array.isArray(res?.data) ? res.data : [];
+        this.colors.set(list);
+      },
+      error: (err) => console.error('Colors load error:', err)
+    });
+
+    // تحميل المقاسات
+    this.productService.getSizes().subscribe({
+      next: (res) => {
+        const list = Array.isArray(res?.data) ? res.data : [];
+        this.sizes.set(list);
+      },
+      error: (err) => console.error('Sizes load error:', err)
+    });
+  }
+
+  loadCategoryLevel(parentId?: string): void {
+    this.isLoadingCategories.set(true);
+    this.productService.getCategories(parentId).subscribe({
+      next: (res) => {
+        const list = Array.isArray(res?.data) ? res.data : [];
+        this.isLoadingCategories.set(false);
+
+        // قاعدة: إذا كان للمتجر تصنيف واحد فقط في هذا المستوى، يتم التحديد/الدخول تلقائياً
+        if (list.length === 1) {
+          const single = list[0];
+          if (single.is_leaf) {
+            this.selectedCategoryId.set(single.id);
+            const fullPath = [...this.categoryBreadcrumb().map(b => b.name), single.name].join(' › ');
+            this.selectedCategoryPath.set(fullPath);
+            this.currentLevelCategories.set([]);
+            return;
+          } else {
+            this.categoryBreadcrumb.update(b => [...b, { id: single.id, name: single.name }]);
+            this.loadCategoryLevel(single.id);
+            return;
+          }
+        }
+
+        this.currentLevelCategories.set(list);
+      },
+      error: () => {
+        this.isLoadingCategories.set(false);
+        this.currentLevelCategories.set([]);
       }
     });
   }
 
-  onRootCategoryChange(rootId: string): void {
-    this.selectedRootCategoryId.set(rootId);
-    this.selectedSubCategoryId.set('');
-    this.selectedChildCategoryId.set('');
-    this.selectedCategoryId.set('');
-    this.subCategories.set([]);
-    this.childCategories.set([]);
-
-    if (!rootId) return;
-
-    this.isLoadingSubCategories.set(true);
-    this.productService.getCategories(rootId).subscribe({
-      next: (res) => {
-        const subs = res.data || [];
-        this.subCategories.set(subs);
-        this.isLoadingSubCategories.set(false);
-      },
-      error: () => this.isLoadingSubCategories.set(false)
-    });
-  }
-
-  onSubCategoryChange(subId: string): void {
-    this.selectedSubCategoryId.set(subId);
-    this.selectedChildCategoryId.set('');
-    this.childCategories.set([]);
-
-    if (!subId) {
-      this.selectedCategoryId.set('');
-      return;
-    }
-
-    this.selectedCategoryId.set(subId);
-
-    this.isLoadingChildCategories.set(true);
-    this.productService.getCategories(subId).subscribe({
-      next: (res) => {
-        const children = res.data || [];
-        this.childCategories.set(children);
-        this.isLoadingChildCategories.set(false);
-      },
-      error: () => this.isLoadingChildCategories.set(false)
-    });
-  }
-
-  onChildCategoryChange(childId: string): void {
-    this.selectedChildCategoryId.set(childId);
-    if (childId) {
-      this.selectedCategoryId.set(childId);
+  onSelectCategory(cat: Category): void {
+    if (cat.is_leaf) {
+      // وصل للعقدة الأخيرة ويختارها
+      this.selectedCategoryId.set(cat.id);
+      const fullPath = [...this.categoryBreadcrumb().map(b => b.name), cat.name].join(' › ');
+      this.selectedCategoryPath.set(fullPath);
     } else {
-      this.selectedCategoryId.set(this.selectedSubCategoryId());
+      // تعمق أكثر في الشجرة
+      this.categoryBreadcrumb.update(b => [...b, { id: cat.id, name: cat.name }]);
+      this.loadCategoryLevel(cat.id);
     }
+  }
+
+  onCategoryDropdownChange(catId: string): void {
+    if (!catId) return;
+    const cat = this.currentLevelCategories().find(c => c.id === catId);
+    if (cat) {
+      this.onSelectCategory(cat);
+    }
+  }
+
+  goBackCategoryLevel(): void {
+    const current = this.categoryBreadcrumb();
+    if (current.length === 0) return;
+    const updated = current.slice(0, -1);
+    this.categoryBreadcrumb.set(updated);
+    this.selectedCategoryId.set('');
+    this.selectedCategoryPath.set('');
+    const parentId = updated.length > 0 ? updated[updated.length - 1].id : undefined;
+    this.loadCategoryLevel(parentId);
+  }
+
+  resetCategorySelection(): void {
+    this.selectedCategoryId.set('');
+    this.selectedCategoryPath.set('');
+    this.categoryBreadcrumb.set([]);
+    this.loadCategoryLevel();
   }
 
   toggleColor(id: string): void {
@@ -131,12 +154,8 @@ export class CreateProductComponent implements OnInit {
       this.error.set('يرجى إدخال عنوان المنتج');
       return;
     }
-    if (!this.selectedRootCategoryId()) {
-      this.error.set('يرجى اختيار التصنيف الرئيسي');
-      return;
-    }
     if (!this.selectedCategoryId()) {
-      this.error.set('لا يمكن نقل المنتج لتصنيف رئيسي، يجب اختيار تصنيف فرعي يمتلك تصنيفاً أباً.');
+      this.error.set('يرجى اختيار تصنيف المنتج حتى العقدة الأخيرة للمتابعة.');
       return;
     }
     if (this.price() <= 0) {
@@ -159,6 +178,8 @@ export class CreateProductComponent implements OnInit {
       next: (res) => {
         this.createdProductId.set(res.id);
         this.isSaving.set(false);
+        // توليد متجه البحث فور الإنشاء
+        this.aiService.generateProductEmbedding(res.id).subscribe();
         this.currentStep.set('images');
       },
       error: (err) => {
@@ -202,16 +223,24 @@ export class CreateProductComponent implements OnInit {
     const id = this.createdProductId();
     if (!id) return;
     this.isSaving.set(true);
+    this.error.set('');
     this.productService.togglePublish(id).subscribe({
-      next: () => {
+      next: (res: any) => {
+        if (res && res.success === false) {
+          this.error.set(res.message || 'تعذر نشر المنتج؛ يرجى التأكد من رفع صورة واحدة على الأقل واكتمال البيانات.');
+          this.isSaving.set(false);
+          return;
+        }
+        // توليد المتجه وتحديث الفهرس تلقائياً
+        this.aiService.generateProductEmbedding(id).subscribe();
         this.isSaving.set(false);
-        this.successMessage.set('تم نشر المنتج بنجاح!');
+        this.successMessage.set('تم نشر المنتج بنجاح وتحديث محرك البحث!');
         setTimeout(() => {
           this.router.navigate(['/merchant/products']);
         }, 1500);
       },
-      error: (err) => {
-        this.error.set(err?.error?.message || 'فشل النشر');
+      error: (err: any) => {
+        this.error.set(err?.error?.message || err?.message || 'فشل نشر المنتج. يرجى التأكد من رفع صورة للمنتج أولاً.');
         this.isSaving.set(false);
       }
     });

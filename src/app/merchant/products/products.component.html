@@ -18,6 +18,18 @@
       <p class="page-sub">إدارة منتجات المتجر، والتحكم في حالات النشر والمخزون</p>
     </div>
     <div class="header-actions">
+      <button class="btn-sync-ai" 
+              [disabled]="isSyncingAllEmbeddings()" 
+              (click)="syncAllMerchantEmbeddings()" 
+              title="تحديث وتوليد متجهات البحث لجميع المنتجات">
+        @if (isSyncingAllEmbeddings()) {
+          <i class="fas fa-spinner fa-spin"></i>
+          <span>جاري التحديث...</span>
+        } @else {
+          <i class="fas fa-sync-alt"></i>
+          <span>تحديث فهرس البحث</span>
+        }
+      </button>
       <button class="btn-trash" [class.active]="showTrash()" (click)="toggleTrash()" title="سلة المحذوفات">
         <i class="fas fa-trash-can"></i>
         <span>المحذوفات</span>

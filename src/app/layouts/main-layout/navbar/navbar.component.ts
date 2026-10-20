@@ -81,9 +81,24 @@ export class NavbarComponent {
 
   scrollTo(id: string, event: Event) {
     event.preventDefault();
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
     this.showMobile.set(false);
+
+    const currentUrl = this.router.url.split('#')[0].split('?')[0];
+    if (currentUrl === '' || currentUrl === '/') {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } else {
+      this.router.navigate(['/'], { fragment: id }).then(() => {
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 250);
+      });
+    }
   }
 
   doSearch(query: string) {

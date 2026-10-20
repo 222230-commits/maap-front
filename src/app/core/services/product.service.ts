@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, catchError, of, switchMap } from 'rxjs';
+import { Observable, catchError, of, switchMap, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface Product {
@@ -401,21 +401,65 @@ export class ProductService {
     );
   }
 
-  // GET /store/colors  /  GET /store/sizes
+  // GET /store/colors  /  GET /store/sizes (مع احتياطي لـ admin ولتجنب انقطاع الواجهة)
   getColors(): Observable<ColorsResponse> {
-    return this.http.get<ColorsResponse>(`${this.BASE}/store/colors`);
+    return this.http.get<any>(`${this.BASE}/store/colors`).pipe(
+      catchError(() => this.http.get<any>(`${this.BASE}/admin/colors`)),
+      map((res: any) => {
+        const list = Array.isArray(res?.data)
+          ? res.data
+          : (Array.isArray(res?.data?.data) ? res.data.data : (Array.isArray(res) ? res : []));
+        return { success: res?.success !== false, data: list };
+      }),
+      catchError(() => of({ success: true, data: [] }))
+    );
   }
 
   getSizes(): Observable<SizesResponse> {
-    return this.http.get<SizesResponse>(`${this.BASE}/store/sizes`);
+    return this.http.get<any>(`${this.BASE}/store/sizes`).pipe(
+      catchError(() => this.http.get<any>(`${this.BASE}/admin/sizes`)),
+      map((res: any) => {
+        const list = Array.isArray(res?.data)
+          ? res.data
+          : (Array.isArray(res?.data?.data) ? res.data.data : (Array.isArray(res) ? res : []));
+        return { success: res?.success !== false, data: list };
+      }),
+      catchError(() => of({ success: true, data: [] }))
+    );
   }
 
-  // GET /store/categories
+  // GET /store/categories (مع fallback تلقائي إلى /Buyer/Categories/dynamic إذا لم يفعل التاجر تصنيفات أو تعذر الوصول)
   getCategories(parentId?: string): Observable<CategoriesResponse> {
-    const url = parentId
+    const storeUrl = parentId
       ? `${this.BASE}/store/categories?parent_id=${parentId}`
       : `${this.BASE}/store/categories`;
-    return this.http.get<CategoriesResponse>(url);
+    const buyerUrl = parentId
+      ? `${this.BASE}/Buyer/Categories/dynamic?parent_id=${parentId}`
+      : `${this.BASE}/Buyer/Categories/dynamic`;
+
+    return this.http.get<any>(storeUrl).pipe(
+      switchMap((res: any) => {
+        const list = Array.isArray(res?.data)
+          ? res.data
+          : (Array.isArray(res?.data?.data) ? res.data.data : (Array.isArray(res) ? res : []));
+        if (list.length > 0) {
+          return of({ success: true, is_leaf: res?.is_leaf, data: list });
+        }
+        return this.http.get<any>(buyerUrl);
+      }),
+      catchError(() => this.http.get<any>(buyerUrl)),
+      map((res: any) => {
+        const list = Array.isArray(res?.data)
+          ? res.data
+          : (Array.isArray(res?.data?.data) ? res.data.data : (Array.isArray(res) ? res : []));
+        return {
+          success: res?.success !== false,
+          is_leaf: res?.is_leaf,
+          data: list
+        };
+      }),
+      catchError(() => of({ success: false, data: [] }))
+    );
   }
 
   // GET /store/tags

@@ -4,6 +4,7 @@ import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ProductService } from '@core/services/product.service';
 import type { Color, Size, Category, Tag, Feature } from '@core/services/product.service';
+import { AiService } from '@core/services/ai.service';
 
 @Component({
   selector: 'app-edit-product',  imports: [CommonModule, RouterModule],
@@ -12,6 +13,7 @@ import type { Color, Size, Category, Tag, Feature } from '@core/services/product
 })
 export class EditProductComponent implements OnInit {
   private productService = inject(ProductService);
+  private aiService      = inject(AiService);
   protected router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -54,19 +56,22 @@ export class EditProductComponent implements OnInit {
 
   // بيانات من الـ API
   colors = signal<Color[]>([]);
+  productColors = computed(() => {
+    const selectedIds = this.selectedColorIds();
+    const all = this.colors();
+    if (selectedIds.length === 0) return all;
+    return all.filter(c => selectedIds.includes(c.id));
+  });
   sizes = signal<Size[]>([]);
   categories = signal<Category[]>([]);
   currentCategoryName = signal('');
-  rootCategories = signal<Category[]>([]);
-  selectedRootCategoryId = signal('');
+  selectedCategoryPath = signal('');
+  isChangingCategory = signal(false);
 
-  subCategories = signal<Category[]>([]);
-  selectedSubCategoryId = signal('');
-  isLoadingSubCategories = signal(false);
-
-  childCategories = signal<Category[]>([]);
-  selectedChildCategoryId = signal('');
-  isLoadingChildCategories = signal(false);
+  // تصنيف واحد يتنقل بالمستوى حتى العقدة الأخيرة
+  currentLevelCategories = signal<Category[]>([]);
+  isLoadingCategories = signal(false);
+  categoryBreadcrumb = signal<{ id: string; name: string }[]>([]);
 
   productImages = signal<{
     total_count: number;
@@ -92,75 +97,104 @@ export class EditProductComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id') ?? '';
     this.productId.set(id);
 
-    // جلب الألوان والمقاسات والتصنيفات أولاً
-    forkJoin({
-      colors: this.productService.getColors(),
-      sizes: this.productService.getSizes(),
-      cats: this.productService.getCategories()
-    }).subscribe({
-      next: ({ colors, sizes, cats }) => {
-        this.colors.set(colors.data);
-        this.sizes.set(sizes.data);
-        this.rootCategories.set(cats.data);
-        this.categories.set(cats.data);
-        // بعدها جلب بيانات المنتج
-        this.loadProduct();
-        this.loadTagsAndFeatures();
+    // جلب الألوان
+    this.productService.getColors().subscribe({
+      next: (res) => this.colors.set(Array.isArray(res?.data) ? res.data : []),
+      error: () => this.colors.set([])
+    });
+
+    // جلب المقاسات
+    this.productService.getSizes().subscribe({
+      next: (res) => this.sizes.set(Array.isArray(res?.data) ? res.data : []),
+      error: () => this.sizes.set([])
+    });
+
+    // جلب بيانات المنتج والتاغات
+    this.loadProduct();
+    this.loadTagsAndFeatures();
+  }
+
+  startCategoryChange(): void {
+    this.isChangingCategory.set(true);
+    this.categoryBreadcrumb.set([]);
+    this.loadCategoryLevel();
+  }
+
+  cancelCategoryChange(): void {
+    this.isChangingCategory.set(false);
+    this.categoryBreadcrumb.set([]);
+    this.currentLevelCategories.set([]);
+  }
+
+  loadCategoryLevel(parentId?: string): void {
+    this.isLoadingCategories.set(true);
+    this.productService.getCategories(parentId).subscribe({
+      next: (res) => {
+        const list = Array.isArray(res?.data) ? res.data : [];
+        this.isLoadingCategories.set(false);
+
+        // قاعدة: إذا كان للمتجر تصنيف واحد فقط في هذا المستوى، يتم التحديد/الدخول تلقائياً
+        if (list.length === 1) {
+          const single = list[0];
+          if (single.is_leaf) {
+            this.selectedCategoryId.set(single.id);
+            const fullPath = [...this.categoryBreadcrumb().map(b => b.name), single.name].join(' › ');
+            this.currentCategoryName.set(fullPath);
+            this.selectedCategoryPath.set(fullPath);
+            this.currentLevelCategories.set([]);
+            this.isChangingCategory.set(false);
+            return;
+          } else {
+            this.categoryBreadcrumb.update(b => [...b, { id: single.id, name: single.name }]);
+            this.loadCategoryLevel(single.id);
+            return;
+          }
+        }
+
+        this.currentLevelCategories.set(list);
+      },
+      error: () => {
+        this.isLoadingCategories.set(false);
+        this.currentLevelCategories.set([]);
       }
     });
   }
 
-  onRootCategoryChange(rootId: string): void {
-    this.selectedRootCategoryId.set(rootId);
-    this.selectedSubCategoryId.set('');
-    this.selectedChildCategoryId.set('');
-    this.selectedCategoryId.set('');
-    this.subCategories.set([]);
-    this.childCategories.set([]);
-
-    if (!rootId) return;
-
-    this.isLoadingSubCategories.set(true);
-    this.productService.getCategories(rootId).subscribe({
-      next: (res) => {
-        const subs = res.data || [];
-        this.subCategories.set(subs);
-        this.isLoadingSubCategories.set(false);
-      },
-      error: () => this.isLoadingSubCategories.set(false)
-    });
-  }
-
-  onSubCategoryChange(subId: string): void {
-    this.selectedSubCategoryId.set(subId);
-    this.selectedChildCategoryId.set('');
-    this.childCategories.set([]);
-
-    if (!subId) {
-      this.selectedCategoryId.set('');
-      return;
-    }
-
-    this.selectedCategoryId.set(subId);
-
-    this.isLoadingChildCategories.set(true);
-    this.productService.getCategories(subId).subscribe({
-      next: (res) => {
-        const children = res.data || [];
-        this.childCategories.set(children);
-        this.isLoadingChildCategories.set(false);
-      },
-      error: () => this.isLoadingChildCategories.set(false)
-    });
-  }
-
-  onChildCategoryChange(childId: string): void {
-    this.selectedChildCategoryId.set(childId);
-    if (childId) {
-      this.selectedCategoryId.set(childId);
+  onSelectCategory(cat: Category): void {
+    if (cat.is_leaf) {
+      // وصل للعقدة الأخيرة ويختارها
+      this.selectedCategoryId.set(cat.id);
+      const fullPath = [...this.categoryBreadcrumb().map(b => b.name), cat.name].join(' › ');
+      this.currentCategoryName.set(fullPath);
+      this.selectedCategoryPath.set(fullPath);
+      this.isChangingCategory.set(false);
     } else {
-      this.selectedCategoryId.set(this.selectedSubCategoryId());
+      // تعمق أكثر في الشجرة
+      this.categoryBreadcrumb.update(b => [...b, { id: cat.id, name: cat.name }]);
+      this.loadCategoryLevel(cat.id);
     }
+  }
+
+  onCategoryDropdownChange(catId: string): void {
+    if (!catId) return;
+    const cat = this.currentLevelCategories().find(c => c.id === catId);
+    if (cat) {
+      this.onSelectCategory(cat);
+    }
+  }
+
+  goBackCategoryLevel(): void {
+    const current = this.categoryBreadcrumb();
+    if (current.length === 0) return;
+    const updated = current.slice(0, -1);
+    this.categoryBreadcrumb.set(updated);
+    const parentId = updated.length > 0 ? updated[updated.length - 1].id : undefined;
+    this.loadCategoryLevel(parentId);
+  }
+
+  resetCategorySelection(): void {
+    this.categoryBreadcrumb.set([]);
+    this.loadCategoryLevel();
   }
 
   loadProduct(): void {
@@ -227,6 +261,11 @@ export class EditProductComponent implements OnInit {
   }
 
   saveProduct(): void {
+    if (!this.selectedCategoryId()) {
+      this.error.set('يرجى اختيار تصنيف المنتج حتى العقدة الأخيرة للمتابعة.');
+      return;
+    }
+
     this.isSaving.set(true);
     this.error.set('');
     this.productService.updateProduct(this.productId(), {
@@ -241,7 +280,9 @@ export class EditProductComponent implements OnInit {
     }).subscribe({
       next: () => {
         this.isSaving.set(false);
-        this.successMessage.set('تم حفظ التعديلات بنجاح');
+        // توليد متجه البحث وتحديث الفهرس تلقائياً عند تعديل المنتج
+        this.aiService.generateProductEmbedding(this.productId()).subscribe();
+        this.successMessage.set('تم حفظ التعديلات بنجاح وتحديث فهرس البحث');
         setTimeout(() => this.successMessage.set(''), 3000);
       },
       error: (err) => {
@@ -284,7 +325,8 @@ export class EditProductComponent implements OnInit {
         this.generalImageFiles.set([]);
         this.generalImagePreviews.set([]);
         this.loadProductImages();
-        this.successMessage.set('تم رفع الصور بنجاح');
+        this.aiService.generateProductEmbedding(this.productId()).subscribe();
+        this.successMessage.set('تم رفع الصور بنجاح وتحديث فهرس البحث');
         setTimeout(() => this.successMessage.set(''), 3000);
       },
       error: () => {
@@ -318,7 +360,8 @@ export class EditProductComponent implements OnInit {
         this.colorImagePreviews.set([]);
         this.selectedColorForUpload.set('');
         this.loadProductImages();
-        this.successMessage.set('تم رفع الصور وربطها باللون بنجاح');
+        this.aiService.generateProductEmbedding(this.productId()).subscribe();
+        this.successMessage.set('تم رفع الصور وربطها باللون بنجاح وتحديث فهرس البحث');
         setTimeout(() => this.successMessage.set(''), 3000);
       },
       error: () => {

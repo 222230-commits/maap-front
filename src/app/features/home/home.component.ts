@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { BuyerService } from '../../core/services/buyer.service';
@@ -38,6 +38,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private aiService      = inject(AiService);
   public  authService    = inject(AuthService);
   public  router         = inject(Router);
+  private route          = inject(ActivatedRoute);
 
   // ── AI Recommendations (STEP 6) ──
   mostPopular = signal<any[]>([]);
@@ -268,6 +269,18 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // التمرير التلقائي للقسم عند القدوم من رابط يحتوي fragment (مثل #about أو #about-us)
+    this.route.fragment.subscribe(fragment => {
+      if (fragment) {
+        setTimeout(() => {
+          const el = document.getElementById(fragment);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 350);
+      }
+    });
+
     // جلب الإعلانات من الـ API (لوحة الإدارة إن وُجد توكن أدمن أو الإعلانات العامة)
     const token = typeof localStorage !== 'undefined' ? localStorage.getItem('access_token') : null;
     const ads$ = (this.authService.role() === 'admin' && token)
