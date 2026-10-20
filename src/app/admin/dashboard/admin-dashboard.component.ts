@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AdminService, Application } from '../../core/services/admin.service';
 import { AuthService } from '../../core/services/auth.service';
+import { ReportExportService } from '../../core/services/report-export.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -11,12 +12,14 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class AdminDashboardComponent implements OnInit {
   private adminService = inject(AdminService);
+  private reportExportService = inject(ReportExportService);
   public router = inject(Router);
   public authService = inject(AuthService);
 
   sidebarCollapsed = signal(false);
 
   isLoading = signal(true);
+  isExporting = signal(false);
   error = signal('');
 
   stats = signal({
@@ -92,5 +95,29 @@ export class AdminDashboardComponent implements OnInit {
 
   formatDate(date: string): string {
     return new Date(date).toLocaleDateString('ar-LY');
+  }
+
+  async exportDocxReport(): Promise<void> {
+    if (this.isExporting() || this.isLoading()) return;
+    this.isExporting.set(true);
+    try {
+      await this.reportExportService.exportAdminDashboardDocx({
+        stats: this.stats(),
+        footerCounters: this.footerCounters(),
+        applicationsChart: this.applicationsChart(),
+        recentApplications: this.recentApplications().map(a => ({
+          business_name: a.business_name,
+          email: a.email,
+          business_address: a.business_address,
+          created_at: a.created_at
+        })),
+        recentActivities: this.recentActivities(),
+        adminName: this.authService.currentUser()?.full_name || 'مدير النظام'
+      });
+    } catch (err) {
+      console.error('Failed to export admin report', err);
+    } finally {
+      this.isExporting.set(false);
+    }
   }
 }

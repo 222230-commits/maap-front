@@ -1,110 +1,473 @@
 <div class="admins-page">
   <div class="page-header">
-    <h1><i class="fas fa-shield-alt"></i> مدراء النظام</h1>
-    <button (click)="showAddModal.set(true)">
-      <i class="fas fa-plus"></i> إضافة مدير
-    </button>
+    <div>
+      <h1><i class="fas fa-shield-alt"></i> مدراء النظام</h1>
+      <p class="header-desc">فريق إدارة منصة مآب والصلاحيات الإدارية المعتمدة</p>
+    </div>
+
+    @if (isSuperAdmin()) {
+      <div class="header-actions">
+        <button class="btn-add-admin" (click)="openAddModal('existing')">
+          <i class="fas fa-crown"></i> ترقية مستخدم إلى مدير
+        </button>
+        <button class="btn-create-admin-outline" (click)="openAddModal('new')">
+          <i class="fas fa-user-plus"></i> إنشاء حساب مدير جديد
+        </button>
+      </div>
+    } @else {
+      <div class="super-admin-notice-pill">
+        <i class="fas fa-lock"></i>
+        <span>الترقية مقتصرة على المدير العام الأول</span>
+      </div>
+    }
   </div>
 
+  <!-- تنبيه للأدمن الجديد عندما يفتح الصفحة -->
+  @if (!isSuperAdmin()) {
+    <div class="non-super-admin-banner">
+      <div class="banner-icon">
+        <i class="fas fa-user-shield"></i>
+      </div>
+      <div class="banner-text">
+        <h4>أهلاً بك في فريق إدارة منصة مآب</h4>
+        <p>
+          يمكنك تصفح قائمة المدراء الذين سبقوك في النظام. صلاحية ترقية وإضافة مدراء جدد مقتصرة حصرياً على 
+          <strong>المدير العام الأول للمنصة (هدى سليمان الشريف - hs350vae@gmail.com)</strong>.
+        </p>
+      </div>
+    </div>
+  }
+
+  <!-- شبكة بطاقات المدراء -->
   <div class="admins-grid">
-    @for (admin of admins(); track admin.id) {
-      <div class="admin-card">
+    @for (admin of adminsList(); track admin.id) {
+      <div class="admin-card" 
+           [class.super-admin-card]="admin.isSuperAdmin"
+           [class.current-user]="admin.isCurrentUser">
+        
         <div class="admin-header">
-          <i class="fas fa-user-shield text-3xl"></i>
-          <div>
-            <h3>{{ admin.name }}</h3>
-            <p>{{ admin.email }}</p>
+          <div class="admin-avatar" [class.super-av]="admin.isSuperAdmin">
             @if (admin.isSuperAdmin) {
-              <span class="super-badge">
-                <i class="fas fa-crown"></i> مدير رئيسي
-              </span>
+              <i class="fas fa-crown"></i>
+            } @else {
+              <i class="fas fa-user-shield"></i>
             }
           </div>
+          <div class="admin-meta">
+            <div class="name-row">
+              <h3>{{ admin.name }}</h3>
+              @if (admin.isSuperAdmin) {
+                <span class="crown-badge"><i class="fas fa-crown"></i> المدير الأول</span>
+              }
+            </div>
+            <p>{{ admin.email }}</p>
+            <div class="badge-row">
+              @if (admin.isCurrentUser) {
+                <span class="current-user-badge">
+                  <i class="fas fa-user-check"></i> حسابك الحالي
+                </span>
+              }
+              <span class="role-badge" [class.super-role]="admin.isSuperAdmin">
+                <i class="fas fa-shield-halved"></i> {{ admin.role }}
+              </span>
+            </div>
+          </div>
         </div>
+
         <div class="permissions">
-          <h4><i class="fas fa-key"></i> الصلاحيات</h4>
-          @if (admin.permissions.manageApplications) {
-            <span><i class="fas fa-check"></i> إدارة طلبات التجار</span>
-          }
-          @if (admin.permissions.manageUsers) {
-            <span><i class="fas fa-check"></i> إدارة المستخدمين</span>
-          }
-          @if (admin.permissions.manageReports) {
-            <span><i class="fas fa-check"></i> إدارة البلاغات</span>
-          }
-          @if (admin.permissions.manageCategories) {
-            <span><i class="fas fa-check"></i> إدارة التصنيفات</span>
-          }
-          @if (admin.permissions.manageSeasons) {
-            <span><i class="fas fa-check"></i> إدارة المواسم</span>
-          }
-          @if (admin.permissions.manageAdmins) {
-            <span><i class="fas fa-check"></i> إدارة المدراء</span>
-          }
+          <h4><i class="fas fa-key"></i> الصلاحيات الممنوحة</h4>
+          <div class="perms-list">
+            @if (admin.isSuperAdmin) {
+              <span class="super-perm"><i class="fas fa-check-double"></i> صلاحية ترقية وإضافة المدراء (حصرياً)</span>
+            }
+            <span><i class="fas fa-check"></i> إدارة طلبات التجار والمتاجر</span>
+            <span><i class="fas fa-check"></i> إدارة المنتجات والتصنيفات</span>
+            <span><i class="fas fa-check"></i> إدارة المستخدمين والبلاغات</span>
+            <span><i class="fas fa-check"></i> استخراج التقارير الرسمية (Word)</span>
+          </div>
         </div>
+
         <div class="admin-footer">
-          <i class="fas fa-calendar"></i>
-          انضم: {{ admin.joinDate | date:'yyyy/MM/dd' }}
+          <i class="fas fa-calendar-check"></i>
+          <span>تاريخ الترقية / الانضمام: {{ admin.joinDate || 'معتمد' }}</span>
         </div>
       </div>
     }
   </div>
 
+  <!-- النافذة المنبثقة: ترقية أو إنشاء مدير جديد -->
   @if (showAddModal()) {
-    <div class="modal-backdrop" (click)="showAddModal.set(false)"></div>
-    <div class="modal">
-      <h2><i class="fas fa-user-plus"></i> إضافة مدير جديد</h2>
-      <div class="form-group">
-        <label>الاسم</label>
-        <input type="text" placeholder="اسم المدير"
-               (input)="updateField('name', $any($event.target).value)" />
-      </div>
-      <div class="form-group">
-        <label>الإيميل</label>
-        <input type="email" placeholder="email@example.com"
-               (input)="updateField('email', $any($event.target).value)" />
-      </div>
-      <h3>الصلاحيات</h3>
-      <div class="permissions-form">
-        <label>
-          <input type="checkbox" checked
-            (change)="updatePermission('manageApplications', $any($event.target).checked)" />
-          إدارة طلبات التجار
-        </label>
-        <label>
-          <input type="checkbox" checked
-            (change)="updatePermission('manageUsers', $any($event.target).checked)" />
-          إدارة المستخدمين
-        </label>
-        <label>
-          <input type="checkbox" checked
-            (change)="updatePermission('manageReports', $any($event.target).checked)" />
-          إدارة البلاغات
-        </label>
-        <label>
-          <input type="checkbox"
-            (change)="updatePermission('manageCategories', $any($event.target).checked)" />
-          إدارة التصنيفات
-        </label>
-        <label>
-          <input type="checkbox"
-            (change)="updatePermission('manageSeasons', $any($event.target).checked)" />
-          إدارة المواسم
-        </label>
-        <label>
-          <input type="checkbox"
-            (change)="updatePermission('manageAdmins', $any($event.target).checked)" />
-          إدارة المدراء
-        </label>
-      </div>
-      <div class="modal-actions">
-        <button class="save-btn" (click)="saveAdmin()">
-          <i class="fas fa-check"></i> حفظ
-        </button>
-        <button class="cancel-btn" (click)="showAddModal.set(false)">
-          <i class="fas fa-times"></i> إلغاء
+    <div class="modal-backdrop" (click)="closeAddModal()"></div>
+    <div class="wizard-modal">
+      
+      <!-- رأس النافذة المنبثقة البنفسجي الأنيق -->
+      <div class="wizard-header">
+        <div class="header-title">
+          <div class="header-icon">
+            <i class="fas fa-user-shield"></i>
+          </div>
+          <div>
+            <h2>ترقية وإضافة مدير نظام</h2>
+            <p>ترقية مستخدم مسجل مسبقاً أو إنشاء حساب مدير جديد</p>
+          </div>
+        </div>
+        <button class="btn-close-modal" (click)="closeAddModal()" aria-label="إغلاق">
+          <i class="fas fa-times"></i>
         </button>
       </div>
+
+      <!-- تبويبات الاختيار -->
+      @if (currentStep() !== 3) {
+        <div class="modal-tabs">
+          <button class="tab-btn"
+                  [class.active]="modalMode() === 'existing'"
+                  (click)="switchModalMode('existing')">
+            <i class="fas fa-search"></i>
+            <span>ترقية مستخدم مسجل مسبقاً</span>
+          </button>
+          <button class="tab-btn"
+                  [class.active]="modalMode() === 'new'"
+                  (click)="switchModalMode('new')">
+            <i class="fas fa-user-plus"></i>
+            <span>إنشاء حساب مدير جديد من الصفر</span>
+          </button>
+        </div>
+      }
+
+      <!-- تنبيهات الأخطاء أو النجاح -->
+      @if (errorMessage()) {
+        <div class="alert alert-error">
+          <i class="fas fa-circle-exclamation"></i>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+      @if (successMessage()) {
+        <div class="alert alert-success">
+          <i class="fas fa-circle-check"></i>
+          <span>{{ successMessage() }}</span>
+        </div>
+      }
+
+      <div class="wizard-body">
+        
+        <!-- الوضع الأول: ترقية مستخدم موجود مسبقاً -->
+        @if (modalMode() === 'existing' && currentStep() !== 3) {
+          <div class="existing-user-promote-section">
+            <div class="info-callout">
+              <i class="fas fa-shield-alt"></i>
+              <div>
+                <strong>الترقية المباشرة لحساب مسجل:</strong>
+                <p>لا تحتاج لمعرفة كلمة المرور الخاصة بالمستخدم. سيواصل الدخول بحسابه وكلمة مروره السرية المعتادة، وستُفتح له صلاحيات لوحة الإدارة فوراً.</p>
+              </div>
+            </div>
+
+            <!-- شريط البحث السريع عن المستخدم -->
+            <div class="search-user-box">
+              <label>ابحث عن المستخدم بالاسم أو البريد الإلكتروني:</label>
+              <div class="search-input-wrap">
+                <i class="fas fa-search search-ico"></i>
+                <input type="text"
+                       [value]="userSearchQuery()"
+                       (input)="onSearchUsers($any($event.target).value)"
+                       placeholder="اكتب اسم المستخدم أو بريده الإلكتروني..." />
+                @if (isSearchingUsers()) {
+                  <i class="fas fa-spinner fa-spin spinner-ico"></i>
+                }
+              </div>
+            </div>
+
+            <!-- قائمة المستخدمين للاختيار منهم -->
+            <div class="users-quick-list">
+              @for (user of searchResults(); track user.id) {
+                <div class="user-select-item"
+                     [class.selected]="selectedUserToPromote()?.id === user.id"
+                     (click)="selectUserToPromote(user)">
+                  <div class="user-select-avatar">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div class="user-select-meta">
+                    <h4>{{ user.full_name }}</h4>
+                    <p>{{ user.email }}</p>
+                    <div class="user-role-row">
+                      <span class="user-role-tag" [class.seller]="user.role === 'seller'">
+                        {{ user.role === 'seller' ? 'تاجر' : 'زبون' }}
+                      </span>
+                      @if (user.role === 'seller' || user.shop) {
+                        <span class="shop-alert-tag">
+                          <i class="fas fa-store"></i> لديه متجر
+                        </span>
+                      }
+                    </div>
+                  </div>
+                  <div class="select-check">
+                    @if (selectedUserToPromote()?.id === user.id) {
+                      <i class="fas fa-check-circle"></i>
+                    } @else {
+                      <i class="far fa-circle"></i>
+                    }
+                  </div>
+                </div>
+              } @empty {
+                @if (!isSearchingUsers()) {
+                  <div class="empty-search">
+                    <i class="fas fa-user-slash"></i>
+                    <p>لا يوجد مستخدمون يطابقون البحث، جرب كتابة اسم أو إيميل آخر.</p>
+                  </div>
+                }
+              }
+            </div>
+
+            <!-- تفاصيل المستخدم المختار وزر الترقية -->
+            @if (selectedUserToPromote()) {
+              <div class="selected-user-card">
+                <div class="card-top">
+                  <div class="avatar"><i class="fas fa-crown"></i></div>
+                  <div>
+                    <h3>{{ selectedUserToPromote()!.full_name }}</h3>
+                    <p>{{ selectedUserToPromote()!.email }}</p>
+                  </div>
+                </div>
+
+                @if (selectedUserToPromote()!.role === 'seller' || selectedUserToPromote()!.shop) {
+                  <div class="store-warning-notice">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    <div>
+                      <strong>تنبيه حذف المتجر:</strong>
+                      <span>هذا المستخدم لديه متجر ({{ selectedUserToPromote()!.shop?.business_name || 'متجر مسجل' }}). عند ترقيته، سيتم تنبيهه بإلزامية حذف متجره لمنع تضارب الصلاحيات.</span>
+                    </div>
+                  </div>
+                }
+
+                <div class="card-prompt">
+                  <i class="fas fa-info-circle"></i>
+                  <span>سيتم تحويل رتبة هذا الحساب فوراً إلى <strong>مدير نظام (Admin)</strong>.</span>
+                </div>
+                <button class="btn-execute-promote"
+                        (click)="promoteSelectedUser()"
+                        [disabled]="isLoading()">
+                  @if (isLoading()) {
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>جاري ترقية المستخدم...</span>
+                  } @else {
+                    <i class="fas fa-crown"></i>
+                    <span>تأكيد ترقية {{ selectedUserToPromote()!.full_name }} إلى مدير</span>
+                  }
+                </button>
+              </div>
+            }
+
+            <div class="wizard-actions">
+              <button type="button" class="btn-secondary" (click)="closeAddModal()">
+                إلغاء
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- الوضع الثاني: إنشاء حساب جديد من الصفر -->
+        @if (modalMode() === 'new' && currentStep() !== 3) {
+          
+          <div class="wizard-steps">
+            <div class="step-item" [class.active]="currentStep() === 1" [class.done]="currentStep() > 1">
+              <div class="step-num">
+                @if (currentStep() > 1) { <i class="fas fa-check"></i> } @else { 1 }
+              </div>
+              <span>بيانات الحساب الجديد</span>
+            </div>
+            <div class="step-line" [class.active]="currentStep() >= 2"></div>
+            <div class="step-item" [class.active]="currentStep() === 2" [class.done]="currentStep() > 2">
+              <div class="step-num">
+                @if (currentStep() > 2) { <i class="fas fa-check"></i> } @else { 2 }
+              </div>
+              <span>رمز التحقق والترقية</span>
+            </div>
+          </div>
+
+          @if (currentStep() === 1) {
+            <form [formGroup]="adminForm" (ngSubmit)="onSubmitStep1()" class="step-form">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>الاسم الكامل <span class="required">*</span></label>
+                  <div class="input-wrap">
+                    <i class="fas fa-user"></i>
+                    <input type="text" formControlName="full_name" placeholder="مثال: أحمد عبد الله" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>اسم المستخدم <span class="required">*</span></label>
+                  <div class="input-wrap">
+                    <i class="fas fa-at"></i>
+                    <input type="text" formControlName="username" placeholder="مثال: ahmed_admin" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>البريد الإلكتروني <span class="required">*</span></label>
+                  <div class="input-wrap">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" formControlName="email" placeholder="admin@example.ly" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>رقم الهاتف الليبي <span class="required">*</span></label>
+                  <div class="input-wrap">
+                    <i class="fas fa-phone"></i>
+                    <input type="tel" formControlName="phone_number" placeholder="مثال: 0912345678" />
+                  </div>
+                </div>
+
+                <div class="form-group full-width">
+                  <label>المدينة / العنوان <span class="required">*</span></label>
+                  <div class="input-wrap">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <input type="text" formControlName="address" placeholder="مثال: طرابلس - زاوية الدهماني" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>كلمة المرور (8 خانات كحد أدنى) <span class="required">*</span></label>
+                  <div class="input-wrap">
+                    <i class="fas fa-lock"></i>
+                    <input [type]="showPassword() ? 'text' : 'password'" formControlName="password" placeholder="••••••••" />
+                    <button type="button" class="btn-toggle-eye" (click)="showPassword.set(!showPassword())">
+                      <i class="fas" [class.fa-eye]="!showPassword()" [class.fa-eye-slash]="showPassword()"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>تأكيد كلمة المرور <span class="required">*</span></label>
+                  <div class="input-wrap">
+                    <i class="fas fa-lock"></i>
+                    <input [type]="showPassword() ? 'text' : 'password'" formControlName="password_confirmation" placeholder="••••••••" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="wizard-actions">
+                <button type="button" class="btn-secondary" (click)="closeAddModal()">
+                  إلغاء
+                </button>
+                <button type="submit" class="btn-primary" [disabled]="isLoading() || adminForm.invalid">
+                  @if (isLoading()) {
+                    <i class="fas fa-spinner fa-spin"></i> جاري تسجيل الحساب...
+                  } @else {
+                    <span>التالي: إرسال رمز التحقق</span>
+                    <i class="fas fa-arrow-left"></i>
+                  }
+                </button>
+              </div>
+            </form>
+          }
+
+          @if (currentStep() === 2) {
+            <div class="otp-step">
+              <div class="otp-desc">
+                <div class="otp-mail-icon">
+                  <i class="fas fa-envelope-open-text"></i>
+                </div>
+                <p>تم إرسال رمز التحقق المكون من 4 أرقام إلى البريد الإلكتروني:</p>
+                <strong>{{ registeredEmail() }}</strong>
+              </div>
+
+              <div class="otp-input-box">
+                <label>أدخل رمز التحقق (OTP)</label>
+                <input type="text"
+                       maxlength="6"
+                       [value]="otpCode()"
+                       (input)="otpCode.set($any($event.target).value)"
+                       placeholder="مثال: 1234"
+                       class="otp-field" />
+              </div>
+
+              <div class="otp-resend">
+                @if (resendCooldown() > 0) {
+                  <span class="cooldown-text">
+                    <i class="fas fa-clock"></i> يمكنك إعادة الإرسال بعد: {{ resendCooldown() }} ثانية
+                  </span>
+                } @else {
+                  <button type="button" class="btn-resend" (click)="onResendOtp()" [disabled]="isResending()">
+                    @if (isResending()) {
+                      <i class="fas fa-spinner fa-spin"></i> جاري الإرسال...
+                    } @else {
+                      <i class="fas fa-rotate-right"></i> إعادة إرسال الرمز
+                    }
+                  </button>
+                }
+              </div>
+
+              <div class="wizard-actions">
+                <button type="button" class="btn-secondary" (click)="currentStep.set(1)" [disabled]="isLoading()">
+                  <i class="fas fa-arrow-right"></i> تعديل البيانات
+                </button>
+                <button type="button" class="btn-primary btn-promote" (click)="onSubmitStep2()" [disabled]="isLoading() || otpCode().length < 4">
+                  @if (isLoading()) {
+                    <i class="fas fa-spinner fa-spin"></i> جاري التحقق وترقية المدير...
+                  } @else {
+                    <i class="fas fa-shield-alt"></i>
+                    <span>تحقق وترقية إلى مسؤول (Admin)</span>
+                  }
+                </button>
+              </div>
+            </div>
+          }
+        }
+
+        <!-- الخطوة 3: اكتمال الترقية بنجاح -->
+        @if (currentStep() === 3) {
+          <div class="success-step">
+            <div class="success-icon-wrap">
+              <i class="fas fa-circle-check"></i>
+            </div>
+            <h3>تهانينا! تمت ترقية المسؤول بنجاح</h3>
+            <p class="success-msg">
+              تمت ترقية <strong>{{ promotedAdminName() }}</strong> برتبة مسؤول رسمي في النظام.
+            </p>
+
+            @if (promotedHasShop()) {
+              <div class="success-shop-delete-alert">
+                <div class="alert-ico">
+                  <i class="fas fa-store-slash"></i>
+                </div>
+                <div class="alert-txt">
+                  <h4>إشعار حذف المتجر الشخصي:</h4>
+                  <p>تم إرسال إشعار للمدير الجديد بوجوب حذف متجره ({{ promotedShopName() || 'المتجر الشخصي' }}) منعاً لتضارب الصلاحيات وفق لوائح المنصة.</p>
+                </div>
+              </div>
+            }
+
+            <div class="admin-details-card">
+              <div class="detail-row">
+                <span>الاسم:</span>
+                <strong>{{ promotedAdminName() }}</strong>
+              </div>
+              <div class="detail-row">
+                <span>البريد الإلكتروني:</span>
+                <strong>{{ promotedAdminEmail() }}</strong>
+              </div>
+              <div class="detail-row">
+                <span>الرتبة الجديدة:</span>
+                <span class="badge-admin"><i class="fas fa-shield-alt"></i> مدير نظام (Admin)</span>
+              </div>
+            </div>
+
+            <div class="wizard-actions centered">
+              <button type="button" class="btn-secondary" (click)="closeAddModal()">
+                إغلاق والعودة للمدراء
+              </button>
+              <button type="button" class="btn-primary" (click)="goToDashboard()">
+                <i class="fas fa-chart-line"></i>
+                <span>التوجه إلى لوحة التحكم (الداشبورد)</span>
+              </button>
+            </div>
+          </div>
+        }
+
+      </div>
+
     </div>
   }
+
 </div>

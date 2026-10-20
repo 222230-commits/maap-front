@@ -730,3 +730,115 @@
   from { transform: scale(0.94); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
+
+/* Export Word Report Card in Merchant Dashboard */
+.m-export-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
+  border: 1px solid var(--border-light, #e2e8f0);
+  border-radius: 18px;
+  padding: 22px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: 0 4px 16px rgba(28, 59, 43, 0.05);
+  margin-top: 10px;
+  transition: all 0.25s ease;
+
+  &:hover {
+    box-shadow: 0 6px 24px rgba(28, 59, 43, 0.09);
+    border-color: #cbd5e1;
+  }
+}
+
+.m-export-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.m-export-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: #EFF6FF;
+  color: #2563EB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+}
+
+.m-export-text {
+  h4 {
+    font-family: 'Tajawal', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--text-dark, #1e293b);
+    margin: 0 0 4px;
+  }
+  p {
+    font-family: 'Tajawal', sans-serif;
+    font-size: 0.82rem;
+    color: var(--text-soft, #64748b);
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+.btn-m-export {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #1C3B2B 0%, #2A543E 100%);
+  color: #ffffff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(28, 59, 43, 0.22);
+  transition: all 0.2s ease;
+
+  i {
+    font-size: 1.05rem;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(28, 59, 43, 0.32);
+    background: linear-gradient(135deg, #163023 0%, #224533 100%);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+@media (max-width: 768px) {
+  .m-export-card {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    padding: 18px;
+  }
+  .m-export-info {
+    flex-direction: column;
+    text-align: center;
+  }
+  .btn-m-export {
+    justify-content: center;
+    width: 100%;
+  }
+}
+

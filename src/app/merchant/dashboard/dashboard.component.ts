@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { MerchantService, MerchantDashboardResponse } from '../../core/services/merchant.service';
 import { ProductService } from '../../core/services/product.service';
 import { AuthService } from '../../core/services/auth.service';
+import { ReportExportService } from '../../core/services/report-export.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,10 +15,12 @@ import { AuthService } from '../../core/services/auth.service';
 export class DashboardComponent implements OnInit {
   private merchantService = inject(MerchantService);
   private productService  = inject(ProductService);
+  private reportExportService = inject(ReportExportService);
   public router = inject(Router);
   public authService = inject(AuthService);
 
   isLoading = signal(true);
+  isExporting = signal(false);
   error = signal('');
   isSuspended = signal(false);
   showSuspendedModal = signal(false);
@@ -128,5 +131,42 @@ export class DashboardComponent implements OnInit {
 
   goTo(path: string): void {
     this.router.navigate([path]);
+  }
+
+  async exportDocxReport(): Promise<void> {
+    const data = this.dashData();
+    if (!data || this.isExporting() || this.isLoading()) return;
+    this.isExporting.set(true);
+    try {
+      await this.reportExportService.exportMerchantDashboardDocx({
+        shopInfo: data.shop_info ? {
+          name: data.shop_info.name,
+          is_active: data.shop_info.is_active,
+          status_text: data.shop_info.status_text
+        } : null,
+        rating: data.general_rating,
+        cards: {
+          products: data.cards.products_count,
+          followers: data.cards.followers_count,
+          total_orders: data.cards.total_orders,
+          completed: data.cards.completed_orders
+        },
+        stockAlerts: this.stockAlerts(),
+        analytics: data.analytics_and_growth ? {
+          highest_sales_day: data.analytics_and_growth.highest_sales_day,
+          most_active_month: data.analytics_and_growth.most_active_month,
+          order_growth: data.analytics_and_growth.order_growth
+        } : null,
+        orderChart: data.order_analytics_chart ? {
+          completed_percent: data.order_analytics_chart.completed_percent,
+          pending_percent: data.order_analytics_chart.pending_percent
+        } : null,
+        merchantName: this.authService.currentUser()?.full_name || 'تاجر مآب'
+      });
+    } catch (err) {
+      console.error('Failed to export merchant report', err);
+    } finally {
+      this.isExporting.set(false);
+    }
   }
 }

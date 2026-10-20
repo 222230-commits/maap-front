@@ -1,6 +1,9 @@
 import { Component, computed, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AdminService, AdminBuyer, UsersResponse } from '../../core/services/admin.service';
+import { AuthService } from '../../core/services/auth.service';
+
+export const SUPER_ADMIN_EMAIL = 'hs350vae@gmail.com';
 
 @Component({
   selector: 'app-users',
@@ -10,7 +13,13 @@ import { AdminService, AdminBuyer, UsersResponse } from '../../core/services/adm
 })
 export class UsersComponent implements OnInit {
   private adminService = inject(AdminService);
+  private authService = inject(AuthService);
   private router = inject(Router);
+
+  isSuperAdmin = computed(() => {
+    const email = this.authService.currentUser()?.email?.toLowerCase()?.trim();
+    return email === SUPER_ADMIN_EMAIL;
+  });
 
   isLoading = signal(true);
   error = signal('');
@@ -29,6 +38,8 @@ export class UsersComponent implements OnInit {
   selectedUser = signal<AdminBuyer | null>(null);
   showProfileModal = signal(false);
   showDeleteConfirm = signal<string | null>(null);
+  showPromoteConfirm = signal<AdminBuyer | null>(null);
+  successNotification = signal<string>('');
   isDeleting = signal(false);
   isToggling = signal<string | null>(null);
   isPromotingId = signal<string | null>(null);
@@ -235,16 +246,61 @@ export class UsersComponent implements OnInit {
     this.showDeleteConfirm.set(null);
   }
 
-  promoteToAdmin(userId: string): void {
-    if (!confirm('هل أنت متأكد من ترقية هذا المستخدم إلى مدير؟')) return;
-    this.isPromotingId.set(userId);
-    this.adminService.promoteToAdmin(userId).subscribe({
+  openPromoteModal(user: AdminBuyer): void {
+    this.showPromoteConfirm.set(user);
+  }
+
+  cancelPromote(): void {
+    this.showPromoteConfirm.set(null);
+  }
+
+  confirmPromote(): void {
+    if (!this.isSuperAdmin()) {
+      this.error.set('عذراً، الترقية إلى رتبة مدير متاحة فقط للإدارة الرئيسية.');
+      this.showPromoteConfirm.set(null);
+      return;
+    }
+
+    const user = this.showPromoteConfirm();
+    if (!user) return;
+
+    this.isPromotingId.set(user.id);
+    this.adminService.promoteToAdmin(user.id).subscribe({
       next: () => {
         this.isPromotingId.set(null);
+
+        // إذا كان المستخدم تاجراً، نخزن تنبيه بوجوب تصفية المتجر
+        const isSeller = user.role === 'seller' || !!user.shop;
+        if (isSeller) {
+          try {
+            localStorage.setItem(`admin_must_delete_shop_${user.id}`, 'true');
+            const sName = user.shop?.business_name || '';
+            if (sName) {
+              localStorage.setItem(`admin_shop_name_${user.id}`, sName);
+            }
+          } catch {}
+        }
+        // إعادة تعيين إشعار الترحيب كي تظهر له نافذة الترقية فور دخوله
+        try {
+          localStorage.removeItem(`has_seen_admin_welcome_${user.id}`);
+        } catch {}
+
+        this.showPromoteConfirm.set(null);
+        this.showProfileModal.set(false);
+        this.successNotification.set(`تمت ترقية ${user.full_name} إلى مدير نظام (Admin) بنجاح!`);
+        setTimeout(() => this.successNotification.set(''), 4500);
         this.loadUsers();
       },
-      error: () => this.isPromotingId.set(null)
+      error: (err) => {
+        this.isPromotingId.set(null);
+        this.showPromoteConfirm.set(null);
+        this.error.set(err?.error?.message || 'فشلت عملية الترقية إلى مدير. يرجى المحاولة لاحقاً.');
+      }
     });
+  }
+
+  goToAdmins(): void {
+    this.router.navigate(['/admin/admins']);
   }
 
   deleteUser(id: string): void {

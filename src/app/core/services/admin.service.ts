@@ -316,10 +316,14 @@ export class AdminService {
     return this.http.post<any>(`${this.BASE}/admin/categories/${id}/restore`, {});
   }
 
-  // POST /admin/management/users/{id}/promote-to-admin
+  // POST /admin/users/{id}/promote-to-admin (مع fallback لـ /admin/management/users/{id}/promote-to-admin)
   promoteToAdmin(userId: string): Observable<ApiResponse> {
     return this.http.post<ApiResponse>(
-      `${this.BASE}/admin/management/users/${userId}/promote-to-admin`, {}
+      `${this.BASE}/admin/users/${userId}/promote-to-admin`, {}
+    ).pipe(
+      catchError(() => this.http.post<ApiResponse>(
+        `${this.BASE}/admin/management/users/${userId}/promote-to-admin`, {}
+      ))
     );
   }
 

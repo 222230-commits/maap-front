@@ -304,6 +304,32 @@
           </div>
         </div>
 
+        <!-- قسم تصدير تقرير الـ Word في نهاية الداشبورد -->
+        <div class="m-export-card">
+          <div class="m-export-info">
+            <div class="m-export-icon">
+              <i class="fas fa-file-word"></i>
+            </div>
+            <div class="m-export-text">
+              <h4>تقرير أداء ونشاط المتجر (Word)</h4>
+              <p>تنزيل تقرير رسمي بصيغة .docx يتضمن مؤشرات المتجر، الطلبات، تنبيهات المخزون، والتحليلات.</p>
+            </div>
+          </div>
+          <button class="btn-m-export"
+                  type="button"
+                  (click)="exportDocxReport()"
+                  [disabled]="isExporting() || isLoading()"
+                  title="تنزيل تقرير أداء المتجر بصيغة Word">
+            @if (isExporting()) {
+              <i class="fas fa-spinner fa-spin"></i>
+              <span>جاري تجهيز التقرير...</span>
+            } @else {
+              <i class="fas fa-file-arrow-down"></i>
+              <span>تنزيل تقرير المتجر (Word)</span>
+            }
+          </button>
+        </div>
+
       }
 
       <!-- حالة الخطأ عند تعذر تحميل البيانات بدون إيقاف وبدون أن يكون أدمن -->

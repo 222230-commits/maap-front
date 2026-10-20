@@ -111,4 +111,58 @@
       <router-outlet />
     </div>
   </main>
+
+  <!-- نافذة التهنئة بالترقية إلى مدير وإشعار حذف المتجر -->
+  @if (showPromotedWelcome()) {
+    <div class="promoted-welcome-backdrop" (click)="dismissPromotedWelcome()"></div>
+    <div class="promoted-welcome-modal" role="dialog" aria-modal="true">
+      <div class="welcome-header">
+        <div class="welcome-crown-icon">
+          <i class="fas fa-crown"></i>
+        </div>
+        <h3 class="welcome-title">مبارك! تم ترقية حسابك إلى مدير (Admin)</h3>
+        <p class="welcome-sub">أهلاً بك في الفريق الإداري لمنصة مآب</p>
+      </div>
+
+      <div class="welcome-body">
+        <div class="welcome-info-card">
+          <i class="fas fa-shield-alt"></i>
+          <div>
+            <strong>تم منحك الصلاحيات الإدارية للمنصة:</strong>
+            <p>يمكنك الآن الإشراف على المنتجات والتصنيفات، معالجة طلبات التجار، ومتابعة البلاغات والإعلانات في مآب.</p>
+          </div>
+        </div>
+
+        @if (mustDeleteShop()) {
+          <div class="welcome-shop-alert">
+            <div class="shop-alert-badge">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>تنبيه إداري إلزامي لمنع تضارب المصالح</span>
+            </div>
+            <h4 class="shop-alert-title">
+              <i class="fas fa-store-slash"></i>
+              <span>يتوجب عليك تصفية أو حذف متجرك الشخصي @if (promotedShopName()) { ({{ promotedShopName() }}) }</span>
+            </h4>
+            <p class="shop-alert-desc">
+              حفاظاً على معايير الحوكمة والشفافية والنزاهة الإدارية المعتمدة في منصة مآب، يُحظر على أعضاء الفريق الإداري امتلاك متاجر نشطة على المنصة. يرجى تصفية مبيعاتك الحالية أو حذف المتجر فوراً للتفرغ الكامل للمهام الإدارية.
+            </p>
+          </div>
+        }
+
+        <div class="welcome-features-list">
+          <div class="feat-item"><i class="fas fa-check-circle"></i><span>الإشراف على المستخدمين والتجار والطلبات</span></div>
+          <div class="feat-item"><i class="fas fa-check-circle"></i><span>مراجعة المنتجات والتصنيفات والبلاغات</span></div>
+          <div class="feat-item"><i class="fas fa-check-circle"></i><span>تصدير التقارير الإدارية المعتمدة بصيغة Word</span></div>
+        </div>
+      </div>
+
+      <div class="welcome-footer">
+        <button type="button" class="btn-welcome-confirm" (click)="dismissPromotedWelcome()">
+          <span>فهمت ذلك، الدخول للوحة التحكم</span>
+          <i class="fas fa-arrow-left"></i>
+        </button>
+      </div>
+    </div>
+  }
 </div>
+

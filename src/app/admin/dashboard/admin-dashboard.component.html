@@ -296,6 +296,32 @@
           </div>
         }
 
+        <!-- قسم تصدير تقرير الـ Word في نهاية الداشبورد -->
+        <div class="dash-export-card">
+          <div class="dash-export-info">
+            <div class="dash-export-icon">
+              <i class="fas fa-file-word"></i>
+            </div>
+            <div class="dash-export-text">
+              <h4>تقرير إحصائيات النظام الشامل (Word)</h4>
+              <p>تنزيل تقرير رسمي منسق بصيغة .docx يتضمن مؤشرات المنصة، الحسابات، طلبات التجار، والأنشطة.</p>
+            </div>
+          </div>
+          <button class="btn-dash-export"
+                  type="button"
+                  (click)="exportDocxReport()"
+                  [disabled]="isExporting() || isLoading()"
+                  title="تنزيل تقرير إحصائيات النظام بصيغة Word">
+            @if (isExporting()) {
+              <i class="fas fa-spinner fa-spin"></i>
+              <span>جاري تجهيز التقرير...</span>
+            } @else {
+              <i class="fas fa-file-arrow-down"></i>
+              <span>تنزيل التقرير (Word)</span>
+            }
+          </button>
+        </div>
+
       }
     </div>
 

@@ -9,23 +9,39 @@
       <p class="page-sub">{{ displayRange() }}</p>
     </div>
 
-    @if (countsSummary().buyers !== null || countsSummary().sellers !== null) {
-      <div class="stats-pills">
-        <span class="stat-pill buyers">
-          <i class="fas fa-shopping-bag"></i>
-          <span>الزبائن: <strong>{{ countsSummary().buyers ?? 0 }}</strong></span>
-        </span>
-        <span class="stat-pill sellers">
-          <i class="fas fa-store"></i>
-          <span>التجار: <strong>{{ countsSummary().sellers ?? 0 }}</strong></span>
-        </span>
-        <span class="stat-pill total">
-          <i class="fas fa-users"></i>
-          <span>الإجمالي: <strong>{{ countsSummary().total }}</strong></span>
-        </span>
-      </div>
-    }
+    <div class="topbar-left-actions">
+      @if (countsSummary().buyers !== null || countsSummary().sellers !== null) {
+        <div class="stats-pills">
+          <span class="stat-pill buyers">
+            <i class="fas fa-shopping-bag"></i>
+            <span>الزبائن: <strong>{{ countsSummary().buyers ?? 0 }}</strong></span>
+          </span>
+          <span class="stat-pill sellers">
+            <i class="fas fa-store"></i>
+            <span>التجار: <strong>{{ countsSummary().sellers ?? 0 }}</strong></span>
+          </span>
+          <span class="stat-pill total">
+            <i class="fas fa-users"></i>
+            <span>الإجمالي: <strong>{{ countsSummary().total }}</strong></span>
+          </span>
+        </div>
+      }
+
+      @if (isSuperAdmin()) {
+        <button class="btn-nav-add-admin" (click)="goToAdmins()" title="إضافة مدير جديد وترقيته">
+          <i class="fas fa-user-shield"></i>
+          <span>إضافة مدير جديد</span>
+        </button>
+      }
+    </div>
   </div>
+
+  @if (successNotification()) {
+    <div class="users-success-banner">
+      <i class="fas fa-circle-check"></i>
+      <span>{{ successNotification() }}</span>
+    </div>
+  }
 
   <div class="admin-content">
 
@@ -145,6 +161,11 @@
               </div>
               <div class="user-actions">
                 <button class="action-btn view" (click)="openProfile(user)" title="عرض التفاصيل"><i class="fas fa-eye"></i></button>
+                @if (isSuperAdmin()) {
+                  <button class="action-btn promote" [disabled]="isPromotingId() === user.id" (click)="openPromoteModal(user)" title="ترقية إلى مدير نظام (Admin)">
+                    @if (isPromotingId() === user.id) { <i class="fas fa-spinner fa-spin"></i> } @else { <i class="fas fa-crown"></i> }
+                  </button>
+                }
                 <button class="action-btn toggle" [class.is-active]="user.is_active" [disabled]="isToggling() === user.id" (click)="toggleStatus(user)" [title]="user.is_active ? 'حظر الحساب' : 'تفعيل الحساب'">
                   @if (isToggling() === user.id) { <i class="fas fa-spinner fa-spin"></i> } @else if (user.is_active) { <i class="fas fa-ban"></i> } @else { <i class="fas fa-check-circle"></i> }
                 </button>
@@ -238,6 +259,51 @@
             @if (selectedUser()!.is_active) { <i class="fas fa-check-circle"></i> حساب نشط } @else { <i class="fas fa-ban"></i> حساب محظور }
           </span>
         </div>
+
+        @if (isSuperAdmin()) {
+          <div class="modal-promote-box">
+            <button class="btn-promote-in-modal"
+                    [disabled]="isPromotingId() === selectedUser()!.id"
+                    (click)="openPromoteModal(selectedUser()!)">
+              <i class="fas fa-crown"></i>
+              <span>ترقية هذا الحساب إلى مدير نظام (Admin)</span>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (showPromoteConfirm()) {
+    <div class="modal-backdrop" (click)="cancelPromote()"></div>
+    <div class="confirm-modal promote-dialog">
+      <div class="confirm-icon promote"><i class="fas fa-crown"></i></div>
+      <h3>ترقية إلى مدير نظام</h3>
+      <p>هل أنت متأكد من ترقية <strong>{{ showPromoteConfirm()!.full_name }}</strong> إلى رتبة مدير نظام (Admin)؟</p>
+
+      @if (showPromoteConfirm()!.role === 'seller' || showPromoteConfirm()!.shop) {
+        <div class="promote-shop-alert">
+          <i class="fas fa-store-slash"></i>
+          <div>
+            <strong>تنبيه خاص بالمتجر:</strong>
+            <p>هذا الحساب يمتلك متجراً @if (showPromoteConfirm()!.shop?.business_name) { ({{ showPromoteConfirm()!.shop?.business_name }}) }. سيتم إشعاره رسمياً بوجوب حذف أو تصفية متجره لتجنب أي تضارب في المصالح الإدارية.</p>
+          </div>
+        </div>
+      }
+
+      <div class="promote-note">
+        <i class="fas fa-info-circle"></i>
+        <span>سيحصل هذا الحساب على صلاحيات الإدارة والتحكم في المنصة.</span>
+      </div>
+      <div class="confirm-actions">
+        <button class="btn-confirm-promote" (click)="confirmPromote()" [disabled]="isPromotingId() === showPromoteConfirm()!.id">
+          @if (isPromotingId() === showPromoteConfirm()!.id) {
+            <i class="fas fa-spinner fa-spin"></i> جاري الترقية...
+          } @else {
+            <i class="fas fa-crown"></i> تأكيد الترقية لأدمن
+          }
+        </button>
+        <button class="btn-cancel" (click)="cancelPromote()">إلغاء</button>
       </div>
     </div>
   }
