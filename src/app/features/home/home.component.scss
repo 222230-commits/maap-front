@@ -572,6 +572,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  text-decoration: none;
 }
 
 .btn-about-outline:hover { border-color: var(--primary); background: var(--primary-light); }
